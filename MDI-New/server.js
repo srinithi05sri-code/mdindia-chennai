@@ -144,6 +144,10 @@ async function testDatabase() {
         console.log("MYSQLPORT:", process.env.MYSQLPORT);
         console.log("MYSQLUSER:", process.env.MYSQLUSER);
         console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+        console.log(
+            "MYSQLPASSWORD:",
+            process.env.MYSQLPASSWORD ? "SET" : "NOT SET"
+        );
 
         const connection = await db.getConnection();
 
