@@ -339,8 +339,8 @@ app.post("/login", async (req, res) => {
                     department,
                     is_active
                 FROM users
-                WHERE employee_id = ?
-                  AND password = ?
+                WHERE LOWER(TRIM(employee_id)) = LOWER(TRIM(?))
+      AND password = ?
                   AND is_active = TRUE
                 LIMIT 1
                 `,
