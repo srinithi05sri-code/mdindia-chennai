@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload Dashboard</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="upload-dashboard">
+
+<div class="upload-content">
+  <header class="upload-header">
+     <div class="header-left">
+                <h1>Upload Dashboard</h1>
+
+                <p class="welcome-text">
+                    Welcome, <strong><%= user.username %></strong>
+                </p>
+            </div>
+
+            <div class="header-right">
+                <a href="/logout" class="logout-btn">
+                    Logout
+                </a>
+            </div>
+  </header>
+
+    <hr>
+
+    <!-- Upload Section -->
+
+    <div class="upload-box">
+
+        <h2>Upload Claims Excel</h2>
+
+        <p class="info">
+            Upload the approved Excel format containing claim details.
+        </p>
+
+        <form
+            action="/upload-excel"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <div class="file-box">
+
+                <label for="excelFile">
+                    Select Excel File
+                </label>
+
+                <input
+                    type="file"
+                    id="excelFile"
+                    name="excelFile"
+                    accept=".xlsx,.xls"
+                    required
+                >
+
+            </div>
+
+            <button type="submit" class="upload-btn">
+                Upload Excel
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Uploaded Files -->
+
+    <div class="upload-card">
+
+        <h2>Upload History</h2>
+
+        <table class="claims-table">
+
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Upload Time</th>
+                    <th>Total Claims</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <% if (uploads && uploads.length > 0) { %>
+
+                    <% uploads.forEach(upload => { %>
+
+                        <tr>
+
+                            <td>
+                                <%= upload.file_name %>
+                            </td>
+
+                            <td>
+                                <%= upload.uploaded_at %>
+                            </td>
+
+                            <td>
+                                <%= upload.total_claims %>
+                            </td>
+
+                            <td>
+                                <%= upload.status %>
+                            </td>
+
+                            <td>
+
+                                <% if (upload.status === "ACTIVE") { %>
+
+                                    <form
+                                       action="/delete-upload/<%= upload.id %>"
+                                        method="POST"
+                                        onsubmit="return confirm('Delete this upload and its claims?');"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="delete-btn"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                <% } %>
+
+                            </td>
+
+                        </tr>
+
+                    <% }) %>
+
+                <% } else { %>
+
+                    <tr>
+
+                        <td colspan="5">
+                            No Excel files uploaded yet.
+                        </td>
+
+                    </tr>
+
+                <% } %>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

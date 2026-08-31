@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body class="dashboard-container">
+
+     <div class="">
+
+        <header class="dashboard-header">
+
+            <div class="">
+                <h1>Admin Dashboard</h1>
+
+                <p class="welcome-text">
+                    Welcome, <strong><%= user.username %></strong>
+                </p>
+            </div>
+
+            <div class="">
+                <a href="/logout" class="logout-btn">
+                    Logout
+                </a>
+            </div>
+
+        </header>
+
+
+    
+
+<hr>
+
+<h2>Productivity Dashboard</h2>
+
+<div class="table-container">
+
+    <table class="productivity-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Platform</th>
+
+                <th>User Name</th>
+
+                <th>Total Allocated</th>
+
+                <th>Approved</th>
+
+                <th>Rejected</th>
+
+                <th>Query</th>
+
+                <th>Re-Query</th>
+
+                <th>Query + Investigation</th>
+
+                <th>Total Productivity</th>
+
+                <th>Investigation</th>
+
+                <th>Sent Back</th>
+
+                <th>Keep</th>
+
+                <th>Other Doctor & Executive</th>
+
+                <th>Pending</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <% processSummary.forEach(row => { %>
+
+                <tr>
+
+                    <td>
+                        <%= row.platform %>
+                    </td>
+
+                    <td>
+                        <%= row.user_name %>
+                    </td>
+
+                    <td>
+                        <%= row.total_allocated %>
+                    </td>
+
+                    <td>
+                        <%= row.approved %>
+                    </td>
+
+                    <td>
+                        <%= row.rejected %>
+                    </td>
+
+                    <td>
+                        <%= row.query_count %>
+                    </td>
+
+                    <td>
+                        <%= row.requery %>
+                    </td>
+
+                    <td>
+                        <%= row.investigation_query %>
+                    </td>
+
+                    <td class="productivity">
+
+                        <%= row.total_productivity %>
+
+                    </td>
+
+                    <td>
+                        <%= row.investigation %>
+                    </td>
+
+                    <td>
+                        <%= row.sent_back %>
+                    </td>
+
+                    <td>
+                        <%= row.keep_count %>
+                    </td>
+
+                    <td>
+                        <%= row.other_doctor_executive %>
+                    </td>
+
+                    <td>
+                        <%= row.pending %>
+                    </td>
+
+                </tr>
+
+            <% }) %>
+
+        </tbody>
+
+    </table>
+
+</div>
+    <hr>
+
+<h2>Claims Dump</h2>
+
+<a href="/admin/download-claims">
+    <button type="button" class="download-btn">
+        Download Updated Claims
+    </button>
+</a>
+
+    <hr>
+
+    <h2>Create New User</h2>
+
+    <form action="/admin/create-user" method="POST" class="form-group">
+
+        <label>Username</label>
+        <input
+            type="text"
+            name="username"
+            required
+        >
+
+        <br><br>
+
+        <label>Password</label>
+        <input
+            type="password"
+            name="password"
+            required
+        >
+
+        <br><br>
+
+        <label>Department</label>
+        <input
+            type="text"
+            name="department"
+            required
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Create User
+        </button>
+
+    </form>
+    <hr>
+
+<h2 class="reassign-form" >Reassign Claims</h2>
+
+<form action="/admin/reassign" method="POST" class="form-group"  >
+
+    <label class="form-group label">Leaving User</label>
+
+    <select name="oldUserId" required>
+
+        <option value="">Select User</option>
+
+        <% userList.forEach(u => { %>
+
+          
+
+                <option value="<%= u.id %>">
+                    <%= u.username %> - <%= u.department %>
+                </option>
+
+            
+
+        <% }) %>
+
+    </select>
+
+    <br><br>
+
+    <label>Assign To</label>
+
+    <select name="newUserId" required>
+
+        <option value="">Select New User</option>
+
+        <% userList.forEach(u => { %>
+
+           
+
+                <option value="<%= u.id %>">
+                    <%= u.username %> - <%= u.department %>
+                </option>
+
+            
+
+        <% }) %>
+
+    </select>
+
+    <br><br>
+
+    <button type="submit">
+        Reassign Claims
+    </button>
+
+</form>
+
+</body>
+</html>

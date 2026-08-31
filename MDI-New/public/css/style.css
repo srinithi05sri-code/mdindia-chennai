@@ -1,0 +1,1534 @@
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+/* =========================================
+   RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   LOGIN PAGE
+========================================= */
+
+body.login-page {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eaf2ff,
+            #f8fbff,
+            #eef5ff
+        );
+}
+
+
+/* =========================================
+   LOGIN BOX
+========================================= */
+
+.login-box {
+    width: 420px;
+
+    padding: 40px;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.12);
+
+    text-align: center;
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.login-logo {
+    width: 75px;
+    height: 75px;
+
+    margin: 0 auto 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 18px;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+
+    font-size: 28px;
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    box-shadow:
+        0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+
+/* =========================================
+   SUBTITLE
+========================================= */
+
+.login-subtitle {
+    color: #64748b;
+
+    font-size: 14px;
+
+    margin-bottom: 28px;
+}
+
+
+/* =========================================
+   LOGIN HEADING
+========================================= */
+
+.login-box h2 {
+    color: #1e293b;
+
+    font-size: 26px;
+
+    margin-bottom: 22px;
+}
+
+
+/* =========================================
+   ERROR MESSAGE
+========================================= */
+
+.error-message {
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+    border: 1px solid #fecaca;
+
+    padding: 11px 14px;
+
+    border-radius: 8px;
+
+    margin-bottom: 18px;
+
+    font-size: 14px;
+
+    text-align: left;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.form-group {
+    text-align: left;
+}
+
+
+.form-group > div {
+    margin-bottom: 18px;
+}
+
+
+/* =========================================
+   LABEL
+========================================= */
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   INPUT
+========================================= */
+
+.form-group input {
+    width: 100%;
+
+    height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #f8fafc;
+
+    color: #1e293b;
+
+    font-size: 14px;
+
+    transition: 0.2s ease;
+}
+
+
+.form-group input::placeholder {
+    color: #94a3b8;
+}
+
+
+.form-group input:focus {
+    border-color: #2563eb;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* =========================================
+   LOGIN BUTTON
+========================================= */
+
+.login-btn {
+    width: 100%;
+
+    height: 48px;
+
+    margin-top: 8px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+.login-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 500px) {
+
+    .login-box {
+        width: calc(100% - 30px);
+
+        padding: 30px 22px;
+    }
+
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+a {
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+/* =========================================================
+   USER DASHBOARD - CLAIM MANAGEMENT
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.user-dashboard {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f3f6fa;
+    color: #1f2937;
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.dashboard-container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.user-header {
+    width: 100%;
+    background: linear-gradient(135deg, #173f5f, #20639b);
+    color: white;
+    padding: 24px 30px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.user-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.user-header p {
+    font-size: 14px;
+    margin-top: 5px;
+    color: #e8f1f8;
+}
+
+.user-header strong {
+    color: white;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   LOGOUT BUTTON
+   ========================================================= */
+
+.logout-btn {
+    text-decoration: none;
+    background: white;
+    color: #173f5f;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: #e8f1f8;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   CLAIM SECTION
+   ========================================================= */
+
+.claims-section {
+    width: 100%;
+    background: white;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.claims-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.claims-title-row h2 {
+    font-size: 22px;
+    color: #173f5f;
+    font-weight: 700;
+}
+
+.table-info {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE CONTAINER
+   ========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+
+    max-height: 68vh;
+
+    border: 1px solid #dbe3ec;
+    border-radius: 10px;
+    background: white;
+}
+
+
+/* =========================================================
+   CLAIM TABLE
+   ========================================================= */
+
+.claim-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.claim-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    background: #173f5f;
+    color: white;
+
+    padding: 13px 14px;
+
+    text-align: left;
+    white-space: nowrap;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 2px solid #0f2f49;
+}
+
+
+/* Editable headers */
+
+.claim-table thead th.editable-header {
+    background: #0f766e;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.claim-table tbody td {
+    padding: 10px 12px;
+
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+
+    background: white;
+
+    white-space: nowrap;
+    vertical-align: middle;
+
+    color: #374151;
+}
+
+
+/* Alternate rows */
+
+.claim-table tbody tr:nth-child(even) td {
+    background: #f8fafc;
+}
+
+
+/* Hover */
+
+.claim-table tbody tr:hover td {
+    background: #eef6ff;
+}
+
+
+/* =========================================================
+   USER ID / USER NAME
+   ========================================================= */
+
+.user-id-cell {
+    font-weight: 700;
+    color: #173f5f !important;
+    background: #eef5fb !important;
+}
+
+.user-name-cell {
+    font-weight: 700;
+    color: #20639b !important;
+    background: #eef5fb !important;
+}
+
+
+/* =========================================================
+   EDITABLE CELLS
+   ========================================================= */
+
+.editable-cell {
+    background: #f0fdfa !important;
+    border-left: 1px solid #ccfbf1;
+}
+
+.editable-cell:hover {
+    background: #e6fffb !important;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.editable-input {
+    width: 140px;
+
+    padding: 8px 9px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+
+    background: white;
+
+    color: #111827;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition: border 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.editable-input:focus {
+    border-color: #0f766e;
+
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.editable-select {
+    min-width: 150px;
+
+    padding: 8px 30px 8px 9px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+
+    background: white;
+
+    color: #111827;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    outline: none;
+
+    transition: border 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.editable-select:focus {
+    border-color: #0f766e;
+
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+
+/* =========================================================
+   SAVE SECTION
+   ========================================================= */
+
+.save-section {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    margin-top: 20px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.save-claims-btn {
+    border: none;
+
+    background: linear-gradient(135deg, #0f766e, #0d9488);
+
+    color: white;
+
+    padding: 12px 28px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+
+    transition: all 0.2s ease;
+}
+
+.save-claims-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow: 0 6px 16px rgba(15, 118, 110, 0.32);
+}
+
+.save-claims-btn:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   DISABLED SAVE BUTTON
+   ========================================================= */
+
+.save-claims-btn:disabled {
+    background: #94a3b8;
+
+    cursor: not-allowed;
+
+    box-shadow: none;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.table-container::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+
+/* =========================================================
+   MOBILE / SMALL SCREEN
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .dashboard-container {
+        padding: 12px;
+    }
+
+    .user-header {
+        padding: 18px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .user-header h1 {
+        font-size: 22px;
+    }
+
+    .logout-btn {
+        align-self: flex-end;
+    }
+
+    .claims-section {
+        padding: 15px;
+    }
+
+    .claims-title-row h2 {
+        font-size: 19px;
+    }
+
+    .table-container {
+        max-height: 65vh;
+    }
+
+    .save-section {
+        justify-content: center;
+    }
+
+    .save-claims-btn {
+        width: 100%;
+    }
+}
+/* =========================================================
+   ADMIN DASHBOARD
+   ========================================================= */
+
+body.dashboard-container {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f3f6fa;
+    color: #1f2937;
+    min-height: 100vh;
+    padding: 24px;
+    margin: 0;
+}
+
+
+/* =========================================================
+   ADMIN HEADER
+   ========================================================= */
+
+.dashboard-header {
+    width: 100%;
+    background: linear-gradient(135deg, #173f5f, #20639b);
+    color: white;
+
+    padding: 24px 30px;
+
+    border-radius: 14px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 8px 0;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.dashboard-header .welcome-text {
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #e8f1f8;
+}
+
+.dashboard-header strong {
+    color: white;
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+.dashboard-header .logout-btn {
+    display: inline-block;
+
+    background: white;
+    color: #173f5f;
+
+    text-decoration: none;
+
+    padding: 11px 22px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition: all 0.2s ease;
+}
+
+.dashboard-header .logout-btn:hover {
+    background: #e8f1f8;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+body.dashboard-container > h2 {
+    color: #173f5f;
+
+    font-size: 22px;
+
+    margin: 25px 0 15px 0;
+
+    font-weight: 700;
+}
+
+body.dashboard-container hr {
+    border: 0;
+
+    height: 1px;
+
+    background: #dbe3ec;
+
+    margin: 25px 0;
+}
+
+
+/* =========================================================
+   PRODUCTIVITY TABLE
+   ========================================================= */
+
+.productivity-table {
+    width: 100%;
+
+    min-width: 1100px;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    background: white;
+
+    font-size: 13px;
+}
+
+
+/* Header */
+
+.productivity-table thead th {
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+
+    background: #173f5f;
+
+    color: white;
+
+    padding: 13px 14px;
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    border-right: 1px solid rgba(255,255,255,0.15);
+
+    border-bottom: 2px solid #0f2f49;
+}
+
+
+/* Body */
+
+.productivity-table tbody td {
+    padding: 11px 14px;
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    border-right: 1px solid #e5e7eb;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    color: #374151;
+
+    background: white;
+}
+
+
+/* Alternate rows */
+
+.productivity-table tbody tr:nth-child(even) td {
+    background: #f8fafc;
+}
+
+
+/* Hover */
+
+.productivity-table tbody tr:hover td {
+    background: #eef6ff;
+}
+
+
+/* Platform */
+
+.productivity-table tbody td:first-child {
+    font-weight: 700;
+
+    color: #173f5f;
+}
+
+
+/* Username */
+
+.productivity-table tbody td:nth-child(2) {
+    font-weight: 700;
+
+    color: #20639b;
+}
+
+
+/* Productivity */
+
+.productivity-table td.productivity {
+    font-weight: 800;
+
+    color: #0f766e;
+
+    background: #f0fdfa !important;
+}
+
+
+/* =========================================================
+   TABLE CONTAINER
+   ========================================================= */
+
+body.dashboard-container .table-container {
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    max-height: 60vh;
+
+    border: 1px solid #dbe3ec;
+
+    border-radius: 10px;
+
+    background: white;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+
+/* Scrollbar */
+
+body.dashboard-container .table-container::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+body.dashboard-container .table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+body.dashboard-container .table-container::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+
+    border-radius: 10px;
+}
+
+body.dashboard-container .table-container::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+
+/* =========================================================
+   DOWNLOAD BUTTON
+   ========================================================= */
+
+.download-btn {
+    border: none;
+
+    background: linear-gradient(135deg, #0f766e, #0d9488);
+
+    color: white;
+
+    padding: 12px 24px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+
+    transition: all 0.2s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow: 0 6px 16px rgba(15, 118, 110, 0.32);
+}
+
+.download-btn:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+.form-group {
+    background: white;
+
+    padding: 24px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+
+    max-width: 600px;
+
+    margin-bottom: 25px;
+}
+
+
+/* Labels */
+
+.form-group label {
+    display: block;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 7px;
+}
+
+
+/* Inputs */
+
+.form-group input {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    margin-bottom: 15px;
+
+    transition: border 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: #20639b;
+
+    box-shadow: 0 0 0 3px rgba(32, 99, 155, 0.12);
+}
+
+
+/* Select */
+
+.form-group select {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    margin-bottom: 15px;
+
+    cursor: pointer;
+}
+
+.form-group select:focus {
+    border-color: #20639b;
+
+    box-shadow: 0 0 0 3px rgba(32, 99, 155, 0.12);
+}
+
+
+/* Form buttons */
+
+.form-group button {
+    border: none;
+
+    background: linear-gradient(135deg, #20639b, #173f5f);
+
+    color: white;
+
+    padding: 11px 22px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.form-group button:hover {
+    transform: translateY(-1px);
+
+    box-shadow: 0 5px 14px rgba(23, 63, 95, 0.25);
+}
+
+
+/* =========================================================
+   REASSIGN SECTION
+   ========================================================= */
+
+.reassign-form {
+    margin-top: 25px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    body.dashboard-container {
+        padding: 12px;
+    }
+
+    .dashboard-header {
+        padding: 18px;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 22px;
+    }
+
+    .dashboard-header .logout-btn {
+        align-self: flex-end;
+    }
+
+    body.dashboard-container > h2 {
+        font-size: 19px;
+    }
+
+    body.dashboard-container .table-container {
+        max-height: 60vh;
+    }
+
+    .form-group {
+        max-width: 100%;
+
+        padding: 18px;
+    }
+
+    .download-btn {
+        width: 100%;
+    }
+}
+/* =========================================================
+   UPLOAD DASHBOARD
+   ========================================================= */
+
+.upload-dashboard {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+/* Main container */
+.upload-content {
+    width: 94%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 25px 0 50px;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.upload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 28px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.header-left h1 {
+    margin: 0 0 6px;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+.welcome-text {
+    margin: 0;
+    font-size: 15px;
+    color: #64748b;
+}
+
+.welcome-text strong {
+    color: #1e293b;
+}
+
+/* Logout */
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.logout-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #dc2626;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+/* Horizontal line */
+.upload-content > hr {
+    border: none;
+    height: 1px;
+    background: #dbe3ef;
+    margin: 25px 0;
+}
+
+/* =========================================================
+   UPLOAD BOX
+   ========================================================= */
+
+.upload-box {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+    margin-bottom: 30px;
+}
+
+.upload-box h2 {
+    margin: 0 0 8px;
+    font-size: 23px;
+    color: #1e3a8a;
+}
+
+.upload-box .info {
+    margin: 0 0 25px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* File selection box */
+.file-box {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 22px;
+}
+
+.file-box label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.file-box input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.file-box input[type="file"]:hover {
+    border-color: #2563eb;
+}
+
+/* Upload button */
+.upload-btn {
+    border: none;
+    padding: 12px 24px;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.upload-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   UPLOAD HISTORY CARD
+   ========================================================= */
+
+.upload-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+
+.upload-card h2 {
+    margin: 0 0 20px;
+    font-size: 23px;
+    color: #1e3a8a;
+}
+
+/* =========================================================
+   UPLOAD HISTORY TABLE
+   ========================================================= */
+
+.claims-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.claims-table thead {
+    background: #1e3a8a;
+}
+
+.claims-table th {
+    padding: 14px 16px;
+    color: #ffffff;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.claims-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    background: #ffffff;
+}
+
+.claims-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+/* File name */
+.claims-table td:first-child {
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.claims-table td:nth-child(4) {
+    font-weight: 600;
+}
+
+/* =========================================================
+   DELETE BUTTON
+   ========================================================= */
+
+.delete-btn {
+    border: none;
+    padding: 8px 16px;
+    background: #ef4444;
+    color: #ffffff;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   EMPTY TABLE
+   ========================================================= */
+
+.claims-table td[colspan="5"] {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .upload-content {
+        width: 96%;
+    }
+
+    .upload-header {
+        padding: 18px;
+    }
+
+    .header-left h1 {
+        font-size: 24px;
+    }
+
+    .upload-box,
+    .upload-card {
+        padding: 20px;
+    }
+
+    .claims-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .upload-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .header-right {
+        width: 100%;
+    }
+
+    .logout-btn {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .upload-box,
+    .upload-card {
+        padding: 16px;
+    }
+
+    .upload-btn {
+        width: 100%;
+    }
+}

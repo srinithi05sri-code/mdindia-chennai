@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDI Claim Management</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="login-page">
+
+    <div class="login-box">
+
+        <div class="login-logo">
+            MDI
+        </div>
+
+        <div class="login-subtitle">
+            Claim Management System
+        </div>
+
+        <h2>Login</h2>
+
+        <% if (error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/login" method="POST" class="form-group">
+
+            <div >
+                <label>Username</label>
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Enter username"
+                    required
+                >
+            </div>
+
+            <div>
+                <label>Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="login-btn">
+                Login
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+</html>
