@@ -1,6 +1,4 @@
-
 require("dotenv").config();
-
 const express = require("express");
 const path = require("path");
 const multer = require("multer");
@@ -12,13 +10,11 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-
 // =====================================================
 // MULTER - EXCEL UPLOAD
 // =====================================================
 
 const upload = multer({
-
     storage: multer.memoryStorage(),
 
     limits: {
@@ -36,11 +32,8 @@ const upload = multer({
             path.extname(file.originalname).toLowerCase();
 
         if (allowed.includes(ext)) {
-
             cb(null, true);
-
         } else {
-
             cb(
                 new Error(
                     "Only Excel files (.xlsx, .xls) are allowed."
@@ -50,35 +43,21 @@ const upload = multer({
     }
 });
 
-
 // =====================================================
 // MYSQL CONNECTION
 // =====================================================
-
 console.log("MYSQLHOST:", process.env.MYSQLHOST);
 console.log("MYSQLPORT:", process.env.MYSQLPORT);
 console.log("MYSQLUSER:", process.env.MYSQLUSER);
 console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
-
 const db = mysql.createPool({
-
     host: process.env.MYSQLHOST,
-
     port: Number(process.env.MYSQLPORT),
-
     user: process.env.MYSQLUSER,
-
     password: process.env.MYSQLPASSWORD,
-
     database: process.env.MYSQLDATABASE,
-
-    waitForConnections: true,
-
-    connectionLimit: 10,
-
-    queueLimit: 0
+   
 });
-
 
 // =====================================================
 // EXPRESS SETTINGS
@@ -108,7 +87,6 @@ app.use(
     )
 );
 
-
 // =====================================================
 // SESSION
 // =====================================================
@@ -128,9 +106,9 @@ app.use(
     })
 );
 
-
 // =====================================================
 // CONSTANTS
+// IMPORTANT: THESE MATCH YOUR MYSQL ENUM VALUES
 // =====================================================
 
 const VALID_CLAIM_TYPES = [
@@ -153,73 +131,39 @@ const VALID_STATUSES = [
     "ROD-Cancel"
 ];
 
-
 // =====================================================
 // TEST DATABASE
 // =====================================================
 
 async function testDatabase() {
-
     try {
 
         console.log("========== MYSQL DEBUG ==========");
-
-        console.log(
-            "MYSQLHOST:",
-            process.env.MYSQLHOST || "NOT SET"
-        );
-
-        console.log(
-            "MYSQLPORT:",
-            process.env.MYSQLPORT || "NOT SET"
-        );
-
-        console.log(
-            "MYSQLUSER:",
-            process.env.MYSQLUSER || "NOT SET"
-        );
-
-        console.log(
-            "MYSQLDATABASE:",
-            process.env.MYSQLDATABASE || "NOT SET"
-        );
-
+        console.log("MYSQLHOST:", process.env.MYSQLHOST || "NOT SET");
+        console.log("MYSQLPORT:", process.env.MYSQLPORT || "NOT SET");
+        console.log("MYSQLUSER:", process.env.MYSQLUSER || "NOT SET");
+        console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE || "NOT SET");
         console.log(
             "MYSQLPASSWORD:",
-            process.env.MYSQLPASSWORD
-                ? "SET"
-                : "NOT SET"
+            process.env.MYSQLPASSWORD ? "SET" : "NOT SET"
         );
-
         console.log("=================================");
 
-        const connection =
-            await db.getConnection();
+        const connection = await db.getConnection();
 
-        console.log(
-            "MySQL Connected Successfully"
-        );
+        console.log("MySQL Connected Successfully");
 
         connection.release();
 
     } catch (error) {
 
-        console.log(
-            "MySQL Connection Failed"
-        );
-
-        console.log(
-            "Error Code:",
-            error.code
-        );
-
-        console.log(
-            "Error Message:",
-            error.message
-        );
+        console.log("MySQL Connection Failed");
+        console.log("Error Code:", error.code);
+        console.log("Error Message:", error.message);
+        console.log("Error Address:", error.address);
+        console.log("Error Port:", error.port);
     }
 }
-
 
 // =====================================================
 // LOGIN PAGE
@@ -235,131 +179,92 @@ app.get("/", (req, res) => {
     );
 });
 
-
 // =====================================================
 // LOGIN
-// USER CAN LOGIN USING USERNAME OR EMPLOYEE ID
 // =====================================================
 
 app.post("/login", async (req, res) => {
 
-    const username =
-        String(req.body.username || "").trim();
+    const {
+        employee_id,
+        password
+    } = req.body;
 
-    const password =
-        String(req.body.password || "");
-
-    if (!username || !password) {
-
-        return res.render(
-            "login",
-            {
-                error:
-                    "Please enter username/employee ID and password"
-            }
-        );
+    // Empty validation
+    if (!employee_id || !password) {
+        return res.render("login", {
+            error: "Employee ID and Password are required"
+        });
     }
 
     try {
 
-        console.log(
-            "LOGIN ATTEMPT:",
-            username
-        );
-
-        const [users] =
-            await db.query(
-                `
-                SELECT
-                    id,
-                    employee_id,
-                    username,
-                    password,
-                    role,
-                    department,
-                    is_active
-                FROM users
-                WHERE
-                    (
-                        TRIM(username) = ?
-                        OR TRIM(employee_id) = ?
-                    )
-                    AND password = ?
-                    AND is_active = TRUE
-                LIMIT 1
-                `,
-                [
-                    username,
-                    username,
-                    password
-                ]
-            );
-
-        console.log(
-            "LOGIN USER COUNT:",
-            users.length
+        const [users] = await db.query(
+            `
+            SELECT
+                id,
+                employee_id,
+                username,
+                password,
+                role,
+                department,
+                is_active
+            FROM users
+            WHERE employee_id = ?
+              AND password = ?
+              AND is_active = TRUE
+            LIMIT 1
+            `,
+            [
+                employee_id.trim(),
+                password
+            ]
         );
 
         if (users.length === 0) {
 
-            return res.render(
-                "login",
-                {
-                    error:
-                        "Invalid username or password"
-                }
-            );
+            return res.render("login", {
+                error: "Invalid Employee ID or Password"
+            });
         }
 
-        const user =
-            users[0];
+        const user = users[0];
 
-
-        // =================================================
-        // SAVE USER IN SESSION
-        // =================================================
+        // ============================================
+        // SAVE USER DETAILS IN SESSION
+        // ============================================
 
         req.session.user = {
 
-            id:
-                user.id,
+            id: user.id,
 
-            employee_id:
-                user.employee_id,
+            employee_id: user.employee_id,
 
-            username:
-                user.username,
+            username: user.username,
 
-            role:
-                user.role,
+            role: user.role,
 
-            department:
-                user.department
+            department: user.department
         };
-
 
         console.log(
             "LOGIN SUCCESS:",
             req.session.user
         );
 
-
-        // =================================================
-        // ROLE REDIRECT
-        // =================================================
+        // ============================================
+        // ROLE BASED REDIRECT
+        // ============================================
 
         if (user.role === "admin") {
-
             return res.redirect("/admin");
         }
 
         if (user.role === "upload") {
-
             return res.redirect("/upload");
         }
 
         if (user.role === "user") {
-
             return res.redirect("/user");
         }
 
@@ -372,16 +277,11 @@ app.post("/login", async (req, res) => {
             error
         );
 
-        res.render(
-            "login",
-            {
-                error:
-                    "Server error. Please try again."
-            }
-        );
+        return res.render("login", {
+            error: "Server error. Please try again."
+        });
     }
 });
-
 
 // =====================================================
 // ADMIN DASHBOARD
@@ -400,275 +300,252 @@ app.get("/admin", async (req, res) => {
     try {
 
         // =================================================
-        // COUNTS
+        // TOP SUMMARY COUNTS
         // =================================================
 
-        const [[total]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-            `);
+        const [[total]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+        `);
 
-        const [[pending]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Pending'
-            `);
+        const [[pending]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Pending'
+        `);
 
-        const [[approved]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Approved'
-            `);
+        const [[approved]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Approved'
+        `);
 
-        const [[rejected]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Rejected'
-            `);
+        const [[rejected]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Rejected'
+        `);
 
-        const [[query]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Query'
-            `);
+        const [[query]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Query'
+        `);
 
-        const [[requery]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Re-Query'
-            `);
+        const [[requery]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Re-Query'
+        `);
 
-        const [[investigationQuery]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Query & Investigation'
-            `);
+        const [[investigationQuery]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Query & Investigation'
+        `);
 
-        const [[investigation]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Investigation'
-            `);
+        const [[investigation]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Investigation'
+        `);
 
-        const [[sentBack]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Sent-Back'
-            `);
+        const [[sentBack]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Sent-Back'
+        `);
 
-        const [[keep]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Keep'
-            `);
+        const [[keep]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Keep'
+        `);
 
-        const [[otherDoctorExecutive]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'Other-Doctor/Executive'
-            `);
+        const [[otherDoctorExecutive]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'Other-Doctor/Executive'
+        `);
 
-        const [[rodCancel]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM claims
-                WHERE claim_status = 'ROD-Cancel'
-            `);
-
+        const [[rodCancel]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM claims
+            WHERE claim_status = 'ROD-Cancel'
+        `);
 
         // =================================================
         // TOTAL USERS
         // =================================================
 
-        const [[users]] =
-            await db.query(`
-                SELECT COUNT(*) AS count
-                FROM users
-                WHERE role = 'user'
-            `);
-
+        const [[users]] = await db.query(`
+            SELECT COUNT(*) AS count
+            FROM users
+            WHERE role = 'user'
+        `);
 
         // =================================================
         // USER LIST
         // =================================================
 
-        const [userList] =
-            await db.query(`
-                SELECT
-                    id,
-                    employee_id,
-                    username,
-                    department,
-                    is_active
-                FROM users
-                WHERE role = 'user'
-                ORDER BY username
-            `);
-
+        const [userList] = await db.query(`
+            SELECT
+                id,
+                employee_id,
+                username,
+                department,
+                is_active
+            FROM users
+            WHERE role = 'user'
+            ORDER BY username
+        `);
 
         // =================================================
         // PRODUCTIVITY SUMMARY
         // =================================================
 
-        const [processSummary] =
-            await db.query(`
-                SELECT
+        const [processSummary] = await db.query(`
+            SELECT
 
-                    COALESCE(
-                        c.platform,
-                        '-'
-                    ) AS platform,
+                COALESCE(c.platform, '-') AS platform,
 
-                    COALESCE(
-                        u.username,
-                        c.user_name,
-                        '-'
-                    ) AS user_name,
+                COALESCE(
+                    u.username,
+                    c.user_name,
+                    '-'
+                ) AS user_name,
 
-                    COUNT(*) AS total_allocated,
+                COUNT(*) AS total_allocated,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Approved'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS approved,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Approved'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS approved,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Rejected'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS rejected,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Rejected'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS rejected,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Query'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS query_count,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Query'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS query_count,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Re-Query'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS requery,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Re-Query'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS requery,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status =
-                                'Query & Investigation'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS investigation_query,
+                SUM(
+                    CASE
+                        WHEN c.claim_status =
+                            'Query & Investigation'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS investigation_query,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status IN (
-                                'Approved',
-                                'Rejected',
-                                'Query',
-                                'Re-Query',
-                                'Query & Investigation',
-                                'Investigation',
-                                'Sent-Back',
-                                'Keep',
-                                'Other-Doctor/Executive',
-                                'ROD-Cancel'
-                            )
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS total_productivity,
+                SUM(
+                    CASE
+                        WHEN c.claim_status IN (
+                            'Approved',
+                            'Rejected',
+                            'Query',
+                            'Re-Query',
+                            'Query & Investigation',
+                            'Investigation',
+                            'Sent-Back',
+                            'Keep',
+                            'Other-Doctor/Executive',
+                            'ROD-Cancel'
+                        )
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS total_productivity,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Investigation'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS investigation,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Investigation'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS investigation,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Sent-Back'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS sent_back,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Sent-Back'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS sent_back,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Keep'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS keep_count,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Keep'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS keep_count,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status =
-                                'Other-Doctor/Executive'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS other_doctor_executive,
+                SUM(
+                    CASE
+                        WHEN c.claim_status =
+                            'Other-Doctor/Executive'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS other_doctor_executive,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'ROD-Cancel'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS rod_cancel,
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'ROD-Cancel'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS rod_cancel,
 
-                    SUM(
-                        CASE
-                            WHEN c.claim_status = 'Pending'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) AS pending
+                SUM(
+                    CASE
+                        WHEN c.claim_status = 'Pending'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS pending
 
-                FROM claims c
+            FROM claims c
 
-                LEFT JOIN users u
-                    ON c.assigned_user_id =
-                       u.employee_id
+            LEFT JOIN users u
+                ON c.assigned_user_id = u.employee_id
 
-                GROUP BY
-                    c.platform,
-                    COALESCE(
-                        u.username,
-                        c.user_name,
-                        '-'
-                    )
+            GROUP BY
+                c.platform,
+                COALESCE(
+                    u.username,
+                    c.user_name,
+                    '-'
+                )
 
-                ORDER BY
-                    c.platform,
-                    user_name
-            `);
-
+            ORDER BY
+                c.platform,
+                user_name
+        `);
 
         // =================================================
-        // RENDER
+        // RENDER ADMIN
         // =================================================
 
         res.render(
@@ -751,486 +628,337 @@ app.get("/admin", async (req, res) => {
     }
 });
 
-
 // =====================================================
-// CREATE USER
+// CREATE NEW USER - ADMIN ONLY
 // =====================================================
 
-app.post(
-    "/admin/create-user",
-    async (req, res) => {
+app.post("/admin/create-user", async (req, res) => {
 
-        if (
-            !req.session.user ||
-            req.session.user.role !== "admin"
-        ) {
+    // Only admin can create user
+    if (
+        !req.session.user ||
+        req.session.user.role !== "admin"
+    ) {
+        return res.redirect("/");
+    }
 
-            return res.redirect("/");
-        }
+    const {
+        employeeId,
+        username,
+        password,
+        department
+    } = req.body;
 
+    console.log("=================================");
+    console.log("CREATE USER REQUEST");
+    console.log("Employee ID:", employeeId);
+    console.log("Username:", username);
+    console.log("Department:", department);
+    console.log("=================================");
 
-        // =================================================
-        // TRIM INPUTS
-        // =================================================
+    // ---------------------------------------------
+    // VALIDATION
+    // ---------------------------------------------
 
-        const employeeId =
-            String(
-                req.body.employeeId || ""
-            ).trim();
+    if (
+        !employeeId ||
+        !username ||
+        !password
+    ) {
+        return res.status(400).send(`
+            <h2>Create User Failed</h2>
 
-        const username =
-            String(
-                req.body.username || ""
-            ).trim();
+            <p>
+                Employee ID, Username and Password are required.
+            </p>
 
-        const password =
-            String(
-                req.body.password || ""
-            );
+            <a href="/admin">
+                Back to Admin
+            </a>
+        `);
+    }
 
-        const department =
-            String(
-                req.body.department || ""
-            ).trim();
+    const cleanEmployeeId = String(employeeId).trim();
+    const cleanUsername = String(username).trim();
+    const cleanPassword = String(password).trim();
+    const cleanDepartment = department
+        ? String(department).trim()
+        : null;
 
+    try {
 
-        // =================================================
-        // VALIDATION
-        // =================================================
+        // ---------------------------------------------
+        // CHECK EMPLOYEE ID ALREADY EXISTS
+        // ---------------------------------------------
 
-        if (
-            !employeeId ||
-            !username ||
-            !password
-        ) {
+        const [employeeExists] = await db.query(
+            `
+            SELECT id
+            FROM users
+            WHERE employee_id = ?
+            LIMIT 1
+            `,
+            [cleanEmployeeId]
+        );
+
+        if (employeeExists.length > 0) {
 
             return res.status(400).send(`
-
-                <h2>Failed to create user</h2>
+                <h2>Create User Failed</h2>
 
                 <p>
-                    Employee ID, Username and Password
-                    are required.
+                    Employee ID <b>${cleanEmployeeId}</b>
+                    already exists.
                 </p>
 
                 <a href="/admin">
                     Back to Admin
                 </a>
-
             `);
         }
 
+        // ---------------------------------------------
+        // CHECK USERNAME ALREADY EXISTS
+        // ---------------------------------------------
 
-        try {
+        const [usernameExists] = await db.query(
+            `
+            SELECT id
+            FROM users
+            WHERE username = ?
+            LIMIT 1
+            `,
+            [cleanUsername]
+        );
 
-            // =================================================
-            // CHECK EMPLOYEE ID
-            // =================================================
+        if (usernameExists.length > 0) {
 
-            const [existingEmployee] =
-                await db.query(
-                    `
-                    SELECT id
-                    FROM users
-                    WHERE TRIM(employee_id) = ?
-                    LIMIT 1
-                    `,
-                    [
-                        employeeId
-                    ]
-                );
+            return res.status(400).send(`
+                <h2>Create User Failed</h2>
 
-
-            if (
-                existingEmployee.length > 0
-            ) {
-
-                return res.status(400).send(`
-
-                    <h2>Employee ID Already Exists</h2>
-
-                    <p>
-                        Employee ID
-                        <b>${employeeId}</b>
-                        is already registered.
-                    </p>
-
-                    <a href="/admin">
-                        Back to Admin
-                    </a>
-
-                `);
-            }
-
-
-            // =================================================
-            // CHECK USERNAME
-            // =================================================
-
-            const [existingUsername] =
-                await db.query(
-                    `
-                    SELECT id
-                    FROM users
-                    WHERE TRIM(username) = ?
-                    LIMIT 1
-                    `,
-                    [
-                        username
-                    ]
-                );
-
-
-            if (
-                existingUsername.length > 0
-            ) {
-
-                return res.status(400).send(`
-
-                    <h2>Username Already Exists</h2>
-
-                    <p>
-                        Username
-                        <b>${username}</b>
-                        is already registered.
-                    </p>
-
-                    <a href="/admin">
-                        Back to Admin
-                    </a>
-
-                `);
-            }
-
-
-            // =================================================
-            // CREATE USER
-            // =================================================
-
-            const [result] =
-                await db.query(
-                    `
-                    INSERT INTO users
-                    (
-                        employee_id,
-                        username,
-                        password,
-                        role,
-                        department,
-                        is_active
-                    )
-                    VALUES
-                    (
-                        ?,
-                        ?,
-                        ?,
-                        'user',
-                        ?,
-                        TRUE
-                    )
-                    `,
-                    [
-                        employeeId,
-                        username,
-                        password,
-                        department
-                    ]
-                );
-
-
-            console.log(
-                "USER CREATED SUCCESSFULLY"
-            );
-
-            console.log(
-                "New User ID:",
-                result.insertId
-            );
-
-            console.log(
-                "Employee ID:",
-                employeeId
-            );
-
-            console.log(
-                "Username:",
-                username
-            );
-
-
-            res.redirect("/admin");
-
-        } catch (error) {
-
-            console.error(
-                "CREATE USER ERROR:",
-                error
-            );
-
-            res.status(500).send(`
-
-                <h2>Failed to create user</h2>
-
-                <pre>${error.message}</pre>
-
-                <br>
+                <p>
+                    Username <b>${cleanUsername}</b>
+                    already exists.
+                </p>
 
                 <a href="/admin">
                     Back to Admin
                 </a>
-
             `);
         }
-    }
-);
 
+        // ---------------------------------------------
+        // INSERT NEW USER
+        // ---------------------------------------------
+
+        const [result] = await db.query(
+            `
+            INSERT INTO users
+            (
+                employee_id,
+                username,
+                password,
+                role,
+                department,
+                is_active
+            )
+            VALUES
+            (
+                ?,
+                ?,
+                ?,
+                'user',
+                ?,
+                TRUE
+            )
+            `,
+            [
+                cleanEmployeeId,
+                cleanUsername,
+                cleanPassword,
+                cleanDepartment
+            ]
+        );
+
+        console.log("=================================");
+        console.log("NEW USER CREATED SUCCESSFULLY");
+        console.log("Database ID:", result.insertId);
+        console.log("Employee ID:", cleanEmployeeId);
+        console.log("Username:", cleanUsername);
+        console.log("=================================");
+
+        // ---------------------------------------------
+        // BACK TO ADMIN
+        // ---------------------------------------------
+
+        return res.redirect("/admin");
+
+    } catch (error) {
+
+        console.error(
+            "CREATE USER ERROR:",
+            error
+        );
+
+        return res.status(500).send(`
+            <h2>Create User Failed</h2>
+
+            <pre>${error.message}</pre>
+
+            <br>
+
+            <a href="/admin">
+                Back to Admin
+            </a>
+        `);
+    }
+});
 
 // =====================================================
 // REASSIGN CLAIMS
 // =====================================================
 
-app.post(
-    "/admin/reassign",
-    async (req, res) => {
+app.post("/admin/reassign", async (req, res) => {
 
-        if (
-            !req.session.user ||
-            req.session.user.role !== "admin"
-        ) {
+    if (
+        !req.session.user ||
+        req.session.user.role !== "admin"
+    ) {
+        return res.redirect("/");
+    }
 
-            return res.redirect("/");
+    const { oldUserId, newUserId } = req.body;
+
+    if (!oldUserId || !newUserId) {
+        return res.status(400).send(`
+            <h2>Invalid User Selection</h2>
+            <p>Please select both users.</p>
+            <a href="/admin">Back to Admin</a>
+        `);
+    }
+
+    if (String(oldUserId) === String(newUserId)) {
+        return res.status(400).send(`
+            <h2>Invalid Reassignment</h2>
+            <p>Both users cannot be the same.</p>
+            <a href="/admin">Back to Admin</a>
+        `);
+    }
+
+    let connection;
+
+    try {
+
+        connection = await db.getConnection();
+
+        await connection.beginTransaction();
+
+        // ---------------------------------------------
+        // OLD USER - GET EMPLOYEE ID
+        // ---------------------------------------------
+
+        const [oldUser] = await connection.query(
+            `
+            SELECT employee_id
+            FROM users
+            WHERE id = ?
+            AND role = 'user'
+            LIMIT 1
+            `,
+            [oldUserId]
+        );
+
+        if (oldUser.length === 0) {
+            throw new Error("Old user not found.");
         }
 
+        const oldEmployeeId = oldUser[0].employee_id;
 
-        const oldUserId =
-            req.body.oldUserId;
+        // ---------------------------------------------
+        // NEW USER - GET EMPLOYEE ID
+        // ---------------------------------------------
 
-        const newUserId =
-            req.body.newUserId;
+        const [newUser] = await connection.query(
+            `
+            SELECT employee_id
+            FROM users
+            WHERE id = ?
+            AND role = 'user'
+            AND is_active = TRUE
+            LIMIT 1
+            `,
+            [newUserId]
+        );
 
-
-        if (
-            !oldUserId ||
-            !newUserId
-        ) {
-
-            return res.status(400).send(`
-
-                <h2>Invalid User Selection</h2>
-
-                <p>
-                    Please select both users.
-                </p>
-
-                <a href="/admin">
-                    Back to Admin
-                </a>
-
-            `);
+        if (newUser.length === 0) {
+            throw new Error("New user not found or inactive.");
         }
 
+        const newEmployeeId = newUser[0].employee_id;
 
-        if (
-            String(oldUserId) ===
-            String(newUserId)
-        ) {
+        // ---------------------------------------------
+        // REASSIGN CLAIMS
+        // ---------------------------------------------
 
-            return res.status(400).send(`
-
-                <h2>Invalid Reassignment</h2>
-
-                <p>
-                    Both users cannot be the same.
-                </p>
-
-                <a href="/admin">
-                    Back to Admin
-                </a>
-
-            `);
-        }
-
-
-        let connection;
-
-
-        try {
-
-            connection =
-                await db.getConnection();
-
-            await connection.beginTransaction();
-
-
-            // =================================================
-            // OLD USER
-            // =================================================
-
-            const [oldUser] =
-                await connection.query(
-                    `
-                    SELECT employee_id
+        const [result] = await connection.query(
+            `
+            UPDATE claims
+            SET
+                assigned_user_id = ?,
+                user_name = (
+                    SELECT username
                     FROM users
-                    WHERE id = ?
-                    AND role = 'user'
+                    WHERE employee_id = ?
                     LIMIT 1
-                    `,
-                    [
-                        oldUserId
-                    ]
-                );
-
-
-            if (
-                oldUser.length === 0
-            ) {
-
-                throw new Error(
-                    "Old user not found."
-                );
-            }
-
-
-            const oldEmployeeId =
-                oldUser[0].employee_id;
-
-
-            // =================================================
-            // NEW USER
-            // =================================================
-
-            const [newUser] =
-                await connection.query(
-                    `
-                    SELECT employee_id
-                    FROM users
-                    WHERE id = ?
-                    AND role = 'user'
-                    AND is_active = TRUE
-                    LIMIT 1
-                    `,
-                    [
-                        newUserId
-                    ]
-                );
-
-
-            if (
-                newUser.length === 0
-            ) {
-
-                throw new Error(
-                    "New user not found or inactive."
-                );
-            }
-
-
-            const newEmployeeId =
-                newUser[0].employee_id;
-
-
-            // =================================================
-            // REASSIGN
-            // =================================================
-
-            const [result] =
-                await connection.query(
-                    `
-                    UPDATE claims
-                    SET
-                        assigned_user_id = ?,
-
-                        user_name = (
-                            SELECT username
-                            FROM users
-                            WHERE employee_id = ?
-                            LIMIT 1
-                        ),
-
-                        updated_at = NOW()
-
-                    WHERE assigned_user_id = ?
-                    `,
-                    [
-                        newEmployeeId,
-                        newEmployeeId,
-                        oldEmployeeId
-                    ]
-                );
-
-
-            await connection.commit();
-
-
-            console.log(
-                "================================="
-            );
-
-            console.log(
-                "REASSIGN SUCCESS"
-            );
-
-            console.log(
-                "Old Employee ID:",
+                ),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE assigned_user_id = ?
+            `,
+            [
+                newEmployeeId,
+                newEmployeeId,
                 oldEmployeeId
-            );
+            ]
+        );
 
-            console.log(
-                "New Employee ID:",
-                newEmployeeId
-            );
+        await connection.commit();
 
-            console.log(
-                "Claims Updated:",
-                result.affectedRows
-            );
+        console.log("=================================");
+        console.log("REASSIGN SUCCESS");
+        console.log("Old Employee ID:", oldEmployeeId);
+        console.log("New Employee ID:", newEmployeeId);
+        console.log("Claims Updated:", result.affectedRows);
+        console.log("=================================");
 
-            console.log(
-                "================================="
-            );
+        res.redirect("/admin");
 
+    } catch (error) {
 
-            res.redirect("/admin");
+        if (connection) {
+            await connection.rollback();
+        }
 
-        } catch (error) {
+        console.error("REASSIGN ERROR:", error);
 
-            if (connection) {
+        res.status(500).send(`
+            <h2>Reassignment Failed</h2>
 
-                await connection.rollback();
-            }
+            <pre>${error.message}</pre>
 
+            <br>
 
-            console.error(
-                "REASSIGN ERROR:",
-                error
-            );
+            <a href="/admin">
+                Back to Admin
+            </a>
+        `);
 
+    } finally {
 
-            res.status(500).send(`
-
-                <h2>Reassignment Failed</h2>
-
-                <pre>${error.message}</pre>
-
-                <br>
-
-                <a href="/admin">
-                    Back to Admin
-                </a>
-
-            `);
-
-        } finally {
-
-            if (connection) {
-
-                connection.release();
-            }
+        if (connection) {
+            connection.release();
         }
     }
-);
-
-
+});
 // =====================================================
 // UPLOAD DASHBOARD
 // =====================================================
@@ -1246,7 +974,6 @@ app.get(
 
             return res.redirect("/");
         }
-
 
         try {
 
@@ -1274,7 +1001,6 @@ app.get(
                     ORDER BY ub.id DESC
                     `
                 );
-
 
             res.render(
                 "upload-dashboard",
@@ -1306,7 +1032,6 @@ app.get(
     }
 );
 
-
 // =====================================================
 // UPLOAD EXCEL
 // =====================================================
@@ -1324,7 +1049,6 @@ app.post(
             return res.redirect("/");
         }
 
-
         if (!req.file) {
 
             return res.status(400).send(
@@ -1332,9 +1056,7 @@ app.post(
             );
         }
 
-
         let connection;
-
 
         try {
 
@@ -1350,14 +1072,11 @@ app.post(
                     }
                 );
 
-
             const sheetName =
                 workbook.SheetNames[0];
 
-
             const sheet =
                 workbook.Sheets[sheetName];
-
 
             const rows =
                 XLSX.utils.sheet_to_json(
@@ -1366,7 +1085,6 @@ app.post(
                         defval: ""
                     }
                 );
-
 
             if (rows.length === 0) {
 
@@ -1380,7 +1098,6 @@ app.post(
 
                 `);
             }
-
 
             // =================================================
             // REQUIRED COLUMNS
@@ -1423,10 +1140,8 @@ app.post(
                 "platform"
             ];
 
-
             const excelColumns =
                 Object.keys(rows[0]);
-
 
             const missingColumns =
                 requiredColumns.filter(
@@ -1434,10 +1149,7 @@ app.post(
                         !excelColumns.includes(column)
                 );
 
-
-            if (
-                missingColumns.length > 0
-            ) {
+            if (missingColumns.length > 0) {
 
                 return res.status(400).send(`
 
@@ -1467,7 +1179,6 @@ app.post(
                 `);
             }
 
-
             // =================================================
             // DB CONNECTION
             // =================================================
@@ -1476,7 +1187,6 @@ app.post(
                 await db.getConnection();
 
             await connection.beginTransaction();
-
 
             // =================================================
             // CREATE BATCH
@@ -1507,10 +1217,8 @@ app.post(
                     ]
                 );
 
-
             const batchId =
                 batchResult.insertId;
-
 
             // =================================================
             // INSERT CLAIMS
@@ -1523,39 +1231,33 @@ app.post(
                         row["CLAIM_REF_NO"] || ""
                     ).trim();
 
-
                 const inwardNo =
                     String(
                         row["INWARD_NO"] || ""
                     ).trim();
-
 
                 const policyNo =
                     String(
                         row["POLICY_NO"] || ""
                     ).trim();
 
-
                 const claimAmount =
                     parseFloat(
                         row["CLAIM_AMT"]
                     ) || 0;
-
 
                 const vertical =
                     String(
                         row["Vertical"] || ""
                     ).trim();
 
-
                 const department =
                     String(
                         row["Vertical"] || ""
                     ).trim();
 
-
                 // =================================================
-                // EMPLOYEE ID FROM EXCEL
+                // EMPLOYEE ID
                 // =================================================
 
                 const employeeId =
@@ -1563,11 +1265,9 @@ app.post(
                         row["User ID"] || ""
                     ).trim();
 
-
                 let assignedUserId = null;
 
                 let userName = null;
-
 
                 if (employeeId) {
 
@@ -1578,10 +1278,9 @@ app.post(
                                 employee_id,
                                 username
                             FROM users
-                            WHERE
-                                TRIM(employee_id) = ?
-                                AND role = 'user'
-                                AND is_active = TRUE
+                            WHERE employee_id = ?
+                            AND role = 'user'
+                            AND is_active = TRUE
                             LIMIT 1
                             `,
                             [
@@ -1589,157 +1288,129 @@ app.post(
                             ]
                         );
 
-
-                    if (
-                        userRows.length === 0
-                    ) {
+                    if (userRows.length === 0) {
 
                         throw new Error(
                             `Employee ID '${employeeId}' not found or inactive.`
                         );
                     }
 
-
                     assignedUserId =
                         userRows[0].employee_id;
-
 
                     userName =
                         userRows[0].username;
                 }
-
 
                 const additionalDeduction =
                     parseFloat(
                         row["Additional Deduction"]
                     ) || 0;
 
-
                 const alAmount =
                     parseFloat(
                         row["AL_AMT"]
                     ) || 0;
-
 
                 const claimClass =
                     String(
                         row["CLAIM_CLASS"] || ""
                     ).trim();
 
-
                 const hospitalCode =
                     String(
                         row["Hospital Code"] || ""
                     ).trim();
-
 
                 const typeOfMou =
                     String(
                         row["Type of MOU"] || ""
                     ).trim();
 
-
                 const diagnosis =
                     String(
                         row["Diagnosis"] || ""
                     ).trim();
-
 
                 const diagnosis2 =
                     String(
                         row["Diagnosis 2"] || ""
                     ).trim();
 
-
                 const policyName =
                     String(
                         row["POLICY_NAME"] || ""
                     ).trim();
-
 
                 const queue =
                     String(
                         row["Queue"] || ""
                     ).trim();
 
-
                 const ageing =
                     String(
                         row["Ageing"] || ""
                     ).trim();
-
 
                 const claimDate =
                     String(
                         row["Date"] || ""
                     ).trim();
 
-
                 const claimTime =
                     String(
                         row["Time"] || ""
                     ).trim();
-
 
                 const todayStatus =
                     String(
                         row["Today Status"] || ""
                     ).trim();
 
-
                 const i3Status =
                     String(
                         row["I3 Status"] || ""
                     ).trim();
-
 
                 const fullQc =
                     String(
                         row["Full qc"] || ""
                     ).trim();
 
-
                 const relation =
                     String(
                         row["RELATION"] || ""
                     ).trim();
-
 
                 const hnf =
                     String(
                         row["HNF"] || ""
                     ).trim();
 
-
                 const ilomId =
                     String(
                         row["ILOM ID"] || ""
                     ).trim();
-
 
                 const approveAmount =
                     parseFloat(
                         row["Approve AMT"]
                     ) || 0;
 
-
                 const remark =
                     String(
                         row["Remark"] || ""
                     ).trim();
-
 
                 const deductionAmount =
                     parseFloat(
                         row["Deduction AMT"]
                     ) || 0;
 
-
                 const interDocExe =
                     String(
                         row["inter. Doc & Exe"] || ""
                     ).trim();
-
 
                 const lot =
                     String(
@@ -1748,14 +1419,12 @@ app.post(
                         ""
                     ).trim();
 
-
                 const platform =
                     String(
                         row["platform"] ||
                         row["Platform"] ||
                         ""
                     ).trim();
-
 
                 // =================================================
                 // CLAIM TYPE
@@ -1766,7 +1435,6 @@ app.post(
                         row["Claim Type"] || ""
                     ).trim();
 
-
                 if (claimType === "") {
 
                     claimType = null;
@@ -1775,7 +1443,6 @@ app.post(
 
                     const upperClaimType =
                         claimType.toUpperCase();
-
 
                     if (
                         upperClaimType ===
@@ -1817,7 +1484,6 @@ app.post(
                     }
                 }
 
-
                 // =================================================
                 // STATUS
                 // =================================================
@@ -1827,32 +1493,28 @@ app.post(
                         row["Status"] || ""
                     ).trim();
 
-
                 if (claimStatus === "") {
 
                     claimStatus = "Pending";
 
                 } else {
 
-                    if (
-                        claimStatus ===
-                        "SentBack"
-                    ) {
-
-                        claimStatus =
-                            "Sent-Back";
-                    }
-
+                    // Normalize Excel values
+                    // TO MATCH MYSQL ENUM
 
                     if (
-                        claimStatus ===
-                        "ROD Cancel"
+                        claimStatus === "SentBack"
                     ) {
 
-                        claimStatus =
-                            "ROD-Cancel";
+                        claimStatus = "Sent-Back";
                     }
 
+                    if (
+                        claimStatus === "ROD Cancel"
+                    ) {
+
+                        claimStatus = "ROD-Cancel";
+                    }
 
                     if (
                         claimStatus ===
@@ -1863,7 +1525,6 @@ app.post(
                             "Query & Investigation";
                     }
 
-
                     if (
                         claimStatus ===
                         "OtherDoctor/Executive"
@@ -1873,7 +1534,6 @@ app.post(
                             "Other-Doctor/Executive";
                     }
                 }
-
 
                 if (
                     !VALID_STATUSES.includes(
@@ -1886,101 +1546,102 @@ app.post(
                     );
                 }
 
-
                 // =================================================
                 // INSERT CLAIM
+                // IMPORTANT:
+                // claims TABLE HAS user_name, NOT username
                 // =================================================
 
-                await connection.query(
-                    `
-                    INSERT INTO claims
-                    (
-                        upload_batch_id,
-                        claim_ref_no,
-                        inward_no,
-                        policy_no,
-                        claim_amount,
-                        vertical,
-                        department,
-                        assigned_user_id,
-                        user_name,
-                        claim_type,
-                        claim_status,
-                        user_remark,
-                        additional_deduction,
-                        al_amount,
-                        claim_class,
-                        hospital_code,
-                        type_of_mou,
-                        diagnosis,
-                        diagnosis_2,
-                        policy_name,
-                        queue,
-                        ageing,
-                        claim_date,
-                        claim_time,
-                        today_status,
-                        i3_status,
-                        full_qc,
-                        relation,
-                        hnf,
-                        ilom_id,
-                        approve_amount,
-                        deduction_amount,
-                        inter_doc_exe,
-                        lot,
-                        platform
-                    )
-                    VALUES
-                    (
-                        ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?
-                    )
-                    `,
-                    [
-                        batchId,
-                        claimRefNo,
-                        inwardNo,
-                        policyNo,
-                        claimAmount,
-                        vertical,
-                        department,
-                        assignedUserId,
-                        userName,
-                        claimType,
-                        claimStatus,
-                        remark,
-                        additionalDeduction,
-                        alAmount,
-                        claimClass,
-                        hospitalCode,
-                        typeOfMou,
-                        diagnosis,
-                        diagnosis2,
-                        policyName,
-                        queue,
-                        ageing,
-                        claimDate,
-                        claimTime,
-                        todayStatus,
-                        i3Status,
-                        fullQc,
-                        relation,
-                        hnf,
-                        ilomId,
-                        approveAmount,
-                        deductionAmount,
-                        interDocExe,
-                        lot,
-                        platform
-                    ]
-                );
+            await connection.query(
+    `
+    INSERT INTO claims
+    (
+        upload_batch_id,
+        claim_ref_no,
+        inward_no,
+        policy_no,
+        claim_amount,
+        vertical,
+        department,
+        assigned_user_id,
+        user_name,
+        claim_type,
+        claim_status,
+        user_remark,
+        additional_deduction,
+        al_amount,
+        claim_class,
+        hospital_code,
+        type_of_mou,
+        diagnosis,
+        diagnosis_2,
+        policy_name,
+        queue,
+        ageing,
+        claim_date,
+        claim_time,
+        today_status,
+        i3_status,
+        full_qc,
+        relation,
+        hnf,
+        ilom_id,
+        approve_amount,
+        deduction_amount,
+        inter_doc_exe,
+        lot,
+        platform
+    )
+    VALUES
+    (
+        ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?, ?, 
+        ?, ?, ?, ?, ?, ?, 
+        ?, ?, ?, ?, ?, ?, 
+        ?, ?, ?, ?, ?
+    )
+    `,
+    [
+        batchId,
+        claimRefNo,
+        inwardNo,
+        policyNo,
+        claimAmount,
+        vertical,
+        department,
+        assignedUserId,
+        userName,
+        claimType,
+        claimStatus,
+        remark,
+        additionalDeduction,
+        alAmount,
+        claimClass,
+        hospitalCode,
+        typeOfMou,
+        diagnosis,
+        diagnosis2,
+        policyName,
+        queue,
+        ageing,
+        claimDate,
+        claimTime,
+        todayStatus,
+        i3Status,
+        fullQc,
+        relation,
+        hnf,
+        ilomId,
+        approveAmount,
+        deductionAmount,
+        interDocExe,
+        lot,
+        platform
+    ]
+);
+                 
             }
-
 
             // =================================================
             // COMMIT
@@ -1988,11 +1649,9 @@ app.post(
 
             await connection.commit();
 
-
             console.log(
                 "EXCEL UPLOAD SUCCESS"
             );
-
 
             res.redirect("/upload");
 
@@ -2003,12 +1662,10 @@ app.post(
                 await connection.rollback();
             }
 
-
             console.error(
                 "EXCEL UPLOAD ERROR:",
                 error
             );
-
 
             res.status(500).send(`
 
@@ -2038,7 +1695,6 @@ ${error.message}
     }
 );
 
-
 // =====================================================
 // DELETE UPLOAD
 // =====================================================
@@ -2055,13 +1711,10 @@ app.post(
             return res.redirect("/");
         }
 
-
         const batchId =
             req.params.id;
 
-
         let connection;
-
 
         try {
 
@@ -2069,7 +1722,6 @@ app.post(
                 await db.getConnection();
 
             await connection.beginTransaction();
-
 
             await connection.query(
                 `
@@ -2080,7 +1732,6 @@ app.post(
                     batchId
                 ]
             );
-
 
             await connection.query(
                 `
@@ -2094,9 +1745,7 @@ app.post(
                 ]
             );
 
-
             await connection.commit();
-
 
             res.redirect("/upload");
 
@@ -2107,12 +1756,10 @@ app.post(
                 await connection.rollback();
             }
 
-
             console.error(
                 "DELETE UPLOAD ERROR:",
                 error
             );
-
 
             res.status(500).send(`
 
@@ -2142,7 +1789,6 @@ ${error.message}
     }
 );
 
-
 // =====================================================
 // SAVE USER CLAIMS
 // =====================================================
@@ -2156,12 +1802,13 @@ app.post(
             return res.redirect("/");
         }
 
+        // =================================================
+        // IMPORTANT
+        // claims.assigned_user_id contains employee_id
+        // =================================================
 
         const employeeId =
-            String(
-                req.session.user.employee_id || ""
-            ).trim();
-
+            req.session.user.employee_id;
 
         if (!employeeId) {
 
@@ -2180,9 +1827,7 @@ app.post(
             `);
         }
 
-
         let connection;
-
 
         try {
 
@@ -2191,16 +1836,18 @@ app.post(
                 employeeId
             );
 
+            console.log(
+                "SAVE BODY:",
+                req.body
+            );
 
             connection =
                 await db.getConnection();
 
-
             await connection.beginTransaction();
 
-
             // =================================================
-            // GET THIS USER CLAIMS
+            // GET ONLY THIS USER'S CLAIMS
             // =================================================
 
             const [claims] =
@@ -2208,13 +1855,12 @@ app.post(
                     `
                     SELECT id
                     FROM claims
-                    WHERE TRIM(assigned_user_id) = ?
+                    WHERE assigned_user_id = ?
                     `,
                     [
                         employeeId
                     ]
                 );
-
 
             if (
                 !claims ||
@@ -2222,7 +1868,6 @@ app.post(
             ) {
 
                 await connection.rollback();
-
 
                 return res.status(400).send(`
 
@@ -2240,7 +1885,6 @@ app.post(
                 `);
             }
 
-
             // =================================================
             // UPDATE EACH CLAIM
             // =================================================
@@ -2250,62 +1894,56 @@ app.post(
                 const id =
                     claim.id;
 
+                // =================================================
+                // GET FORM VALUES
+                // =================================================
 
                 const claimType =
                     req.body[
                         `claim_type_${id}`
                     ] || null;
 
-
                 const ilomId =
                     req.body[
                         `ilom_id_${id}`
                     ] || null;
-
 
                 const approveAmount =
                     req.body[
                         `approve_amount_${id}`
                     ];
 
-
                 const claimStatus =
                     req.body[
                         `claim_status_${id}`
                     ] || "Pending";
-
 
                 const userRemark =
                     req.body[
                         `user_remark_${id}`
                     ] || null;
 
-
                 const deductionAmount =
                     req.body[
                         `deduction_amount_${id}`
                     ];
-
 
                 const diagnosis2 =
                     req.body[
                         `diagnosis_2_${id}`
                     ] || null;
 
-
                 const interDocExe =
                     req.body[
                         `inter_doc_exe_${id}`
                     ] || null;
 
-
                 // =================================================
-                // CLAIM TYPE
+                // VALIDATE CLAIM TYPE
                 // =================================================
 
                 let finalClaimType =
                     claimType;
-
 
                 if (
                     finalClaimType === ""
@@ -2313,7 +1951,6 @@ app.post(
 
                     finalClaimType = null;
                 }
-
 
                 if (
                     finalClaimType &&
@@ -2327,24 +1964,22 @@ app.post(
                     );
                 }
 
-
                 // =================================================
-                // STATUS
+                // VALIDATE STATUS
                 // =================================================
 
                 let finalClaimStatus =
                     claimStatus;
 
+                // Normalize possible frontend values
 
                 if (
-                    finalClaimStatus ===
-                    "SentBack"
+                    finalClaimStatus === "SentBack"
                 ) {
 
                     finalClaimStatus =
                         "Sent-Back";
                 }
-
 
                 if (
                     finalClaimStatus ===
@@ -2355,7 +1990,6 @@ app.post(
                         "ROD-Cancel";
                 }
 
-
                 if (
                     finalClaimStatus ===
                     "Investigation&Query"
@@ -2365,7 +1999,6 @@ app.post(
                         "Query & Investigation";
                 }
 
-
                 if (
                     finalClaimStatus ===
                     "OtherDoctor/Executive"
@@ -2374,7 +2007,6 @@ app.post(
                     finalClaimStatus =
                         "Other-Doctor/Executive";
                 }
-
 
                 if (
                     !VALID_STATUSES.includes(
@@ -2387,9 +2019,8 @@ app.post(
                     );
                 }
 
-
                 // =================================================
-                // AMOUNTS
+                // DECIMAL VALUES
                 // =================================================
 
                 const finalApproveAmount =
@@ -2399,7 +2030,6 @@ app.post(
                         ? 0
                         : Number(approveAmount);
 
-
                 const finalDeductionAmount =
                     deductionAmount === "" ||
                     deductionAmount === undefined ||
@@ -2407,6 +2037,9 @@ app.post(
                         ? 0
                         : Number(deductionAmount);
 
+                // =================================================
+                // VALIDATE NUMBERS
+                // =================================================
 
                 if (
                     !Number.isFinite(
@@ -2419,7 +2052,6 @@ app.post(
                     );
                 }
 
-
                 if (
                     !Number.isFinite(
                         finalDeductionAmount
@@ -2431,39 +2063,26 @@ app.post(
                     );
                 }
 
-
                 // =================================================
                 // UPDATE CLAIM
-                // updated_at changes EVERY SAVE
                 // =================================================
 
                 await connection.query(
                     `
                     UPDATE claims
                     SET
-
                         claim_type = ?,
-
                         ilom_id = ?,
-
                         approve_amount = ?,
-
                         claim_status = ?,
-
                         user_remark = ?,
-
                         deduction_amount = ?,
-
                         diagnosis_2 = ?,
-
                         inter_doc_exe = ?,
-
                         updated_at = NOW()
-
                     WHERE
                         id = ?
-
-                        AND TRIM(assigned_user_id) = ?
+                        AND assigned_user_id = ?
                     `,
                     [
 
@@ -2490,26 +2109,21 @@ app.post(
                 );
             }
 
-
             // =================================================
             // COMMIT
             // =================================================
 
             await connection.commit();
 
-
             console.log(
                 `Claims saved successfully for employee ${employeeId}`
             );
 
-
             // =================================================
-            // USER DOES NOT SEE SAVE TIME
+            // REDIRECT
             // =================================================
 
-            res.redirect(
-                "/user?saved=1"
-            );
+           res.redirect("/user?saved=1");
 
         } catch (error) {
 
@@ -2517,7 +2131,6 @@ app.post(
                 "SAVE CLAIMS ERROR:",
                 error
             );
-
 
             if (connection) {
 
@@ -2533,7 +2146,6 @@ app.post(
                     );
                 }
             }
-
 
             return res.status(500).send(`
 
@@ -2563,10 +2175,8 @@ ${error.message}
     }
 );
 
-
 // =====================================================
 // ADMIN DOWNLOAD UPDATED CLAIMS
-// SAVE TIME ONLY IN EXCEL DUMP
 // =====================================================
 
 app.get(
@@ -2581,128 +2191,119 @@ app.get(
             return res.redirect("/");
         }
 
-
         try {
 
             const [claims] =
-                await db.query(
-                    `
+                await db.query(`
                     SELECT
 
-                        c.claim_ref_no
+                        claim_ref_no
                             AS CLAIM_REF_NO,
 
-                        c.inward_no
+                        inward_no
                             AS INWARD_NO,
 
-                        c.policy_no
+                        policy_no
                             AS POLICY_NO,
 
-                        c.vertical
+                        vertical
                             AS Vertical,
 
-                        c.additional_deduction
+                        additional_deduction
                             AS "Additional Deduction",
 
-                        c.claim_amount
+                        claim_amount
                             AS CLAIM_AMT,
 
-                        c.al_amount
+                        al_amount
                             AS AL_AMT,
 
-                        c.claim_class
+                        claim_class
                             AS CLAIM_CLASS,
 
-                        c.hospital_code
+                        hospital_code
                             AS "Hospital Code",
 
-                        c.type_of_mou
+                        type_of_mou
                             AS "Type of MOU",
 
-                        c.diagnosis
+                        diagnosis
                             AS Diagnosis,
 
-                        c.diagnosis_2
+                        diagnosis_2
                             AS "Diagnosis 2",
 
-                        c.policy_name
+                        policy_name
                             AS POLICY_NAME,
 
-                        c.queue
+                        queue
                             AS Queue,
 
-                        c.ageing
+                        ageing
                             AS Ageing,
 
-                        c.claim_date
+                        claim_date
                             AS Date,
 
-                        c.claim_time
+                        claim_time
                             AS Time,
 
-                        c.today_status
+                        today_status
                             AS "Today Status",
 
-                        c.i3_status
+                        i3_status
                             AS "I3 Status",
 
-                        c.full_qc
+                        full_qc
                             AS "Full qc",
 
-                        c.relation
+                        relation
                             AS RELATION,
 
-                        c.hnf
+                        hnf
                             AS HNF,
 
-                        c.assigned_user_id
+                        assigned_user_id
                             AS "User ID",
 
-                        c.lot
+                        lot
                             AS lot,
 
-                        c.platform
+                        platform
                             AS platform,
 
-                        c.user_name
+                        user_name
                             AS "User Name",
 
-                        c.claim_type
+                        claim_type
                             AS "Claim Type",
 
-                        c.ilom_id
+                        ilom_id
                             AS "ILOM ID",
 
-                        c.approve_amount
+                        approve_amount
                             AS "Approve AMT",
 
-                        c.claim_status
+                        claim_status
                             AS Status,
 
-                        c.user_remark
+                        user_remark
                             AS Remark,
 
-                        c.deduction_amount
+                        deduction_amount
                             AS "Deduction AMT",
 
-                        c.inter_doc_exe
+                        inter_doc_exe
                             AS "inter. Doc & Exe",
-
-                        DATE_FORMAT(
-                            c.updated_at,
-                            '%d/%m/%Y %h:%i:%s %p'
-                        )
-                            AS "Save Time"
+                        
+                             DATE_FORMAT(updated_at, '%d/%m/%Y %h:%i:%s %p')
+    AS "Save Time"
 
                     FROM claims c
-
-                    LEFT JOIN upload_batches ub
-                        ON c.upload_batch_id = ub.id
-
+                     LEFT JOIN upload_batches ub
+                         ON c.upload_batch_id = ub.id
                     ORDER BY c.id DESC
-                    `
-                );
-
+                `);
 
             // =================================================
             // CREATE EXCEL
@@ -2713,61 +2314,14 @@ app.get(
                     claims
                 );
 
-
             const workbook =
                 XLSX.utils.book_new();
-
 
             XLSX.utils.book_append_sheet(
                 workbook,
                 worksheet,
                 "Claims"
             );
-
-
-            // =================================================
-            // EXCEL COLUMN WIDTH
-            // =================================================
-
-            worksheet["!cols"] = [
-
-                { wch: 18 },
-                { wch: 18 },
-                { wch: 18 },
-                { wch: 15 },
-                { wch: 20 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 18 },
-                { wch: 18 },
-                { wch: 25 },
-                { wch: 25 },
-                { wch: 25 },
-                { wch: 15 },
-                { wch: 12 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 18 },
-                { wch: 18 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 20 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 25 }
-            ];
-
 
             const excelBuffer =
                 XLSX.write(
@@ -2778,18 +2332,15 @@ app.get(
                     }
                 );
 
-
             res.setHeader(
                 "Content-Disposition",
                 "attachment; filename=updated_claims.xlsx"
             );
 
-
             res.setHeader(
                 "Content-Type",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             );
-
 
             res.send(
                 excelBuffer
@@ -2801,7 +2352,6 @@ app.get(
                 "DOWNLOAD ERROR:",
                 error
             );
-
 
             res.status(500).send(`
 
@@ -2822,7 +2372,6 @@ ${error.message}
     }
 );
 
-
 // =====================================================
 // USER DASHBOARD
 // =====================================================
@@ -2836,14 +2385,15 @@ app.get(
             return res.redirect("/");
         }
 
-
         try {
 
-            const employeeId =
-                String(
-                    req.session.user.employee_id || ""
-                ).trim();
+            // =================================================
+            // IMPORTANT:
+            // assigned_user_id = employee_id
+            // =================================================
 
+            const employeeId =
+                req.session.user.employee_id;
 
             if (!employeeId) {
 
@@ -2862,16 +2412,15 @@ app.get(
                 `);
             }
 
-
             // =================================================
             // GET USER CLAIMS
+            // ONLY TODAY'S UPLOADS
             // =================================================
 
             const [claims] =
                 await db.query(
                     `
                     SELECT
-
                         c.*,
 
                         u.id AS employeeid,
@@ -2883,12 +2432,11 @@ app.get(
                     FROM claims c
 
                     LEFT JOIN users u
-                        ON TRIM(c.assigned_user_id) =
-                           TRIM(u.employee_id)
+                        ON c.assigned_user_id =
+                           u.employee_id
 
                     WHERE
-
-                        TRIM(c.assigned_user_id) = ?
+                        c.assigned_user_id = ?
 
                         AND c.uploaded_at >= CURDATE()
 
@@ -2899,9 +2447,8 @@ app.get(
                     ]
                 );
 
-
             // =================================================
-            // FORMAT DATE / TIME
+            // FORMAT EXCEL DATE / TIME
             // =================================================
 
             const formattedClaims =
@@ -2911,10 +2458,8 @@ app.get(
                         let formattedDate =
                             "-";
 
-
                         let formattedTime =
                             "-";
-
 
                         // =================================================
                         // DATE
@@ -2929,7 +2474,6 @@ app.get(
                                     claim.claim_date
                                 );
 
-
                             if (
                                 !isNaN(
                                     date.getTime()
@@ -2940,7 +2484,6 @@ app.get(
                                     date.toLocaleDateString(
                                         "en-IN",
                                         {
-
                                             day:
                                                 "2-digit",
 
@@ -2953,7 +2496,6 @@ app.get(
                                     );
                             }
                         }
-
 
                         // =================================================
                         // TIME
@@ -2968,7 +2510,7 @@ app.get(
                                     claim.claim_time
                                 );
 
-
+                            // If MySQL returns HH:MM:SS
                             if (
                                 /^\d{2}:\d{2}:\d{2}$/.test(
                                     timeValue
@@ -2980,7 +2522,6 @@ app.get(
                                         `1970-01-01T${timeValue}`
                                     );
 
-
                                 if (
                                     !isNaN(
                                         time.getTime()
@@ -2991,7 +2532,6 @@ app.get(
                                         time.toLocaleTimeString(
                                             "en-IN",
                                             {
-
                                                 hour:
                                                     "2-digit",
 
@@ -3011,7 +2551,6 @@ app.get(
                             }
                         }
 
-
                         return {
 
                             ...claim,
@@ -3025,24 +2564,22 @@ app.get(
                     }
                 );
 
+            // =================================================
+            // DEBUG
+            // =================================================
 
             console.log(
                 "USER EMPLOYEE ID:",
                 employeeId
             );
 
-
             console.log(
                 "CLAIMS:",
                 formattedClaims.length
             );
 
-
             // =================================================
             // RENDER
-            // Save Time is NOT passed separately.
-            // User dashboard will not display it unless
-            // your EJS explicitly uses updated_at.
             // =================================================
 
             res.render(
@@ -3067,7 +2604,6 @@ app.get(
                 error
             );
 
-
             res.status(500).send(`
 
                 <h2>
@@ -3089,7 +2625,6 @@ ${error.message}
     }
 );
 
-
 // =====================================================
 // LOGOUT
 // =====================================================
@@ -3107,21 +2642,11 @@ app.get(
     }
 );
 
-
 // =====================================================
 // START SERVER
 // =====================================================
 
-app.listen(
-    PORT,
-    "0.0.0.0",
-    async () => {
-
-        console.log(
-            `Server running on port ${PORT}`
-        );
-
-        await testDatabase();
-    }
-);
-
+app.listen(PORT, "0.0.0.0", async () => {
+    console.log(`Server running on port ${PORT}`);
+    await testDatabase();
+});

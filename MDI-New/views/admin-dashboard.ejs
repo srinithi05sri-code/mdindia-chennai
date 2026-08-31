@@ -164,46 +164,56 @@
 
     <h2>Create New User</h2>
 
-    <form action="/admin/create-user" method="POST" class="form-group">
-         <label>Employee ID</label>
+   <form action="/admin/create-user" method="POST">
+
+    <div>
+        <label>Employee ID</label>
+
         <input
-        type="text"
-        name="employee_id"
-        placeholder="Enter Employee ID"
-        required
-    >
+            type="text"
+            name="employeeId"
+            placeholder="Enter Employee ID"
+            required
+        >
+    </div>
+
+    <div>
         <label>Username</label>
+
         <input
             type="text"
             name="username"
+            placeholder="Enter Username"
             required
         >
+    </div>
 
-        <br><br>
-
+    <div>
         <label>Password</label>
+
         <input
             type="password"
             name="password"
+            placeholder="Enter Password"
             required
         >
+    </div>
 
-        <br><br>
-
+    <div>
         <label>Department</label>
+
         <input
             type="text"
             name="department"
-            required
+            placeholder="Enter Department"
         >
+    </div>
 
-        <br><br>
+    <button type="submit">
+        Create User
+    </button>
 
-        <button type="submit">
-            Create User
-        </button>
-
-    </form>
+</form>
     <hr>
 
 <h2 class="reassign-form" >Reassign Claims</h2>
