@@ -306,199 +306,202 @@ app.get("/", (req, res) => {
 // IMPORTANT FIXED
 // =====================================================
 
+// =====================================================
+// LOGIN
+// =====================================================
+
 app.post("/login", async (req, res) => {
 
-    const employee_id =
-        String(req.body.employee_id || "").trim();
+    const employee_id = String(req.body.employee_id || "").trim();
+    const password = String(req.body.password || "").trim();
 
-    const password =
-        String(req.body.password || "").trim();
+    console.log("=================================");
+    console.log("LOGIN ATTEMPT");
+    console.log("Employee ID:", employee_id);
+    console.log("Password:", password);
+    console.log("=================================");
 
     if (!employee_id || !password) {
-
-        return res.render(
-            "login",
-            {
-                error:
-                    "Employee ID and Password are required"
-            }
-        );
+        return res.render("login", {
+            error: "Employee ID and Password are required"
+        });
     }
 
     try {
 
-        const [users] =
-            await db.query(
-                `
-                SELECT
-                    id,
-                    employee_id,
-                    username,
-                    password,
-                    role,
-                    department,
-                    is_active
-                FROM users
-                WHERE LOWER(TRIM(employee_id)) = LOWER(TRIM(?))
-      AND password = ?
-                  AND is_active = TRUE
-                LIMIT 1
-                `,
-                [
-                    employee_id,
-                    password
-                ]
-            );
+        // -------------------------------------------------
+        // FIND USER
+        // -------------------------------------------------
+
+        const [users] = await db.query(
+            `
+            SELECT
+                id,
+                employee_id,
+                username,
+                password,
+                role,
+                department,
+                is_active
+            FROM users
+            WHERE employee_id = ?
+            LIMIT 1
+            `,
+            [employee_id]
+        );
+
+        console.log("USER FOUND:", users);
+
+        // -------------------------------------------------
+        // USER NOT FOUND
+        // -------------------------------------------------
 
         if (users.length === 0) {
 
             console.log(
-                "LOGIN FAILED - INVALID CREDENTIALS:",
+                "LOGIN FAILED - EMPLOYEE ID NOT FOUND:",
                 employee_id
             );
 
-            return res.render(
-                "login",
-                {
-                    error:
-                        "Invalid Employee ID or Password"
-                }
-            );
+            return res.render("login", {
+                error: "Invalid Employee ID or Password"
+            });
         }
 
-        const user =
-            users[0];
+        const user = users[0];
 
-        // =================================================
-        // IMPORTANT:
-        // NORMALIZE ROLE
-        // admin / Admin / ADMIN / admin(space)
-        // அனைத்தும் admin ஆகும்
-        // =================================================
+        console.log("DATABASE USER:", {
+            id: user.id,
+            employee_id: user.employee_id,
+            username: user.username,
+            role: user.role,
+            department: user.department,
+            is_active: user.is_active
+        });
 
-        const normalizedRole =
-            normalizeRole(user.role);
+        // -------------------------------------------------
+        // PASSWORD CHECK
+        // -------------------------------------------------
 
-        console.log(
-            "DATABASE ROLE:",
-            user.role
-        );
-
-        console.log(
-            "NORMALIZED ROLE:",
-            normalizedRole
-        );
-
-        // =================================================
-        // CHECK VALID ROLE
-        // =================================================
-
-        if (
-            ![
-                "admin",
-                "upload",
-                "user"
-            ].includes(normalizedRole)
-        ) {
+        if (String(user.password).trim() !== password) {
 
             console.log(
-                "INVALID ROLE IN DATABASE:",
-                user.role
+                "LOGIN FAILED - PASSWORD MISMATCH:",
+                employee_id
             );
 
-            return res.render(
-                "login",
-                {
-                    error:
-                        `Invalid role '${user.role}' assigned to this account.`
-                }
-            );
+            return res.render("login", {
+                error: "Invalid Employee ID or Password"
+            });
         }
 
-        // =================================================
-        // SAVE USER DETAILS IN SESSION
-        // =================================================
+        // -------------------------------------------------
+        // ACTIVE CHECK
+        // -------------------------------------------------
+
+        /*
+           Handles:
+           TRUE
+           1
+           "1"
+           "true"
+           "TRUE"
+        */
+
+        const activeValue = String(user.is_active)
+            .trim()
+            .toLowerCase();
+
+        const isActive =
+            activeValue === "1" ||
+            activeValue === "true";
+
+        if (!isActive) {
+
+            console.log(
+                "LOGIN FAILED - USER INACTIVE:",
+                employee_id,
+                "is_active:",
+                user.is_active
+            );
+
+            return res.render("login", {
+                error: "Your account is inactive"
+            });
+        }
+
+        // -------------------------------------------------
+        // NORMALIZE ROLE
+        // -------------------------------------------------
+
+        const role = String(user.role || "")
+            .trim()
+            .toLowerCase();
+
+        // -------------------------------------------------
+        // SAVE SESSION
+        // -------------------------------------------------
 
         req.session.user = {
 
-            id:
-                user.id,
+            id: user.id,
 
-            employee_id:
-                user.employee_id,
+            employee_id: user.employee_id,
 
-            username:
-                user.username,
+            username: user.username,
 
-            role:
-                normalizedRole,
+            role: role,
 
-            department:
-                user.department
+            department: user.department
         };
 
-        console.log(
-            "================================="
-        );
+        console.log("=================================");
+        console.log("LOGIN SUCCESS");
+        console.log("SESSION USER:", req.session.user);
+        console.log("=================================");
 
-        console.log(
-            "LOGIN SUCCESS"
-        );
+        // -------------------------------------------------
+        // ROLE REDIRECT
+        // -------------------------------------------------
 
-        console.log(
-            "Employee ID:",
-            req.session.user.employee_id
-        );
+        if (role === "admin") {
 
-        console.log(
-            "Username:",
-            req.session.user.username
-        );
-
-        console.log(
-            "Role:",
-            req.session.user.role
-        );
-
-        console.log(
-            "================================="
-        );
-
-        // =================================================
-        // ROLE BASED REDIRECT
-        // =================================================
-
-        if (normalizedRole === "admin") {
+            console.log(
+                "REDIRECTING TO ADMIN DASHBOARD"
+            );
 
             return res.redirect("/admin");
         }
 
-        if (normalizedRole === "upload") {
+        if (role === "upload") {
 
             return res.redirect("/upload");
         }
 
-        if (normalizedRole === "user") {
+        if (role === "user") {
 
             return res.redirect("/user");
         }
 
-        return res.redirect("/");
+        console.log(
+            "UNKNOWN ROLE:",
+            user.role
+        );
+
+        return res.render("login", {
+            error: "Invalid user role"
+        });
 
     } catch (error) {
 
         console.error(
-            "LOGIN ERROR:",
+            "LOGIN DATABASE ERROR:",
             error
         );
 
-        return res.render(
-            "login",
-            {
-                error:
-                    "Server error. Please try again."
-            }
-        );
+        return res.render("login", {
+            error: "Server error. Please try again."
+        });
     }
 });
 
