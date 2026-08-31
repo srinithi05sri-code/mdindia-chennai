@@ -631,7 +631,6 @@ app.get("/admin", async (req, res) => {
 // =====================================================
 // CREATE USER
 // =====================================================
-
 app.post(
     "/admin/create-user",
     async (req, res) => {
@@ -640,15 +639,14 @@ app.post(
             !req.session.user ||
             req.session.user.role !== "admin"
         ) {
-
             return res.redirect("/");
         }
 
         const {
+            employeeId,
             username,
             password,
-            department,
-            employee_id
+            department
         } = req.body;
 
         try {
@@ -675,7 +673,7 @@ app.post(
                 )
                 `,
                 [
-                    employee_id || null,
+                    employeeId || null,
                     username,
                     password,
                     department
@@ -2017,9 +2015,7 @@ app.post(
             // REDIRECT
             // =================================================
 
-            return res.redirect(
-                "/user?saved=1"
-            );
+           res.redirect("/user?saved=1");
 
         } catch (error) {
 
@@ -2191,10 +2187,14 @@ app.get(
 
                         inter_doc_exe
                             AS "inter. Doc & Exe"
+                        
+                             DATE_FORMAT(updated_at, '%d/%m/%Y %h:%i:%s %p')
+    AS "Save Time"
 
-                    FROM claims
-
-                    ORDER BY id DESC
+                    FROM claims c
+                     LEFT JOIN upload_batches ub
+                         ON c.upload_batch_id = ub.id
+                    ORDER BY c.id DESC
                 `);
 
             // =================================================
