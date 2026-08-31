@@ -139,15 +139,17 @@ const VALID_STATUSES = [
 
 async function testDatabase() {
     try {
+
         console.log("========== MYSQL DEBUG ==========");
-        console.log("MYSQLHOST:", process.env.MYSQLHOST);
-        console.log("MYSQLPORT:", process.env.MYSQLPORT);
-        console.log("MYSQLUSER:", process.env.MYSQLUSER);
-        console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+        console.log("MYSQLHOST:", process.env.MYSQLHOST || "NOT SET");
+        console.log("MYSQLPORT:", process.env.MYSQLPORT || "NOT SET");
+        console.log("MYSQLUSER:", process.env.MYSQLUSER || "NOT SET");
+        console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE || "NOT SET");
         console.log(
             "MYSQLPASSWORD:",
             process.env.MYSQLPASSWORD ? "SET" : "NOT SET"
         );
+        console.log("=================================");
 
         const connection = await db.getConnection();
 
@@ -156,12 +158,12 @@ async function testDatabase() {
         connection.release();
 
     } catch (error) {
-        console.log("========== MYSQL CONNECTION ERROR ==========");
+
+        console.log("MySQL Connection Failed");
         console.log("Error Code:", error.code);
         console.log("Error Message:", error.message);
-        console.log("Error Host:", error.hostname);
+        console.log("Error Address:", error.address);
         console.log("Error Port:", error.port);
-        console.log("============================================");
     }
 }
 
