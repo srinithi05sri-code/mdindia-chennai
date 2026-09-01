@@ -2087,6 +2087,119 @@ app.get(
         }
     }
 );
+app.get("/user-dashboard", async (req, res) => {
+
+    if (
+        !req.session.user ||
+        normalizeRole(req.session.user.role) !== "user"
+    ) {
+        return res.redirect("/");
+    }
+
+    try {
+
+        const employeeId = req.session.user.employee_id;
+
+        // ============================================
+        // USER PROCESS SUMMARY
+        // ============================================
+
+        const [processSummary] = await db.query(`
+            SELECT
+
+                COALESCE(c.platform, '-') AS platform,
+
+                COUNT(*) AS total_allocated,
+
+                SUM(c.claim_status = 'Approved') AS approved,
+
+                SUM(c.claim_status = 'Rejected') AS rejected,
+
+                SUM(c.claim_status = 'Query') AS query_count,
+
+                SUM(c.claim_status = 'Re-Query') AS requery,
+
+                SUM(
+                    c.claim_status = 'Query & Investigation'
+                ) AS investigation_query,
+
+                SUM(
+                    c.claim_status = 'Investigation'
+                ) AS investigation,
+
+                SUM(
+                    c.claim_status = 'Sent-Back'
+                ) AS sent_back,
+
+                SUM(
+                    c.claim_status = 'Keep'
+                ) AS keep_count,
+
+                SUM(
+                    c.claim_status = 'Other-Doctor/Executive'
+                ) AS other_doctor_executive,
+
+                SUM(
+                    c.claim_status = 'Pending'
+                ) AS pending,
+
+                SUM(
+                    c.claim_status <> 'Pending'
+                ) AS total_productivity
+
+            FROM claims c
+
+            WHERE TRIM(c.assigned_user_id) = TRIM(?)
+
+            GROUP BY c.platform
+
+            ORDER BY c.platform
+        `, [employeeId]);
+
+
+        // ============================================
+        // USER CLAIMS
+        // ============================================
+
+        const [claims] = await db.query(`
+            SELECT *
+            FROM claims
+            WHERE TRIM(assigned_user_id) = TRIM(?)
+            ORDER BY id DESC
+        `, [employeeId]);
+
+
+        // ============================================
+        // RENDER USER DASHBOARD
+        // ============================================
+
+        return res.render("user-dashboard", {
+
+            user: req.session.user,
+
+            claims: claims,
+
+            processSummary: processSummary
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "USER DASHBOARD ERROR:",
+            error
+        );
+
+        return res.status(500).send(`
+            <h2>User Dashboard Error</h2>
+            <pre>${error.message}</pre>
+            <br>
+            <a href="/user-dashboard">
+                Back to Dashboard
+            </a>
+        `);
+    }
+});
 
 
 // =====================================================
