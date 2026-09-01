@@ -1009,8 +1009,12 @@ app.get(
 
                         ub.file_name,
 
-                        ub.uploaded_at
-                            AS uploaded_at,
+                        
+        CONVERT_TZ(
+            ub.uploaded_at,
+            '+00:00',
+            '+05:30'
+        ) AS uploaded_at,
 
                         ub.total_claims,
 
