@@ -30,8 +30,9 @@ const upload = multer({
             ".xls"
         ];
 
-        const ext =
-            path.extname(file.originalname).toLowerCase();
+        const ext = path
+            .extname(file.originalname)
+            .toLowerCase();
 
         if (allowed.includes(ext)) {
             cb(null, true);
@@ -58,9 +59,13 @@ console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
 const db = mysql.createPool({
 
     host: process.env.MYSQLHOST,
-    port: Number(process.env.MYSQLPORT),
+
+    port: Number(
+        process.env.MYSQLPORT || 3306
+    ),
 
     user: process.env.MYSQLUSER,
+
     password: process.env.MYSQLPASSWORD,
 
     database: process.env.MYSQLDATABASE,
@@ -124,7 +129,6 @@ app.use(
 
         cookie: {
             maxAge: 1000 * 60 * 60,
-
             httpOnly: true
         }
     })
@@ -141,7 +145,6 @@ const VALID_CLAIM_TYPES = [
     "Pre Post"
 ];
 
-
 const VALID_STATUSES = [
     "Pending",
     "Approved",
@@ -155,6 +158,14 @@ const VALID_STATUSES = [
     "Other-Doctor/Executive",
     "ROD-Cancel"
 ];
+
+
+// =====================================================
+// SAVE LOCK
+// Prevent accidental simultaneous double-save
+// =====================================================
+
+const savingUsers = new Set();
 
 
 // =====================================================
@@ -175,18 +186,15 @@ function normalizeRole(role) {
 
 function normalizeStatus(status) {
 
-    let value =
-        String(status || "")
-            .trim();
+    let value = String(status || "").trim();
 
     if (value === "") {
         return "Pending";
     }
 
-    const normalized =
-        value
-            .replace(/\s+/g, " ")
-            .trim();
+    const normalized = value
+        .replace(/\s+/g, " ")
+        .trim();
 
     if (
         normalized === "SentBack" ||
@@ -227,16 +235,13 @@ function normalizeStatus(status) {
 
 function normalizeClaimType(value) {
 
-    let claimType =
-        String(value || "")
-            .trim();
+    let claimType = String(value || "").trim();
 
     if (claimType === "") {
         return null;
     }
 
-    const upper =
-        claimType.toUpperCase();
+    const upper = claimType.toUpperCase();
 
     if (upper === "INPATIENT") {
         return "IPD";
@@ -280,11 +285,7 @@ function convertExcelDate(value) {
         return null;
     }
 
-
-    // ---------------------------------------------
     // Excel numeric serial
-    // Example: 46578
-    // ---------------------------------------------
 
     if (
         typeof value === "number" &&
@@ -298,8 +299,7 @@ function convertExcelDate(value) {
             return null;
         }
 
-        const year =
-            String(date.y);
+        const year = String(date.y);
 
         const month =
             String(date.m).padStart(2, "0");
@@ -310,10 +310,7 @@ function convertExcelDate(value) {
         return `${year}-${month}-${day}`;
     }
 
-
-    // ---------------------------------------------
     // JavaScript Date
-    // ---------------------------------------------
 
     if (value instanceof Date) {
 
@@ -337,10 +334,7 @@ function convertExcelDate(value) {
         return `${year}-${month}-${day}`;
     }
 
-
-    // ---------------------------------------------
     // String
-    // ---------------------------------------------
 
     const text =
         String(value).trim();
@@ -349,16 +343,16 @@ function convertExcelDate(value) {
         return null;
     }
 
-
     // YYYY-MM-DD
+
     if (
         /^\d{4}-\d{2}-\d{2}$/.test(text)
     ) {
         return text;
     }
 
+    // DD-MM-YYYY / DD/MM/YYYY
 
-    // DD-MM-YYYY
     let match =
         text.match(
             /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/
@@ -378,8 +372,8 @@ function convertExcelDate(value) {
         return `${year}-${month}-${day}`;
     }
 
-
     // DD/MM/YYYY with time
+
     match =
         text.match(
             /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/
@@ -399,8 +393,8 @@ function convertExcelDate(value) {
         return `${year}-${month}-${day}`;
     }
 
-
     // Excel serial stored as string
+
     if (
         /^\d+(\.\d+)?$/.test(text)
     ) {
@@ -429,7 +423,6 @@ function convertExcelDate(value) {
         }
     }
 
-
     return null;
 }
 
@@ -448,9 +441,7 @@ function convertExcelTime(value) {
         return null;
     }
 
-
-    // Excel time as decimal
-    // Example: 0.5 = 12:00:00
+    // Excel decimal time
 
     if (
         typeof value === "number" &&
@@ -459,7 +450,9 @@ function convertExcelTime(value) {
     ) {
 
         const totalSeconds =
-            Math.round(value * 24 * 60 * 60);
+            Math.round(
+                value * 24 * 60 * 60
+            );
 
         const hours =
             Math.floor(
@@ -481,7 +474,6 @@ function convertExcelTime(value) {
         ].join(":");
     }
 
-
     const text =
         String(value).trim();
 
@@ -489,24 +481,21 @@ function convertExcelTime(value) {
         return null;
     }
 
-
     // HH:MM
+
     if (
         /^\d{1,2}:\d{2}$/.test(text)
     ) {
-
         return `${text}:00`;
     }
 
-
     // HH:MM:SS
+
     if (
         /^\d{1,2}:\d{2}:\d{2}$/.test(text)
     ) {
-
         return text;
     }
-
 
     return text;
 }
@@ -554,7 +543,6 @@ async function testDatabase() {
         console.log(
             "================================="
         );
-
 
         const connection =
             await db.getConnection();
@@ -620,7 +608,6 @@ app.post(
                 req.body.password || ""
             ).trim();
 
-
         if (
             !employee_id ||
             !password
@@ -634,7 +621,6 @@ app.post(
                 }
             );
         }
-
 
         try {
 
@@ -659,7 +645,6 @@ app.post(
                     ]
                 );
 
-
             if (
                 users.length === 0
             ) {
@@ -673,16 +658,13 @@ app.post(
                 );
             }
 
-
             const user =
                 users[0];
-
 
             const dbPassword =
                 String(
                     user.password || ""
                 ).trim();
-
 
             if (
                 dbPassword !== password
@@ -697,7 +679,6 @@ app.post(
                 );
             }
 
-
             const activeValue =
                 String(
                     user.is_active
@@ -705,11 +686,9 @@ app.post(
                     .trim()
                     .toLowerCase();
 
-
             const isActive =
                 activeValue === "1" ||
                 activeValue === "true";
-
 
             if (!isActive) {
 
@@ -722,12 +701,10 @@ app.post(
                 );
             }
 
-
             const role =
                 normalizeRole(
                     user.role
                 );
-
 
             req.session.user = {
 
@@ -747,7 +724,6 @@ app.post(
                     user.department
             };
 
-
             if (
                 role === "admin"
             ) {
@@ -756,7 +732,6 @@ app.post(
                     "/admin"
                 );
             }
-
 
             if (
                 role === "upload"
@@ -767,7 +742,6 @@ app.post(
                 );
             }
 
-
             if (
                 role === "user"
             ) {
@@ -776,7 +750,6 @@ app.post(
                     "/user"
                 );
             }
-
 
             return res.render(
                 "login",
@@ -823,8 +796,11 @@ app.get(
             return res.redirect("/");
         }
 
-
         try {
+
+            // ---------------------------------------------
+            // USERS
+            // ---------------------------------------------
 
             const [userList] =
                 await db.query(
@@ -841,6 +817,10 @@ app.get(
                     `
                 );
 
+
+            // ---------------------------------------------
+            // PROCESS SUMMARY
+            // ---------------------------------------------
 
             const [processSummary] =
                 await db.query(
@@ -898,7 +878,8 @@ app.get(
                         ) AS sent_back,
 
                         SUM(
-                            c.claim_status = 'Keep'
+                            c.claim_status =
+                            'Keep'
                         ) AS keep_count,
 
                         SUM(
@@ -907,7 +888,13 @@ app.get(
                         ) AS other_doctor_executive,
 
                         SUM(
-                            c.claim_status = 'Pending'
+                            c.claim_status =
+                            'ROD-Cancel'
+                        ) AS rod_cancel,
+
+                        SUM(
+                            c.claim_status =
+                            'Pending'
                         ) AS pending,
 
                         SUM(
@@ -947,6 +934,7 @@ app.get(
 
             const adminUser = {
                 ...req.session.user,
+
                 name:
                     req.session.user.username
             };
@@ -976,8 +964,11 @@ app.get(
 
             return res.status(500).send(`
                 <h2>Admin Dashboard Error</h2>
+
                 <pre>${error.message}</pre>
+
                 <br>
+
                 <a href="/admin">
                     Back to Admin
                 </a>
@@ -989,6 +980,8 @@ app.get(
 
 // =====================================================
 // UPLOAD DASHBOARD
+// IMPORTANT:
+// DB COLUMN = upload_at
 // =====================================================
 
 app.get(
@@ -1005,16 +998,20 @@ app.get(
             return res.redirect("/");
         }
 
-
         try {
 
             const [uploads] =
                 await db.query(
                     `
                     SELECT
+
                         ub.id,
+
                         ub.file_name,
-                        ub.uploaded_at,
+
+                        ub.upload_at
+                            AS uploaded_at,
+
                         ub.total_claims,
 
                         CASE
@@ -1051,7 +1048,14 @@ app.get(
 
             return res.status(500).send(`
                 <h2>Database Error</h2>
+
                 <pre>${error.message}</pre>
+
+                <br>
+
+                <a href="/upload">
+                    Back to Upload
+                </a>
             `);
         }
     }
@@ -1077,7 +1081,6 @@ app.post(
             return res.redirect("/");
         }
 
-
         if (!req.file) {
 
             return res.status(400).send(
@@ -1085,9 +1088,7 @@ app.post(
             );
         }
 
-
         let connection;
-
 
         try {
 
@@ -1104,7 +1105,6 @@ app.post(
                     }
                 );
 
-
             if (
                 !workbook.SheetNames ||
                 workbook.SheetNames.length === 0
@@ -1115,14 +1115,11 @@ app.post(
                 );
             }
 
-
             const sheetName =
                 workbook.SheetNames[0];
 
-
             const sheet =
                 workbook.Sheets[sheetName];
-
 
             const rows =
                 XLSX.utils.sheet_to_json(
@@ -1132,7 +1129,6 @@ app.post(
                         raw: true
                     }
                 );
-
 
             if (
                 rows.length === 0
@@ -1207,12 +1203,13 @@ app.post(
             connection =
                 await db.getConnection();
 
-
             await connection.beginTransaction();
 
 
             // ---------------------------------------------
             // CREATE UPLOAD BATCH
+            // IMPORTANT:
+            // upload_at, NOT uploaded_at
             // ---------------------------------------------
 
             const [batchResult] =
@@ -1223,7 +1220,7 @@ app.post(
                         file_name,
                         total_claims,
                         status,
-                        uploaded_at
+                        upload_at
                     )
                     VALUES
                     (
@@ -1257,6 +1254,10 @@ app.post(
                 const row =
                     rows[index];
 
+
+                // -----------------------------------------
+                // BASIC FIELDS
+                // -----------------------------------------
 
                 const claimRefNo =
                     String(
@@ -1313,6 +1314,10 @@ app.post(
                         row["User Name"] || ""
                     ).trim();
 
+
+                // -----------------------------------------
+                // OPTIONAL FIELDS
+                // -----------------------------------------
 
                 const additionalDeduction =
                     parseFloat(
@@ -1372,35 +1377,6 @@ app.post(
                     String(
                         row["Ageing"] || ""
                     ).trim();
-
-
-                // -----------------------------------------
-                // FIX EXCEL DATE 46578
-                // -----------------------------------------
-
-                const claimDate =
-                    convertExcelDate(
-                        row["Date"]
-                    );
-
-
-                if (
-                    row["Date"] !== "" &&
-                    row["Date"] !== null &&
-                    row["Date"] !== undefined &&
-                    !claimDate
-                ) {
-
-                    throw new Error(
-                        `Invalid Date for Claim ${claimRefNo}.`
-                    );
-                }
-
-
-                const claimTime =
-                    convertExcelTime(
-                        row["Time"]
-                    );
 
 
                 const todayStatus =
@@ -1477,6 +1453,39 @@ app.post(
                         row["Platform"] ||
                         ""
                     ).trim();
+
+
+                // -----------------------------------------
+                // DATE
+                // -----------------------------------------
+
+                const claimDate =
+                    convertExcelDate(
+                        row["Date"]
+                    );
+
+
+                if (
+                    row["Date"] !== "" &&
+                    row["Date"] !== null &&
+                    row["Date"] !== undefined &&
+                    !claimDate
+                ) {
+
+                    throw new Error(
+                        `Invalid Date for Claim ${claimRefNo}.`
+                    );
+                }
+
+
+                // -----------------------------------------
+                // TIME
+                // -----------------------------------------
+
+                const claimTime =
+                    convertExcelTime(
+                        row["Time"]
+                    );
 
 
                 // -----------------------------------------
@@ -1736,7 +1745,17 @@ app.post(
 
 
         const batchId =
-            req.params.id;
+            String(
+                req.params.id || ""
+            ).trim();
+
+
+        if (!batchId) {
+
+            return res.status(400).send(
+                "Invalid upload ID."
+            );
+        }
 
 
         let connection;
@@ -1747,9 +1766,10 @@ app.post(
             connection =
                 await db.getConnection();
 
-
             await connection.beginTransaction();
 
+
+            // Delete claims belonging to batch
 
             await connection.query(
                 `
@@ -1761,6 +1781,8 @@ app.post(
                 ]
             );
 
+
+            // Mark upload deleted
 
             await connection.query(
                 `
@@ -1785,7 +1807,15 @@ app.post(
         } catch (error) {
 
             if (connection) {
-                await connection.rollback();
+
+                try {
+                    await connection.rollback();
+                } catch (rollbackError) {
+                    console.error(
+                        "ROLLBACK ERROR:",
+                        rollbackError
+                    );
+                }
             }
 
 
@@ -1818,37 +1848,102 @@ app.post(
 
 
 // =====================================================
-// SAVE USER CLAIMS - CORRECTED
+// SAVE USER CLAIMS
 // =====================================================
 
-app.post(
-    "/save-claims",
-    async (req, res) => {
+// ============================================================
+// SAVE CLAIMS
+// ============================================================
 
-        if (
-            !req.session.user ||
-            normalizeRole(
-                req.session.user.role
-            ) !== "user"
-        ) {
+app.post("/save-claims", async (req, res) => {
 
-            return res.redirect("/");
-        }
+    // ---------------------------------------------------------
+    // LOGIN CHECK
+    // ---------------------------------------------------------
+    if (
+        !req.session.user ||
+        normalizeRole(req.session.user.role) !== "user"
+    ) {
+        return res.redirect("/");
+    }
 
+    const employeeId = String(
+        req.session.user.employee_id || ""
+    ).trim();
 
-        const employeeId =
-            String(
-                req.session.user.employee_id || ""
-            ).trim();
+    if (!employeeId) {
+        return res.status(400).send(`
+            <h2>Save Failed</h2>
+            <p>Employee ID is missing.</p>
 
+            <a href="/user">
+                Back to Dashboard
+            </a>
+        `);
+    }
 
-        if (!employeeId) {
+    // ---------------------------------------------------------
+    // DOUBLE SAVE PROTECTION
+    // ---------------------------------------------------------
+    if (savingUsers.has(employeeId)) {
+
+        return res.status(409).send(`
+            <h2>Save Already In Progress</h2>
+
+            <p>
+                Your previous save request is still processing.
+                Please wait a moment.
+            </p>
+
+            <a href="/user">
+                Back to User Dashboard
+            </a>
+        `);
+    }
+
+    savingUsers.add(employeeId);
+
+    let connection;
+
+    try {
+
+        // =====================================================
+        // FIND CLAIM IDS FROM FORM
+        // =====================================================
+
+        const submittedKeys = Object.keys(req.body);
+
+        const claimIds = [
+            ...new Set(
+
+                submittedKeys
+
+                    .map(key => {
+
+                        const match = key.match(
+                            /^(?:claim_type|ilom_id|approve_amount|claim_status|user_remark|deduction_amount|diagnosis_2|inter_doc_exe)_(\d+)$/
+                        );
+
+                        return match
+                            ? Number(match[1])
+                            : null;
+                    })
+
+                    .filter(
+                        id =>
+                            Number.isInteger(id) &&
+                            id > 0
+                    )
+            )
+        ];
+
+        if (claimIds.length === 0) {
 
             return res.status(400).send(`
                 <h2>Save Failed</h2>
 
                 <p>
-                    Employee ID is missing.
+                    No claim changes were submitted.
                 </p>
 
                 <a href="/user">
@@ -1857,852 +1952,732 @@ app.post(
             `);
         }
 
+        console.log(
+            "SAVE CLAIM IDS:",
+            claimIds
+        );
 
-        let connection;
+        // =====================================================
+        // DB CONNECTION
+        // =====================================================
 
+        connection = await db.getConnection();
 
-        try {
+        await connection.beginTransaction();
 
-            // =================================================
-            // IMPORTANT FIX
-            // Only process claim IDs actually submitted
-            // =================================================
+        // =====================================================
+        // UPDATE CLAIMS
+        // =====================================================
 
-            const submittedKeys =
-                Object.keys(req.body);
+        for (const id of claimIds) {
 
+            // -------------------------------------------------
+            // SECURITY CHECK
+            // Claim must belong to logged-in employee
+            // -------------------------------------------------
 
-            const claimIds = [
-                ...new Set(
-                    submittedKeys
-                        .map(key => {
-
-                            const match =
-                                key.match(
-                                    /^(?:claim_type|ilom_id|approve_amount|claim_status|user_remark|deduction_amount|diagnosis_2|inter_doc_exe)_(\d+)$/
-                                );
-
-                            return match
-                                ? Number(match[1])
-                                : null;
-                        })
-                        .filter(
-                            id =>
-                                Number.isInteger(id) &&
-                                id > 0
-                        )
-                )
-            ];
-
-
-            if (
-                claimIds.length === 0
-            ) {
-
-                return res.status(400).send(`
-                    <h2>Save Failed</h2>
-
-                    <p>
-                        No claim changes were submitted.
-                    </p>
-
-                    <a href="/user">
-                        Back to Dashboard
-                    </a>
-                `);
-            }
-
-
-            console.log(
-                "SAVE CLAIM IDS:",
-                claimIds
-            );
-
-
-            connection =
-                await db.getConnection();
-
-
-            await connection.beginTransaction();
-
-
-            // =================================================
-            // UPDATE ONLY SUBMITTED CLAIMS
-            // =================================================
-
-            for (
-                const id of claimIds
-            ) {
-
-                // ---------------------------------------------
-                // Security check
-                // ---------------------------------------------
-
-                const [claimRows] =
-                    await connection.query(
-                        `
-                        SELECT id
-                        FROM claims
-                        WHERE id = ?
-                        AND TRIM(assigned_user_id)
-                            = TRIM(?)
-                        LIMIT 1
-                        `,
-                        [
-                            id,
-                            employeeId
-                        ]
-                    );
-
-
-                if (
-                    claimRows.length === 0
-                ) {
-
-                    throw new Error(
-                        `Claim ID ${id} does not belong to this user.`
-                    );
-                }
-
-
-                // ---------------------------------------------
-                // VALUES
-                // ---------------------------------------------
-
-                const claimTypeRaw =
-                    req.body[
-                        `claim_type_${id}`
-                    ];
-
-
-                const ilomId =
-                    String(
-                        req.body[
-                            `ilom_id_${id}`
-                        ] || ""
-                    ).trim() || null;
-
-
-                const approveAmountRaw =
-                    req.body[
-                        `approve_amount_${id}`
-                    ];
-
-
-                const claimStatusRaw =
-                    req.body[
-                        `claim_status_${id}`
-                    ];
-
-
-                const userRemark =
-                    String(
-                        req.body[
-                            `user_remark_${id}`
-                        ] || ""
-                    ).trim() || null;
-
-
-                const deductionAmountRaw =
-                    req.body[
-                        `deduction_amount_${id}`
-                    ];
-
-
-                const diagnosis2 =
-                    String(
-                        req.body[
-                            `diagnosis_2_${id}`
-                        ] || ""
-                    ).trim() || null;
-
-
-                const interDocExe =
-                    String(
-                        req.body[
-                            `inter_doc_exe_${id}`
-                        ] || ""
-                    ).trim() || null;
-
-
-                // ---------------------------------------------
-                // CLAIM TYPE
-                // ---------------------------------------------
-
-                const finalClaimType =
-                    normalizeClaimType(
-                        claimTypeRaw
-                    );
-
-
-                // ---------------------------------------------
-                // STATUS
-                // ---------------------------------------------
-
-                const finalClaimStatus =
-                    normalizeStatus(
-                        claimStatusRaw
-                    );
-
-
-                if (
-                    !VALID_STATUSES.includes(
-                        finalClaimStatus
-                    )
-                ) {
-
-                    throw new Error(
-                        `Invalid Status '${finalClaimStatus}' for Claim ID ${id}.`
-                    );
-                }
-
-
-                // ---------------------------------------------
-                // APPROVE AMOUNT
-                // ---------------------------------------------
-
-                let finalApproveAmount = 0;
-
-
-                if (
-                    approveAmountRaw !== undefined &&
-                    approveAmountRaw !== null &&
-                    String(
-                        approveAmountRaw
-                    ).trim() !== ""
-                ) {
-
-                    finalApproveAmount =
-                        Number(
-                            String(
-                                approveAmountRaw
-                            ).replace(
-                                /,/g,
-                                ""
-                            ).trim()
-                        );
-                }
-
-
-                if (
-                    !Number.isFinite(
-                        finalApproveAmount
-                    )
-                ) {
-
-                    throw new Error(
-                        `Invalid Approve Amount for Claim ID ${id}.`
-                    );
-                }
-
-
-                // ---------------------------------------------
-                // DEDUCTION AMOUNT
-                // ---------------------------------------------
-
-                let finalDeductionAmount = 0;
-
-
-                if (
-                    deductionAmountRaw !== undefined &&
-                    deductionAmountRaw !== null &&
-                    String(
-                        deductionAmountRaw
-                    ).trim() !== ""
-                ) {
-
-                    finalDeductionAmount =
-                        Number(
-                            String(
-                                deductionAmountRaw
-                            ).replace(
-                                /,/g,
-                                ""
-                            ).trim()
-                        );
-                }
-
-
-                if (
-                    !Number.isFinite(
-                        finalDeductionAmount
-                    )
-                ) {
-
-                    throw new Error(
-                        `Invalid Deduction Amount for Claim ID ${id}.`
-                    );
-                }
-
-
-                // =================================================
-                // UPDATE
-                // =================================================
-
+            const [claimRows] =
                 await connection.query(
                     `
-                    UPDATE claims
-
-                    SET
-
-                        claim_type = ?,
-
-                        ilom_id = ?,
-
-                        approve_amount = ?,
-
-                        claim_status = ?,
-
-                        user_remark = ?,
-
-                        deduction_amount = ?,
-
-                        diagnosis_2 = ?,
-
-                        inter_doc_exe = ?,
-
-                        updated_at = NOW()
-
-                    WHERE
-                        id = ?
-
-                    AND
-                        TRIM(assigned_user_id)
-                        = TRIM(?)
+                    SELECT id
+                    FROM claims
+                    WHERE id = ?
+                    AND TRIM(assigned_user_id) = TRIM(?)
+                    LIMIT 1
                     `,
                     [
-
-                        finalClaimType,
-
-                        ilomId,
-
-                        finalApproveAmount,
-
-                        finalClaimStatus,
-
-                        userRemark,
-
-                        finalDeductionAmount,
-
-                        diagnosis2,
-
-                        interDocExe,
-
                         id,
-
                         employeeId
                     ]
                 );
+
+            if (claimRows.length === 0) {
+
+                throw new Error(
+                    `Claim ID ${id} does not belong to this user.`
+                );
             }
 
-
             // =================================================
-            // COMMIT
-            // =================================================
-
-            await connection.commit();
-
-
-            console.log(
-                `CLAIMS SAVED SUCCESSFULLY: ${employeeId}`
-            );
-
-
-            // =================================================
-            // REDIRECT
+            // FORM VALUES
             // =================================================
 
-            return res.redirect(
-                "/user?saved=1"
-            );
+            const claimTypeRaw =
+                req.body[`claim_type_${id}`];
 
-        } catch (error) {
+            const ilomId =
+                String(
+                    req.body[`ilom_id_${id}`] || ""
+                ).trim() || null;
 
-            if (connection) {
+            const approveAmountRaw =
+                req.body[`approve_amount_${id}`];
 
-                try {
-                    await connection.rollback();
-                } catch (rollbackError) {
+            const claimStatusRaw =
+                req.body[`claim_status_${id}`];
 
-                    console.error(
-                        "ROLLBACK ERROR:",
-                        rollbackError
+            const userRemark =
+                String(
+                    req.body[`user_remark_${id}`] || ""
+                ).trim() || null;
+
+            const deductionAmountRaw =
+                req.body[`deduction_amount_${id}`];
+
+            const diagnosis2 =
+                String(
+                    req.body[`diagnosis_2_${id}`] || ""
+                ).trim() || null;
+
+            const interDocExe =
+                String(
+                    req.body[`inter_doc_exe_${id}`] || ""
+                ).trim() || null;
+
+            // =================================================
+            // CLAIM TYPE
+            // =================================================
+
+            const finalClaimType =
+                normalizeClaimType(
+                    claimTypeRaw
+                );
+
+            // =================================================
+            // STATUS
+            // =================================================
+
+            const finalClaimStatus =
+                normalizeStatus(
+                    claimStatusRaw
+                );
+
+            if (
+                !VALID_STATUSES.includes(
+                    finalClaimStatus
+                )
+            ) {
+
+                throw new Error(
+                    `Invalid Status '${finalClaimStatus}' for Claim ID ${id}.`
+                );
+            }
+
+            // =================================================
+            // APPROVE AMOUNT
+            // =================================================
+
+            let finalApproveAmount = 0;
+
+            if (
+                approveAmountRaw !== undefined &&
+                approveAmountRaw !== null &&
+                String(approveAmountRaw).trim() !== ""
+            ) {
+
+                finalApproveAmount =
+                    Number(
+                        String(approveAmountRaw)
+                            .replace(/,/g, "")
+                            .trim()
                     );
-                }
             }
 
+            if (
+                !Number.isFinite(
+                    finalApproveAmount
+                )
+            ) {
 
-            console.error(
-                "SAVE CLAIMS ERROR:",
-                error
+                throw new Error(
+                    `Invalid Approve Amount for Claim ID ${id}.`
+                );
+            }
+
+            // =================================================
+            // DEDUCTION AMOUNT
+            // =================================================
+
+            let finalDeductionAmount = 0;
+
+            if (
+                deductionAmountRaw !== undefined &&
+                deductionAmountRaw !== null &&
+                String(deductionAmountRaw).trim() !== ""
+            ) {
+
+                finalDeductionAmount =
+                    Number(
+                        String(deductionAmountRaw)
+                            .replace(/,/g, "")
+                            .trim()
+                    );
+            }
+
+            if (
+                !Number.isFinite(
+                    finalDeductionAmount
+                )
+            ) {
+
+                throw new Error(
+                    `Invalid Deduction Amount for Claim ID ${id}.`
+                );
+            }
+
+            // =================================================
+            // UPDATE
+            // =================================================
+
+            await connection.query(
+                `
+                UPDATE claims
+
+                SET
+                    claim_type = ?,
+                    ilom_id = ?,
+                    approve_amount = ?,
+                    claim_status = ?,
+                    user_remark = ?,
+                    deduction_amount = ?,
+                    diagnosis_2 = ?,
+                    inter_doc_exe = ?,
+                    updated_at =
+                        CONVERT_TZ(
+                            UTC_TIMESTAMP(),
+                            '+00:00',
+                            '+05:30'
+                        )
+
+                WHERE
+                    id = ?
+
+                AND
+                    TRIM(assigned_user_id) = TRIM(?)
+                `,
+                [
+                    finalClaimType,
+                    ilomId,
+                    finalApproveAmount,
+                    finalClaimStatus,
+                    userRemark,
+                    finalDeductionAmount,
+                    diagnosis2,
+                    interDocExe,
+                    id,
+                    employeeId
+                ]
             );
+        }
+
+        // =====================================================
+        // COMMIT
+        // =====================================================
+
+        await connection.commit();
+
+        console.log(
+            `CLAIMS SAVED SUCCESSFULLY: ${employeeId}`
+        );
+
+        // =====================================================
+        // REDIRECT
+        // =====================================================
+
+        return res.redirect(
+            "/user?saved=1"
+        );
+
+    } catch (error) {
+
+        // =====================================================
+        // ROLLBACK
+        // =====================================================
+
+        if (connection) {
+
+            try {
+
+                await connection.rollback();
+
+            } catch (rollbackError) {
+
+                console.error(
+                    "ROLLBACK ERROR:",
+                    rollbackError
+                );
+            }
+        }
+
+        console.error(
+            "SAVE CLAIMS ERROR:",
+            error
+        );
+
+        return res.status(500).send(`
+            <h2>Save Claims Failed</h2>
+
+            <p>
+                ${error.message}
+            </p>
+
+            <br>
+
+            <a href="/user">
+                Back to User Dashboard
+            </a>
+        `);
+
+    } finally {
+
+        if (connection) {
+            connection.release();
+        }
+
+        savingUsers.delete(employeeId);
+    }
+});
 
 
-            return res.status(500).send(`
-                <h2>Save Claims Failed</h2>
+// ============================================================
+// USER DASHBOARD
+// ============================================================
 
-                <pre>${error.message}</pre>
+app.get("/user", async (req, res) => {
 
-                <br>
+    // ---------------------------------------------------------
+    // LOGIN CHECK
+    // ---------------------------------------------------------
 
-                <a href="/user">
-                    Back to User Dashboard
+    if (
+        !req.session.user ||
+        normalizeRole(req.session.user.role) !== "user"
+    ) {
+        return res.redirect("/");
+    }
+
+    try {
+
+        const employeeId = String(
+            req.session.user.employee_id || ""
+        ).trim();
+
+        if (!employeeId) {
+
+            return res.status(400).send(`
+                <h2>User Dashboard Error</h2>
+
+                <p>
+                    Employee ID is missing.
+                </p>
+
+                <a href="/">
+                    Login Again
                 </a>
             `);
-
-        } finally {
-
-            if (connection) {
-                connection.release();
-            }
-        }
-    }
-);
-
-
-// =====================================================
-// USER DASHBOARD
-// =====================================================
-
-app.get(
-    "/user",
-    async (req, res) => {
-
-        if (
-            !req.session.user ||
-            normalizeRole(
-                req.session.user.role
-            ) !== "user"
-        ) {
-
-            return res.redirect("/");
         }
 
+        // =====================================================
+        // CLAIMS
+        // =====================================================
 
-        try {
+        const [claims] = await db.query(
+            `
+            SELECT
 
-            const employeeId =
-                String(
-                    req.session.user.employee_id || ""
-                ).trim();
+                c.*,
 
+                u.id AS employeeid,
 
-            if (!employeeId) {
+                u.employee_id AS employee_id,
 
-                return res.status(400).send(`
-                    <h2>User Dashboard Error</h2>
+                u.username AS employee_name,
 
-                    <p>
-                        Employee ID is missing.
-                    </p>
+                ub.upload_at AS uploaded_at
 
-                    <a href="/">
-                        Login Again
-                    </a>
-                `);
-            }
+            FROM claims c
 
+            LEFT JOIN users u
 
-            // =================================================
-            // CLAIMS
-            // =================================================
+                ON TRIM(c.assigned_user_id)
+                =
+                TRIM(u.employee_id)
 
-            const [claims] =
-                await db.query(
-                    `
-                    SELECT
+            LEFT JOIN upload_batches ub
 
-                        c.*,
+                ON c.upload_batch_id = ub.id
 
-                        u.id AS employeeid,
+            WHERE
+                TRIM(c.assigned_user_id)
+                =
+                TRIM(?)
 
-                        u.employee_id AS employee_id,
+            ORDER BY
+                c.id DESC
+            `,
+            [
+                employeeId
+            ]
+        );
 
-                        u.username AS employee_name,
+        // =====================================================
+        // USER SUMMARY
+        // =====================================================
 
-                        ub.uploaded_at AS uploaded_at
+        const [[userSummary]] = await db.query(
+            `
+            SELECT
 
-                    FROM claims c
+                COUNT(*) AS total_allocated,
 
-                    LEFT JOIN users u
+                COALESCE(
+                    SUM(
+                        claim_status = 'Pending'
+                    ),
+                    0
+                ) AS pending,
 
-                        ON TRIM(
-                            c.assigned_user_id
+                COALESCE(
+                    SUM(
+                        claim_status = 'Approved'
+                    ),
+                    0
+                ) AS approved,
+
+                COALESCE(
+                    SUM(
+                        claim_status = 'Rejected'
+                    ),
+                    0
+                ) AS rejected,
+
+                COALESCE(
+                    SUM(
+                        claim_status = 'Query'
+                    ),
+                    0
+                ) AS query_count,
+
+                COALESCE(
+                    SUM(
+                        claim_status = 'Re-Query'
+                    ),
+                    0
+                ) AS requery,
+
+                COALESCE(
+                    SUM(
+                        claim_status =
+                        'Query & Investigation'
+                    ),
+                    0
+                ) AS investigation_query,
+
+                COALESCE(
+                    SUM(
+                        claim_status =
+                        'Investigation'
+                    ),
+                    0
+                ) AS investigation,
+
+                COALESCE(
+                    SUM(
+                        claim_status =
+                        'Sent-Back'
+                    ),
+                    0
+                ) AS sent_back,
+
+                COALESCE(
+                    SUM(
+                        claim_status = 'Keep'
+                    ),
+                    0
+                ) AS keep_count,
+
+                COALESCE(
+                    SUM(
+                        claim_status =
+                        'Other-Doctor/Executive'
+                    ),
+                    0
+                ) AS other_doctor_executive,
+
+                COALESCE(
+                    SUM(
+                        claim_status =
+                        'ROD-Cancel'
+                    ),
+                    0
+                ) AS rod_cancel,
+
+                COALESCE(
+                    SUM(
+                        claim_status IN (
+                            'Approved',
+                            'Rejected',
+                            'Query',
+                            'Re-Query',
+                            'Query & Investigation',
+                            'Investigation',
+                            'Sent-Back',
+                            'Keep',
+                            'Other-Doctor/Executive',
+                            'ROD-Cancel'
                         )
-                        =
-                        TRIM(
-                            u.employee_id
-                        )
+                    ),
+                    0
+                ) AS total_productivity
 
-                    LEFT JOIN upload_batches ub
+            FROM claims
 
-                        ON c.upload_batch_id
-                        =
-                        ub.id
+            WHERE
+                TRIM(assigned_user_id)
+                =
+                TRIM(?)
+            `,
+            [
+                employeeId
+            ]
+        );
 
-                    WHERE
-                        TRIM(
-                            c.assigned_user_id
-                        )
-                        =
-                        TRIM(?)
+        // =====================================================
+        // PLATFORM SUMMARY
+        // =====================================================
 
-                    ORDER BY
-                        c.id DESC
-                    `,
-                    [
-                        employeeId
-                    ]
-                );
+        const [platformSummary] =
+            await db.query(
+                `
+                SELECT
 
+                    COALESCE(
+                        platform,
+                        '-'
+                    ) AS platform,
 
-            // =================================================
-            // USER SUMMARY
-            // =================================================
+                    COUNT(*) AS total_allocated,
 
-            const [[userSummary]] =
-                await db.query(
-                    `
-                    SELECT
-
-                        COUNT(*) AS total,
-
-                        SUM(
-                            claim_status = 'Pending'
-                        ) AS pending,
-
+                    COALESCE(
                         SUM(
                             claim_status = 'Approved'
-                        ) AS approved,
+                        ),
+                        0
+                    ) AS approved,
 
+                    COALESCE(
                         SUM(
                             claim_status = 'Rejected'
-                        ) AS rejected,
+                        ),
+                        0
+                    ) AS rejected,
 
+                    COALESCE(
                         SUM(
                             claim_status = 'Query'
-                        ) AS query_count,
+                        ),
+                        0
+                    ) AS query_count,
 
+                    COALESCE(
                         SUM(
                             claim_status = 'Re-Query'
-                        ) AS requery,
+                        ),
+                        0
+                    ) AS requery,
 
+                    COALESCE(
                         SUM(
                             claim_status =
                             'Query & Investigation'
-                        ) AS investigation_query,
+                        ),
+                        0
+                    ) AS investigation_query,
 
+                    COALESCE(
                         SUM(
                             claim_status =
                             'Investigation'
-                        ) AS investigation,
+                        ),
+                        0
+                    ) AS investigation,
 
+                    COALESCE(
                         SUM(
                             claim_status =
                             'Sent-Back'
-                        ) AS sent_back,
+                        ),
+                        0
+                    ) AS sent_back,
 
+                    COALESCE(
                         SUM(
                             claim_status = 'Keep'
-                        ) AS keep_count,
+                        ),
+                        0
+                    ) AS keep_count,
 
+                    COALESCE(
                         SUM(
                             claim_status =
                             'Other-Doctor/Executive'
-                        ) AS other_doctor_executive,
+                        ),
+                        0
+                    ) AS other_doctor_executive,
 
+                    COALESCE(
+                        SUM(
+                            claim_status = 'Pending'
+                        ),
+                        0
+                    ) AS pending,
+
+                    COALESCE(
                         SUM(
                             claim_status =
                             'ROD-Cancel'
-                        ) AS rod_cancel,
+                        ),
+                        0
+                    ) AS rod_cancel,
 
+                    COALESCE(
                         SUM(
-                            claim_status <> 'Pending'
-                        ) AS total_productivity
+                            claim_status IN (
+                                'Approved',
+                                'Rejected',
+                                'Query',
+                                'Re-Query',
+                                'Query & Investigation',
+                                'Investigation',
+                                'Sent-Back',
+                                'Keep',
+                                'Other-Doctor/Executive',
+                                'ROD-Cancel'
+                            )
+                        ),
+                        0
+                    ) AS total_productivity
 
-                    FROM claims
+                FROM claims
 
-                    WHERE
-                        TRIM(
-                            assigned_user_id
-                        )
-                        =
-                        TRIM(?)
-                    `,
-                    [
-                        employeeId
-                    ]
-                );
+                WHERE
+                    TRIM(assigned_user_id)
+                    =
+                    TRIM(?)
 
+                GROUP BY
+                    platform
 
-            // =================================================
-            // FORMAT CLAIMS
-            // =================================================
+                ORDER BY
+                    platform
+                `,
+                [
+                    employeeId
+                ]
+            );
 
-            const formattedClaims =
-                claims.map(
-                    claim => {
+        // =====================================================
+        // FORMAT CLAIMS
+        // =====================================================
 
-                        let formattedDate =
-                            "-";
+        const formattedClaims =
+            claims.map(claim => {
 
-                        let formattedTime =
-                            "-";
+                let formattedDate = "-";
+                let formattedTime = "-";
+                let formattedUploadedAt = "-";
 
+                // -------------------------------------------------
+                // CLAIM DATE
+                // -------------------------------------------------
 
-                        // -----------------------------------------
-                        // DATE
-                        // -----------------------------------------
+                if (claim.claim_date) {
 
-                        if (
+                    const date =
+                        new Date(
                             claim.claim_date
-                        ) {
+                        );
 
-                            const date =
-                                new Date(
-                                    claim.claim_date
-                                );
-
-
-                            if (
-                                !isNaN(
-                                    date.getTime()
-                                )
-                            ) {
-
-                                formattedDate =
-                                    date.toLocaleDateString(
-                                        "en-IN",
-                                        {
-                                            day:
-                                                "2-digit",
-
-                                            month:
-                                                "2-digit",
-
-                                            year:
-                                                "numeric"
-                                        }
-                                    );
-                            }
-                        }
-
-
-                        // -----------------------------------------
-                        // TIME
-                        // -----------------------------------------
-
-                        if (
-                            claim.claim_time
-                        ) {
-
-                            const timeValue =
-                                String(
-                                    claim.claim_time
-                                ).trim();
-
-
-                            if (
-                                /^\d{2}:\d{2}:\d{2}$/
-                                    .test(
-                                        timeValue
-                                    )
-                            ) {
-
-                                const [
-                                    hour,
-                                    minute
-                                ] =
-                                    timeValue
-                                        .split(":");
-
-
-                                let h =
-                                    Number(hour);
-
-
-                                const suffix =
-                                    h >= 12
-                                        ? "PM"
-                                        : "AM";
-
-
-                                h =
-                                    h % 12 || 12;
-
-
-                                formattedTime =
-                                    `${String(h).padStart(2, "0")}:${minute} ${suffix}`;
-
-                            } else {
-
-                                formattedTime =
-                                    timeValue;
-                            }
-                        }
-
-
-                        // -----------------------------------------
-                        // UPLOADED TIME
-                        // -----------------------------------------
-
-                        let formattedUploadedAt =
-                            "-";
-
-
-                        if (
-                            claim.uploaded_at
-                        ) {
-
-                            const uploadedDate =
-                                new Date(
-                                    claim.uploaded_at
-                                );
-
-
-                            if (
-                                !isNaN(
-                                    uploadedDate.getTime()
-                                )
-                            ) {
-
-                                formattedUploadedAt =
-                                    uploadedDate.toLocaleString(
-                                        "en-IN",
-                                        {
-                                            day:
-                                                "2-digit",
-
-                                            month:
-                                                "2-digit",
-
-                                            year:
-                                                "numeric",
-
-                                            hour:
-                                                "2-digit",
-
-                                            minute:
-                                                "2-digit",
-
-                                            second:
-                                                "2-digit",
-
-                                            hour12:
-                                                true
-                                        }
-                                    );
-                            }
-                        }
-
-
-                        return {
-
-                            ...claim,
-
-                            formatted_claim_date:
-                                formattedDate,
-
-                            formatted_claim_time:
-                                formattedTime,
-
-                            formatted_uploaded_at:
-                                formattedUploadedAt
-                        };
-                    }
-                );
-
-
-            // =================================================
-            // PROCESS SUMMARY
-            // =================================================
-
-            const processSummary = [
-
-                {
-
-                    platform:
-                        "All",
-
-                    total_allocated:
-                        Number(
-                            userSummary.total || 0
-                        ),
-
-                    approved:
-                        Number(
-                            userSummary.approved || 0
-                        ),
-
-                    rejected:
-                        Number(
-                            userSummary.rejected || 0
-                        ),
-
-                    query_count:
-                        Number(
-                            userSummary.query_count || 0
-                        ),
-
-                    requery:
-                        Number(
-                            userSummary.requery || 0
-                        ),
-
-                    investigation_query:
-                        Number(
-                            userSummary.investigation_query || 0
-                        ),
-
-                    investigation:
-                        Number(
-                            userSummary.investigation || 0
-                        ),
-
-                    sent_back:
-                        Number(
-                            userSummary.sent_back || 0
-                        ),
-
-                    keep_count:
-                        Number(
-                            userSummary.keep_count || 0
-                        ),
-
-                    other_doctor_executive:
-                        Number(
-                            userSummary.other_doctor_executive || 0
-                        ),
-
-                    pending:
-                        Number(
-                            userSummary.pending || 0
-                        ),
-
-                    total_productivity:
-                        Number(
-                            userSummary.total_productivity || 0
+                    if (
+                        !isNaN(
+                            date.getTime()
                         )
+                    ) {
+
+                        formattedDate =
+                            date.toLocaleDateString(
+                                "en-IN",
+                                {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric"
+                                }
+                            );
+                    }
                 }
-            ];
 
+                // -------------------------------------------------
+                // CLAIM TIME
+                // -------------------------------------------------
 
-            return res.render(
-                "user-dashboard",
-                {
+                if (claim.claim_time) {
 
-                    user:
-                        req.session.user,
+                    const timeValue =
+                        String(
+                            claim.claim_time
+                        ).trim();
 
-                    claims:
-                        formattedClaims,
+                    if (
+                        /^\d{2}:\d{2}:\d{2}$/
+                            .test(timeValue)
+                    ) {
 
-                    saved:
-                        req.query.saved === "1",
+                        const [
+                            hour,
+                            minute
+                        ] =
+                            timeValue.split(":");
 
-                    savedAt:
-                        req.query.saved === "1"
-                            ? new Date().toLocaleString(
+                        let h =
+                            Number(hour);
+
+                        const suffix =
+                            h >= 12
+                                ? "PM"
+                                : "AM";
+
+                        h =
+                            h % 12 || 12;
+
+                        formattedTime =
+                            `${String(h).padStart(2, "0")}:${minute} ${suffix}`;
+
+                    } else {
+
+                        formattedTime =
+                            timeValue;
+                    }
+                }
+
+                // -------------------------------------------------
+                // UPLOAD TIME
+                // -------------------------------------------------
+
+                if (claim.uploaded_at) {
+
+                    const uploadedDate =
+                        new Date(
+                            claim.uploaded_at
+                        );
+
+                    if (
+                        !isNaN(
+                            uploadedDate.getTime()
+                        )
+                    ) {
+
+                        formattedUploadedAt =
+                            uploadedDate.toLocaleString(
                                 "en-IN",
                                 {
                                     day: "2-digit",
@@ -2713,36 +2688,174 @@ app.get(
                                     second: "2-digit",
                                     hour12: true
                                 }
-                            )
-                            : null,
-
-                    processSummary:
-                        processSummary
+                            );
+                    }
                 }
-            );
 
-        } catch (error) {
+                return {
 
-            console.error(
-                "USER DASHBOARD ERROR:",
-                error
-            );
+                    ...claim,
 
+                    formatted_claim_date:
+                        formattedDate,
 
-            return res.status(500).send(`
-                <h2>User Dashboard Error</h2>
+                    formatted_claim_time:
+                        formattedTime,
 
-                <pre>${error.message}</pre>
+                    formatted_uploaded_at:
+                        formattedUploadedAt
+                };
+            });
 
-                <br>
+        // =====================================================
+        // PROCESS SUMMARY
+        // =====================================================
 
-                <a href="/user">
-                    Back to Dashboard
-                </a>
-            `);
+        const processSummary = {
+
+            totalAllocated:
+                Number(
+                    userSummary.total_allocated || 0
+                ),
+
+            pending:
+                Number(
+                    userSummary.pending || 0
+                ),
+
+            approved:
+                Number(
+                    userSummary.approved || 0
+                ),
+
+            rejected:
+                Number(
+                    userSummary.rejected || 0
+                ),
+
+            query:
+                Number(
+                    userSummary.query_count || 0
+                ),
+
+            requery:
+                Number(
+                    userSummary.requery || 0
+                ),
+
+            investigationQuery:
+                Number(
+                    userSummary.investigation_query || 0
+                ),
+
+            investigation:
+                Number(
+                    userSummary.investigation || 0
+                ),
+
+            sentBack:
+                Number(
+                    userSummary.sent_back || 0
+                ),
+
+            keep:
+                Number(
+                    userSummary.keep_count || 0
+                ),
+
+            otherDoctorExecutive:
+                Number(
+                    userSummary.other_doctor_executive || 0
+                ),
+
+            rodCancel:
+                Number(
+                    userSummary.rod_cancel || 0
+                ),
+
+            totalProductivity:
+                Number(
+                    userSummary.total_productivity || 0
+                ),
+
+            // IMPORTANT
+            // EJS uses processSummary.platformSummary
+
+            platformSummary:
+                platformSummary
+        };
+
+        // =====================================================
+        // SAVED TIME
+        // =====================================================
+
+        let savedAt = null;
+
+        if (
+            req.query.saved === "1"
+        ) {
+
+            savedAt =
+                new Date().toLocaleString(
+                    "en-IN",
+                    {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true
+                    }
+                );
         }
+
+        // =====================================================
+        // RENDER
+        // =====================================================
+
+        return res.render(
+            "user-dashboard",
+            {
+
+                user:
+                    req.session.user,
+
+                claims:
+                    formattedClaims,
+
+                saved:
+                    req.query.saved === "1",
+
+                savedAt:
+                    savedAt,
+
+                processSummary:
+                    processSummary
+
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "USER DASHBOARD ERROR:",
+            error
+        );
+
+        return res.status(500).send(`
+            <h2>User Dashboard Error</h2>
+
+            <pre>${error.message}</pre>
+
+            <br>
+
+            <a href="/user">
+                Back to Dashboard
+            </a>
+        `);
     }
-);
+});
 
 
 // =====================================================
@@ -2810,13 +2923,19 @@ app.post(
 
         try {
 
+            // ---------------------------------------------
+            // CHECK EMPLOYEE ID
+            // ---------------------------------------------
+
             const [employeeExists] =
                 await db.query(
                     `
-                    SELECT id
+                    SELECT
+                        id
                     FROM users
                     WHERE LOWER(TRIM(employee_id))
-                        = LOWER(TRIM(?))
+                        =
+                        LOWER(TRIM(?))
                     LIMIT 1
                     `,
                     [
@@ -2845,13 +2964,19 @@ app.post(
             }
 
 
+            // ---------------------------------------------
+            // CHECK USERNAME
+            // ---------------------------------------------
+
             const [usernameExists] =
                 await db.query(
                     `
-                    SELECT id
+                    SELECT
+                        id
                     FROM users
                     WHERE LOWER(TRIM(username))
-                        = LOWER(TRIM(?))
+                        =
+                        LOWER(TRIM(?))
                     LIMIT 1
                     `,
                     [
@@ -2879,6 +3004,10 @@ app.post(
                 `);
             }
 
+
+            // ---------------------------------------------
+            // INSERT USER
+            // ---------------------------------------------
 
             await db.query(
                 `
@@ -3015,10 +3144,15 @@ app.post(
             await connection.beginTransaction();
 
 
+            // ---------------------------------------------
+            // OLD USER
+            // ---------------------------------------------
+
             const [oldUser] =
                 await connection.query(
                     `
-                    SELECT employee_id
+                    SELECT
+                        employee_id
                     FROM users
                     WHERE id = ?
                     AND LOWER(TRIM(role)) = 'user'
@@ -3045,6 +3179,10 @@ app.post(
                     oldUser[0].employee_id
                 ).trim();
 
+
+            // ---------------------------------------------
+            // NEW USER
+            // ---------------------------------------------
 
             const [newUser] =
                 await connection.query(
@@ -3084,6 +3222,10 @@ app.post(
                 newUser[0].username;
 
 
+            // ---------------------------------------------
+            // REASSIGN CLAIMS
+            // ---------------------------------------------
+
             await connection.query(
                 `
                 UPDATE claims
@@ -3119,7 +3261,15 @@ app.post(
         } catch (error) {
 
             if (connection) {
-                await connection.rollback();
+
+                try {
+                    await connection.rollback();
+                } catch (rollbackError) {
+                    console.error(
+                        "ROLLBACK ERROR:",
+                        rollbackError
+                    );
+                }
             }
 
 
@@ -3228,7 +3378,8 @@ app.get(
                         ) AS sent_back,
 
                         SUM(
-                            c.claim_status = 'Keep'
+                            c.claim_status =
+                            'Keep'
                         ) AS keep_count,
 
                         SUM(
@@ -3242,7 +3393,8 @@ app.get(
                         ) AS rod_cancel,
 
                         SUM(
-                            c.claim_status = 'Pending'
+                            c.claim_status =
+                            'Pending'
                         ) AS pending,
 
                         SUM(
@@ -3262,12 +3414,15 @@ app.get(
                         )
 
                     GROUP BY
+
                         c.platform,
+
                         COALESCE(
                             u.employee_id,
                             c.assigned_user_id,
                             '-'
                         ),
+
                         COALESCE(
                             u.username,
                             c.user_name,
@@ -3275,7 +3430,9 @@ app.get(
                         )
 
                     ORDER BY
+
                         c.platform,
+
                         user_name
                     `
                 );
@@ -3375,20 +3532,35 @@ app.get(
             worksheet["!cols"] = [
 
                 { wch: 18 },
+
                 { wch: 18 },
+
                 { wch: 25 },
+
                 { wch: 18 },
+
                 { wch: 12 },
+
                 { wch: 12 },
+
                 { wch: 12 },
+
                 { wch: 12 },
+
                 { wch: 22 },
+
                 { wch: 20 },
+
                 { wch: 18 },
+
                 { wch: 15 },
+
                 { wch: 12 },
+
                 { wch: 25 },
+
                 { wch: 15 },
+
                 { wch: 12 }
             ];
 
@@ -3510,7 +3682,8 @@ app.get(
                         BETWEEN ?
                         AND ?
 
-                    ORDER BY id DESC
+                    ORDER BY
+                        id DESC
                     `,
                     [
                         fromDate,
@@ -3609,6 +3782,36 @@ app.get(
                 XLSX.utils.json_to_sheet(
                     excelData
                 );
+
+
+            worksheet["!cols"] = [
+
+                { wch: 20 },
+                { wch: 18 },
+                { wch: 18 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 18 },
+                { wch: 15 },
+                { wch: 20 },
+                { wch: 15 },
+                { wch: 25 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 20 },
+                { wch: 20 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 18 },
+                { wch: 15 },
+                { wch: 30 },
+                { wch: 18 },
+                { wch: 25 },
+                { wch: 25 },
+                { wch: 15 },
+                { wch: 15 }
+            ];
 
 
             XLSX.utils.book_append_sheet(
@@ -3747,7 +3950,23 @@ app.use(
         }
 
 
-        next(err);
+        console.error(
+            "GLOBAL ERROR:",
+            err
+        );
+
+
+        return res.status(500).send(`
+            <h2>Server Error</h2>
+
+            <pre>${err.message || "Unknown error"}</pre>
+
+            <br>
+
+            <a href="/">
+                Back to Login
+            </a>
+        `);
     }
 );
 

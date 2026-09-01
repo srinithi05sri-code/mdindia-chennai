@@ -109,24 +109,43 @@ function formatExcelDate(value) {
 
             <!-- LAST SAVED -->
 
-            <% if (
-                typeof savedAt !== "undefined" &&
-                savedAt
-            ) { %>
+         <%
+function formatSavedDate(value) {
+    if (!value) return "";
 
-                <div class="save-time-box">
+    const date = new Date(value);
 
-                    <strong>
-                        Last Saved:
-                    </strong>
+    if (isNaN(date.getTime())) {
+        return value;
+    }
 
-                    <span>
-                        <%= savedAt %>
-                    </span>
+    return date.toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+    });
+}
+%>
 
-                </div>
+<% if (
+    typeof savedAt !== "undefined" &&
+    savedAt
+) { %>
 
-            <% } %>
+    <div class="save-time-box">
+        <strong>Last Saved:</strong>
+
+        <span>
+            <%= formatSavedDate(savedAt) %>
+        </span>
+    </div>
+
+<% } %>
 
         </div>
 
@@ -1415,75 +1434,6 @@ function formatExcelDate(value) {
    EXCEL DATE CONVERTER
 ============================================================ */
 
-function formatExcelDate(value) {
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        return "-";
-
-    }
-
-
-    /* Already a normal date */
-
-    if (
-        typeof value === "string" &&
-        value.includes("-")
-    ) {
-
-        const date = new Date(value);
-
-        if (!isNaN(date.getTime())) {
-
-            return date.toLocaleDateString(
-                "en-IN"
-            );
-
-        }
-
-    }
-
-
-    /* Excel serial number */
-
-    const serial = Number(value);
-
-    if (
-        !isNaN(serial) &&
-        serial > 1000
-    ) {
-
-        const excelEpoch =
-            new Date(
-                Date.UTC(
-                    1899,
-                    11,
-                    30
-                )
-            );
-
-        excelEpoch.setUTCDate(
-            excelEpoch.getUTCDate() +
-            serial
-        );
-
-        return excelEpoch.toLocaleDateString(
-            "en-IN",
-            {
-                timeZone: "UTC"
-            }
-        );
-
-    }
-
-
-    return value;
-
-}
 
 
 
