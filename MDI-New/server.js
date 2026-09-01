@@ -3652,11 +3652,13 @@ app.get(
             return res.redirect("/");
         }
 
-        const fromDate =
-            String(req.query.fromDate || "").trim();
+        const fromDate = String(
+            req.query.fromDate || ""
+        ).trim();
 
-        const toDate =
-            String(req.query.toDate || "").trim();
+        const toDate = String(
+            req.query.toDate || ""
+        ).trim();
 
         if (!fromDate || !toDate) {
             return res.status(400).send(
@@ -3666,33 +3668,30 @@ app.get(
 
         try {
 
-            // =================================================
-            // GET CLAIM DATA
-            // =================================================
+            console.log("========== DUMP DOWNLOAD ==========");
+            console.log("FROM DATE:", fromDate);
+            console.log("TO DATE:", toDate);
 
             const [rows] = await db.query(
                 `
                 SELECT
                     c.*,
 
+                    ub.file_name,
                     ub.uploaded_at AS upload_date_time
 
                 FROM claims c
 
                 LEFT JOIN upload_batches ub
-                    ON ub.id = c.upload_batch_id
+                    ON c.upload_batch_id = ub.id
 
                 WHERE
-                    DATE(
-                        COALESCE(
-                            ub.uploaded_at,
-                            c.claim_date,
-                            c.created_at
-                        )
-                    )
-                    BETWEEN ? AND ?
+                    DATE(ub.uploaded_at)
+                    BETWEEN ?
+                    AND ?
 
-                ORDER BY c.id DESC
+                ORDER BY
+                    c.id DESC
                 `,
                 [
                     fromDate,
@@ -3701,13 +3700,12 @@ app.get(
             );
 
             console.log(
-                "DOWNLOAD CLAIMS COUNT:",
+                "DUMP ROW COUNT:",
                 rows.length
             );
 
-            // =================================================
-            // CREATE EXCEL DATA
-            // =================================================
+            const workbook =
+                XLSX.utils.book_new();
 
             const excelData = rows.map(row => ({
 
@@ -3734,9 +3732,6 @@ app.get(
 
                 "User Name":
                     row.user_name || "",
-
-                // IMPORTANT:
-                // lot and platform BEFORE Claim Type
 
                 "lot":
                     row.lot || "",
@@ -3789,29 +3784,24 @@ app.get(
                 "inter. Doc & Exe":
                     row.inter_doc_exe || "",
 
-                // Upload date & time
-                "Uploaded Date & Time":
-                    row.upload_date_time || ""
+                "Upload Date & Time":
+                    row.upload_date_time || "",
+
+                "Upload File":
+                    row.file_name || ""
+
             }));
 
-
-            // =================================================
-            // CREATE WORKBOOK
-            // =================================================
-
-            const workbook =
-                XLSX.utils.book_new();
-
+            console.log(
+                "DUMP EXCEL GENERATED:",
+                excelData.length,
+                "rows"
+            );
 
             const worksheet =
                 XLSX.utils.json_to_sheet(
                     excelData
                 );
-
-
-            // =================================================
-            // COLUMN WIDTHS
-            // =================================================
 
             worksheet["!cols"] = [
 
@@ -3823,12 +3813,10 @@ app.get(
                 { wch: 18 }, // Department
                 { wch: 15 }, // User ID
                 { wch: 20 }, // User Name
-
                 { wch: 15 }, // lot
                 { wch: 15 }, // platform
-
                 { wch: 15 }, // Claim Type
-                { wch: 20 }, // Status
+                { wch: 25 }, // Status
                 { wch: 15 }, // Date
                 { wch: 15 }, // Time
                 { wch: 20 }, // Today Status
@@ -3842,24 +3830,16 @@ app.get(
                 { wch: 18 }, // Deduction AMT
                 { wch: 25 }, // Diagnosis 2
                 { wch: 25 }, // inter. Doc & Exe
-                { wch: 22 }  // Uploaded Date & Time
+                { wch: 22 }, // Upload Date & Time
+                { wch: 30 }  // Upload File
+
             ];
-
-
-            // =================================================
-            // APPEND SHEET
-            // =================================================
 
             XLSX.utils.book_append_sheet(
                 workbook,
                 worksheet,
                 "Claims"
             );
-
-
-            // =================================================
-            // CREATE BUFFER
-            // =================================================
 
             const buffer =
                 XLSX.write(
@@ -3870,11 +3850,6 @@ app.get(
                     }
                 );
 
-
-            // =================================================
-            // DOWNLOAD
-            // =================================================
-
             res.setHeader(
                 "Content-Disposition",
                 "attachment; filename=updated-claims.xlsx"
@@ -3884,7 +3859,6 @@ app.get(
                 "Content-Type",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             );
-
 
             return res.send(buffer);
 
