@@ -3664,52 +3664,35 @@ app.get(
             );
         }
 
-        let connection;
-
         try {
 
-            console.log("=================================");
-            console.log("ADMIN DUMP DOWNLOAD");
-            console.log("FROM DATE:", fromDate);
-            console.log("TO DATE:", toDate);
-            console.log("=================================");
+            // =================================================
+            // GET CLAIM DATA
+            // =================================================
 
-            connection = await db.getConnection();
-
-            /*
-            =====================================================
-            GET CLAIM DATA
-            =====================================================
-            */
-
-            const [rows] = await connection.query(
+            const [rows] = await db.query(
                 `
                 SELECT
-
                     c.*,
 
-                    ub.file_name AS upload_file_name,
-
-                    ub.uploaded_at AS uploaded_at,
-
-                    c.updated_at AS saved_at
+                    ub.uploaded_at AS upload_date_time
 
                 FROM claims c
 
                 LEFT JOIN upload_batches ub
-                    ON c.upload_batch_id = ub.id
+                    ON ub.id = c.upload_batch_id
 
                 WHERE
                     DATE(
                         COALESCE(
-                            c.claim_date,
                             ub.uploaded_at,
+                            c.claim_date,
                             c.created_at
                         )
-                    ) BETWEEN ? AND ?
+                    )
+                    BETWEEN ? AND ?
 
-                ORDER BY
-                    c.id DESC
+                ORDER BY c.id DESC
                 `,
                 [
                     fromDate,
@@ -3718,15 +3701,13 @@ app.get(
             );
 
             console.log(
-                "DUMP ROW COUNT:",
+                "DOWNLOAD CLAIMS COUNT:",
                 rows.length
             );
 
-            /*
-            =====================================================
-            CREATE EXCEL DATA
-            =====================================================
-            */
+            // =================================================
+            // CREATE EXCEL DATA
+            // =================================================
 
             const excelData = rows.map(row => ({
 
@@ -3753,6 +3734,9 @@ app.get(
 
                 "User Name":
                     row.user_name || "",
+
+                // IMPORTANT:
+                // lot and platform BEFORE Claim Type
 
                 "lot":
                     row.lot || "",
@@ -3805,105 +3789,29 @@ app.get(
                 "inter. Doc & Exe":
                     row.inter_doc_exe || "",
 
+                // Upload date & time
                 "Uploaded Date & Time":
-                    row.uploaded_at || "",
-
-                "Saved Date & Time":
-                    row.saved_at || ""
-
+                    row.upload_date_time || ""
             }));
 
 
-            /*
-            =====================================================
-            CREATE WORKBOOK
-            =====================================================
-            */
+            // =================================================
+            // CREATE WORKBOOK
+            // =================================================
 
             const workbook =
                 XLSX.utils.book_new();
 
 
-            /*
-            =====================================================
-            IMPORTANT
-            =====================================================
-            Even if there are ZERO rows,
-            headings should still appear.
-            =====================================================
-            */
-
-            const headers = [
-
-                "CLAIM_REF_NO",
-                "INWARD_NO",
-                "POLICY_NO",
-                "CLAIM_AMT",
-                "Vertical",
-                "Department",
-                "User ID",
-                "User Name",
-
-                "lot",
-                "platform",
-
-                "Claim Type",
-                "Status",
-                "Date",
-                "Time",
-
-                "Today Status",
-                "I3 Status",
-                "Full qc",
-                "RELATION",
-                "HNF",
-
-                "ILOM ID",
-                "Approve AMT",
-                "Remark",
-                "Deduction AMT",
-                "Diagnosis 2",
-                "inter. Doc & Exe",
-
-                "Uploaded Date & Time",
-                "Saved Date & Time"
-            ];
+            const worksheet =
+                XLSX.utils.json_to_sheet(
+                    excelData
+                );
 
 
-            /*
-            =====================================================
-            FORCE HEADERS
-            =====================================================
-            */
-
-            let worksheet;
-
-            if (excelData.length > 0) {
-
-                worksheet =
-                    XLSX.utils.json_to_sheet(
-                        excelData,
-                        {
-                            header: headers
-                        }
-                    );
-
-            } else {
-
-                worksheet =
-                    XLSX.utils.aoa_to_sheet(
-                        [
-                            headers
-                        ]
-                    );
-            }
-
-
-            /*
-            =====================================================
-            COLUMN WIDTH
-            =====================================================
-            */
+            // =================================================
+            // COLUMN WIDTHS
+            // =================================================
 
             worksheet["!cols"] = [
 
@@ -3916,37 +3824,31 @@ app.get(
                 { wch: 15 }, // User ID
                 { wch: 20 }, // User Name
 
-                { wch: 12 }, // lot
+                { wch: 15 }, // lot
                 { wch: 15 }, // platform
 
                 { wch: 15 }, // Claim Type
-                { wch: 25 }, // Status
+                { wch: 20 }, // Status
                 { wch: 15 }, // Date
                 { wch: 15 }, // Time
-
                 { wch: 20 }, // Today Status
                 { wch: 20 }, // I3 Status
                 { wch: 15 }, // Full qc
                 { wch: 15 }, // RELATION
                 { wch: 15 }, // HNF
-
                 { wch: 18 }, // ILOM ID
                 { wch: 15 }, // Approve AMT
                 { wch: 30 }, // Remark
                 { wch: 18 }, // Deduction AMT
                 { wch: 25 }, // Diagnosis 2
                 { wch: 25 }, // inter. Doc & Exe
-
-                { wch: 25 }, // Uploaded Date & Time
-                { wch: 25 }  // Saved Date & Time
+                { wch: 22 }  // Uploaded Date & Time
             ];
 
 
-            /*
-            =====================================================
-            APPEND SHEET
-            =====================================================
-            */
+            // =================================================
+            // APPEND SHEET
+            // =================================================
 
             XLSX.utils.book_append_sheet(
                 workbook,
@@ -3955,11 +3857,9 @@ app.get(
             );
 
 
-            /*
-            =====================================================
-            WRITE XLSX
-            =====================================================
-            */
+            // =================================================
+            // CREATE BUFFER
+            // =================================================
 
             const buffer =
                 XLSX.write(
@@ -3971,11 +3871,9 @@ app.get(
                 );
 
 
-            /*
-            =====================================================
-            RESPONSE HEADERS
-            =====================================================
-            */
+            // =================================================
+            // DOWNLOAD
+            // =================================================
 
             res.setHeader(
                 "Content-Disposition",
@@ -3988,15 +3886,7 @@ app.get(
             );
 
 
-            console.log(
-                "DUMP EXCEL GENERATED:",
-                rows.length,
-                "rows"
-            );
-
-
             return res.send(buffer);
-
 
         } catch (error) {
 
@@ -4016,12 +3906,6 @@ app.get(
                     Back to Admin
                 </a>
             `);
-
-        } finally {
-
-            if (connection) {
-                connection.release();
-            }
         }
     }
 );
