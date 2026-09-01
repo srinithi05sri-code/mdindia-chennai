@@ -539,18 +539,734 @@ app.post("/login", async (req, res) => {
 });
 
 
-app.get("/upload", (req, res) => {
-    if (
-        !req.session.user ||
-        normalizeRole(req.session.user.role) !== "upload"
-    ) {
-        return res.redirect("/");
-    }
+// =====================================================
+// UPLOAD DASHBOARD
+// =====================================================
 
-    res.render("upload-dashboard", {
-        user: req.session.user
-    });
-});
+app.get(
+    "/upload",
+    async (req, res) => {
+
+        if (
+            !req.session.user ||
+            normalizeRole(
+                req.session.user.role
+            ) !== "upload"
+        ) {
+
+            return res.redirect("/");
+        }
+
+        try {
+
+            const [uploads] =
+                await db.query(
+                    `
+                    SELECT
+
+                        ub.id,
+
+                        ub.file_name,
+
+                        ub.uploaded_at,
+
+                        ub.total_claims,
+
+                        CASE
+                            WHEN ub.status = 'ACTIVE'
+                            THEN 'ACTIVE'
+                            ELSE 'DELETED'
+                        END AS status
+
+                    FROM upload_batches ub
+
+                    ORDER BY ub.id DESC
+                    `
+                );
+
+            return res.render(
+                "upload-dashboard",
+                {
+
+                    user:
+                        req.session.user,
+
+                    uploads:
+                        uploads
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "UPLOAD DASHBOARD ERROR:",
+                error
+            );
+
+            return res.status(500).send(`
+                <h2>Database Error</h2>
+
+                <pre>${error.message}</pre>
+            `);
+        }
+    }
+);
+
+// =====================================================
+// UPLOAD EXCEL
+// =====================================================
+
+app.post(
+    "/upload-excel",
+    upload.single("excelFile"),
+    async (req, res) => {
+
+        if (
+            !req.session.user ||
+            normalizeRole(
+                req.session.user.role
+            ) !== "upload"
+        ) {
+
+            return res.redirect("/");
+        }
+
+        if (!req.file) {
+
+            return res.status(400).send(
+                "Please select an Excel file."
+            );
+        }
+
+        let connection;
+
+        try {
+
+            // =================================================
+            // READ EXCEL
+            // =================================================
+
+            const workbook =
+                XLSX.read(
+                    req.file.buffer,
+                    {
+                        type: "buffer"
+                    }
+                );
+
+            const sheetName =
+                workbook.SheetNames[0];
+
+            const sheet =
+                workbook.Sheets[sheetName];
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        defval: ""
+                    }
+                );
+
+            if (rows.length === 0) {
+
+                return res.status(400).send(`
+                    <h2>Excel file is empty</h2>
+
+                    <a href="/upload">
+                        Back to Upload
+                    </a>
+                `);
+            }
+
+            // =================================================
+            // REQUIRED COLUMNS
+            // =================================================
+
+            const requiredColumns = [
+
+                "CLAIM_REF_NO",
+                "INWARD_NO",
+                "POLICY_NO",
+                "Vertical",
+                "Additional Deduction",
+                "CLAIM_AMT",
+                "AL_AMT",
+                "CLAIM_CLASS",
+                "Hospital Code",
+                "Type of MOU",
+                "Diagnosis",
+                "Diagnosis 2",
+                "POLICY_NAME",
+                "Queue",
+                "Ageing",
+                "Date",
+                "Time",
+                "Today Status",
+                "I3 Status",
+                "Full qc",
+                "RELATION",
+                "HNF",
+                "User ID",
+                "User Name",
+                "Claim Type",
+                "ILOM ID",
+                "Approve AMT",
+                "Status",
+                "Remark",
+                "Deduction AMT",
+                "inter. Doc & Exe",
+                "lot",
+                "platform"
+            ];
+
+            const excelColumns =
+                Object.keys(rows[0]);
+
+            const missingColumns =
+                requiredColumns.filter(
+                    column =>
+                        !excelColumns.includes(
+                            column
+                        )
+                );
+
+            if (missingColumns.length > 0) {
+
+                return res.status(400).send(`
+                    <h2>
+                        Invalid Excel Format
+                    </h2>
+
+                    <p>
+                        Missing columns:
+                    </p>
+
+                    <ul>
+                        ${missingColumns
+                            .map(
+                                column =>
+                                    `<li>${column}</li>`
+                            )
+                            .join("")}
+                    </ul>
+
+                    <a href="/upload">
+                        Back to Upload
+                    </a>
+                `);
+            }
+
+            // =================================================
+            // DB CONNECTION
+            // =================================================
+
+            connection =
+                await db.getConnection();
+
+            await connection.beginTransaction();
+
+            // =================================================
+            // CREATE BATCH
+            // =================================================
+
+            const [batchResult] =
+                await connection.query(
+                    `
+                    INSERT INTO upload_batches
+                    (
+                        file_name,
+                        uploaded_by,
+                        total_claims,
+                        status
+                    )
+                    VALUES
+                    (
+                        ?,
+                        ?,
+                        ?,
+                        'ACTIVE'
+                    )
+                    `,
+                    [
+                        req.file.originalname,
+                        req.session.user.id,
+                        rows.length
+                    ]
+                );
+
+            const batchId =
+                batchResult.insertId;
+
+            // =================================================
+            // INSERT CLAIMS
+            // =================================================
+
+            for (const row of rows) {
+
+                const claimRefNo =
+                    String(
+                        row["CLAIM_REF_NO"] || ""
+                    ).trim();
+
+                const inwardNo =
+                    String(
+                        row["INWARD_NO"] || ""
+                    ).trim();
+
+                const policyNo =
+                    String(
+                        row["POLICY_NO"] || ""
+                    ).trim();
+
+                const claimAmount =
+                    parseFloat(
+                        row["CLAIM_AMT"]
+                    ) || 0;
+
+                const vertical =
+                    String(
+                        row["Vertical"] || ""
+                    ).trim();
+
+                const department =
+                    vertical;
+
+                // =================================================
+                // USER ID
+                // =================================================
+
+                const employeeId =
+                    String(
+                        row["User ID"] || ""
+                    ).trim();
+
+                let assignedUserId =
+                    null;
+
+                let userName =
+                    null;
+
+                if (employeeId) {
+
+                    const [userRows] =
+                        await connection.query(
+                            `
+                            SELECT
+                                employee_id,
+                                username
+                            FROM users
+                            WHERE employee_id = ?
+                            AND LOWER(TRIM(role)) = 'user'
+                            AND is_active = TRUE
+                            LIMIT 1
+                            `,
+                            [
+                                employeeId
+                            ]
+                        );
+
+                    if (userRows.length === 0) {
+
+                        throw new Error(
+                            `Employee ID '${employeeId}' not found or inactive.`
+                        );
+                    }
+
+                    assignedUserId =
+                        userRows[0].employee_id;
+
+                    userName =
+                        userRows[0].username;
+                }
+
+                const additionalDeduction =
+                    parseFloat(
+                        row["Additional Deduction"]
+                    ) || 0;
+
+                const alAmount =
+                    parseFloat(
+                        row["AL_AMT"]
+                    ) || 0;
+
+                const claimClass =
+                    String(
+                        row["CLAIM_CLASS"] || ""
+                    ).trim();
+
+                const hospitalCode =
+                    String(
+                        row["Hospital Code"] || ""
+                    ).trim();
+
+                const typeOfMou =
+                    String(
+                        row["Type of MOU"] || ""
+                    ).trim();
+
+                const diagnosis =
+                    String(
+                        row["Diagnosis"] || ""
+                    ).trim();
+
+                const diagnosis2 =
+                    String(
+                        row["Diagnosis 2"] || ""
+                    ).trim();
+
+                const policyName =
+                    String(
+                        row["POLICY_NAME"] || ""
+                    ).trim();
+
+                const queue =
+                    String(
+                        row["Queue"] || ""
+                    ).trim();
+
+                const ageing =
+                    String(
+                        row["Ageing"] || ""
+                    ).trim();
+
+                const claimDate =
+                    String(
+                        row["Date"] || ""
+                    ).trim();
+
+                const claimTime =
+                    String(
+                        row["Time"] || ""
+                    ).trim();
+
+                const todayStatus =
+                    String(
+                        row["Today Status"] || ""
+                    ).trim();
+
+                const i3Status =
+                    String(
+                        row["I3 Status"] || ""
+                    ).trim();
+
+                const fullQc =
+                    String(
+                        row["Full qc"] || ""
+                    ).trim();
+
+                const relation =
+                    String(
+                        row["RELATION"] || ""
+                    ).trim();
+
+                const hnf =
+                    String(
+                        row["HNF"] || ""
+                    ).trim();
+
+                const ilomId =
+                    String(
+                        row["ILOM ID"] || ""
+                    ).trim();
+
+                const approveAmount =
+                    parseFloat(
+                        row["Approve AMT"]
+                    ) || 0;
+
+                const remark =
+                    String(
+                        row["Remark"] || ""
+                    ).trim();
+
+                const deductionAmount =
+                    parseFloat(
+                        row["Deduction AMT"]
+                    ) || 0;
+
+                const interDocExe =
+                    String(
+                        row["inter. Doc & Exe"] || ""
+                    ).trim();
+
+                const lot =
+                    String(
+                        row["lot"] ||
+                        row["LOT"] ||
+                        ""
+                    ).trim();
+
+                const platform =
+                    String(
+                        row["platform"] ||
+                        row["Platform"] ||
+                        ""
+                    ).trim();
+
+                // =================================================
+                // CLAIM TYPE
+                // =================================================
+
+                const claimType =
+                    normalizeClaimType(
+                        row["Claim Type"]
+                    );
+
+                // =================================================
+                // STATUS
+                // =================================================
+
+                const claimStatus =
+                    normalizeStatus(
+                        row["Status"]
+                    );
+
+                if (
+                    !VALID_STATUSES.includes(
+                        claimStatus
+                    )
+                ) {
+
+                    throw new Error(
+                        `Invalid Status '${claimStatus}' for Claim ${claimRefNo}.`
+                    );
+                }
+
+                // =================================================
+                // INSERT CLAIM
+                // =================================================
+
+                await connection.query(
+                    `
+                    INSERT INTO claims
+                    (
+                        upload_batch_id,
+                        claim_ref_no,
+                        inward_no,
+                        policy_no,
+                        claim_amount,
+                        vertical,
+                        department,
+                        assigned_user_id,
+                        user_name,
+                        claim_type,
+                        claim_status,
+                        user_remark,
+                        additional_deduction,
+                        al_amount,
+                        claim_class,
+                        hospital_code,
+                        type_of_mou,
+                        diagnosis,
+                        diagnosis_2,
+                        policy_name,
+                        queue,
+                        ageing,
+                        claim_date,
+                        claim_time,
+                        today_status,
+                        i3_status,
+                        full_qc,
+                        relation,
+                        hnf,
+                        ilom_id,
+                        approve_amount,
+                        deduction_amount,
+                        inter_doc_exe,
+                        lot,
+                        platform
+                    )
+                    VALUES
+                    (
+                        ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?
+                    )
+                    `,
+                    [
+                        batchId,
+                        claimRefNo,
+                        inwardNo,
+                        policyNo,
+                        claimAmount,
+                        vertical,
+                        department,
+                        assignedUserId,
+                        userName,
+                        claimType,
+                        claimStatus,
+                        remark,
+                        additionalDeduction,
+                        alAmount,
+                        claimClass,
+                        hospitalCode,
+                        typeOfMou,
+                        diagnosis,
+                        diagnosis2,
+                        policyName,
+                        queue,
+                        ageing,
+                        claimDate,
+                        claimTime,
+                        todayStatus,
+                        i3Status,
+                        fullQc,
+                        relation,
+                        hnf,
+                        ilomId,
+                        approveAmount,
+                        deductionAmount,
+                        interDocExe,
+                        lot,
+                        platform
+                    ]
+                );
+            }
+
+            await connection.commit();
+
+            console.log(
+                "EXCEL UPLOAD SUCCESS"
+            );
+
+            return res.redirect("/upload");
+
+        } catch (error) {
+
+            if (connection) {
+
+                await connection.rollback();
+            }
+
+            console.error(
+                "EXCEL UPLOAD ERROR:",
+                error
+            );
+
+            return res.status(500).send(`
+                <h2>
+                    Excel Upload Failed
+                </h2>
+
+                <pre>
+${error.message}
+                </pre>
+
+                <br>
+
+                <a href="/upload">
+                    Back to Upload
+                </a>
+            `);
+
+        } finally {
+
+            if (connection) {
+
+                connection.release();
+            }
+        }
+    }
+);
+
+// =====================================================
+// DELETE UPLOAD
+// =====================================================
+
+app.post(
+    "/delete-upload/:id",
+    async (req, res) => {
+
+        if (
+            !req.session.user ||
+            normalizeRole(
+                req.session.user.role
+            ) !== "upload"
+        ) {
+
+            return res.redirect("/");
+        }
+
+        const batchId =
+            req.params.id;
+
+        let connection;
+
+        try {
+
+            connection =
+                await db.getConnection();
+
+            await connection.beginTransaction();
+
+            await connection.query(
+                `
+                DELETE FROM claims
+                WHERE upload_batch_id = ?
+                `,
+                [
+                    batchId
+                ]
+            );
+
+            await connection.query(
+                `
+                UPDATE upload_batches
+                SET status = 'DELETED'
+                WHERE id = ?
+                AND status = 'ACTIVE'
+                `,
+                [
+                    batchId
+                ]
+            );
+
+            await connection.commit();
+
+            return res.redirect("/upload");
+
+        } catch (error) {
+
+            if (connection) {
+
+                await connection.rollback();
+            }
+
+            console.error(
+                "DELETE UPLOAD ERROR:",
+                error
+            );
+
+            return res.status(500).send(`
+                <h2>
+                    Delete Failed
+                </h2>
+
+                <pre>
+${error.message}
+                </pre>
+
+                <br>
+
+                <a href="/upload">
+                    Back to Upload
+                </a>
+            `);
+
+        } finally {
+
+            if (connection) {
+
+                connection.release();
+            }
+        }
+    }
+);
+
 // =====================================================
 // ADMIN DASHBOARD
 // =====================================================
