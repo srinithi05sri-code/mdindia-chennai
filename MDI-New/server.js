@@ -1220,7 +1220,7 @@ app.post(
                         file_name,
                         total_claims,
                         status,
-                        upload_at
+                        uploaded_at
                     )
                     VALUES
                     (
@@ -2293,7 +2293,7 @@ app.get("/user", async (req, res) => {
 
                 u.username AS employee_name,
 
-                ub.upload_at AS uploaded_at
+                ub.uploaded_at AS uploaded_at
 
             FROM claims c
 
