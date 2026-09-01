@@ -3875,7 +3875,35 @@ app.get(
 // =====================================================
 // ADMIN DOWNLOAD CLAIMS
 // =====================================================
+function formatISTDateTime(value) {
 
+    if (!value) {
+        return "";
+    }
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+        return "";
+    }
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            timeZone: "Asia/Kolkata",
+
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+
+            hour12: false
+        }
+    );
+}
 app.get(
     "/admin/download-claims",
     async (req, res) => {
@@ -4024,21 +4052,9 @@ app.get(
                 "inter. Doc & Exe":
                     row.inter_doc_exe || "",
 
-               "Upload Date & Time":
-         row.upload_date_time
-        ? new Date(row.upload_date_time).toLocaleString(
-            "en-IN",
-            {
-                timeZone: "Asia/Kolkata",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false
-            }
-        )
+              "Upload Date & Time":
+    row.upload_date_time
+        ? formatISTDateTime(row.upload_date_time)
         : "",
 
     "Upload File":
