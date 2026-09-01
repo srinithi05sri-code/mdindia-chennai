@@ -106,7 +106,124 @@
 
         </div>
 
+<!-- =====================================================
+     PROCESS SUMMARY
+===================================================== -->
 
+<div class="process-summary-section">
+
+    <div class="claims-title-row">
+        <div>
+            <h2>Process Summary</h2>
+            <p class="table-info">
+                Your claim processing summary
+            </p>
+        </div>
+    </div>
+
+    <div class="table-container">
+
+        <table class="productivity-table">
+
+            <thead>
+                <tr>
+                    <th>Platform</th>
+                    <th>Total Allocated</th>
+                    <th>Approved</th>
+                    <th>Rejected</th>
+                    <th>Query</th>
+                    <th>Re-Query</th>
+                    <th>Query + Investigation</th>
+                    <th>Investigation</th>
+                    <th>Sent Back</th>
+                    <th>Keep</th>
+                    <th>Other Doctor & Executive</th>
+                    <th>Pending</th>
+                    <th>Total Productivity</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <% if (processSummary && processSummary.length > 0) { %>
+
+                    <% processSummary.forEach(row => { %>
+
+                        <tr>
+
+                            <td>
+                                <%= row.platform || "-" %>
+                            </td>
+
+                            <td>
+                                <%= row.total_allocated || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.approved || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.rejected || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.query_count || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.requery || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.investigation_query || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.investigation || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.sent_back || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.keep_count || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.other_doctor_executive || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.pending || 0 %>
+                            </td>
+
+                            <td class="productivity">
+                                <%= row.total_productivity || 0 %>
+                            </td>
+
+                        </tr>
+
+                    <% }) %>
+
+                <% } else { %>
+
+                    <tr>
+                        <td colspan="13" style="text-align:center;">
+                            No productivity data available
+                        </td>
+                    </tr>
+
+                <% } %>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
         <!-- ================= SAVE FORM ================= -->
 
