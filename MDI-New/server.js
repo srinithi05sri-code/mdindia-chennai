@@ -538,6 +538,19 @@ app.post("/login", async (req, res) => {
     }
 });
 
+
+app.get("/upload", (req, res) => {
+    if (
+        !req.session.user ||
+        normalizeRole(req.session.user.role) !== "upload"
+    ) {
+        return res.redirect("/");
+    }
+
+    res.render("upload-dashboard", {
+        user: req.session.user
+    });
+});
 // =====================================================
 // ADMIN DASHBOARD
 // =====================================================
