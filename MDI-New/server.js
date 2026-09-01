@@ -1009,7 +1009,7 @@ app.get(
 
                         ub.file_name,
 
-                        ub.upload_at
+                        ub.uploaded_at
                             AS uploaded_at,
 
                         ub.total_claims,
