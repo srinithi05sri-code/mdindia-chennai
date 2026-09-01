@@ -3645,10 +3645,6 @@ app.get(
     "/admin/download-claims",
     async (req, res) => {
 
-        // =====================================================
-        // ADMIN LOGIN CHECK
-        // =====================================================
-
         if (
             !req.session.user ||
             normalizeRole(req.session.user.role) !== "admin"
@@ -3656,67 +3652,55 @@ app.get(
             return res.redirect("/");
         }
 
-
         const fromDate =
             String(req.query.fromDate || "").trim();
 
         const toDate =
             String(req.query.toDate || "").trim();
 
-
         if (!fromDate || !toDate) {
-
-            return res.status(400).send(`
-                <h2>Download Failed</h2>
-                <p>From Date and To Date are required.</p>
-                <a href="/admin">Back to Admin</a>
-            `);
+            return res.status(400).send(
+                "From Date and To Date are required."
+            );
         }
-
 
         try {
 
             // =================================================
-            // IMPORTANT
-            // Use upload_batches.uploaded_at as fallback too
+            // GET CLAIM DATA + UPLOADED DATE/TIME
             // =================================================
 
-            const [rows] =
-                await db.query(
-                    `
-                    SELECT
-                        c.*
-                    FROM claims c
+           const [rows] =
+    await db.query(
+        `
+        SELECT
+            c.*,
 
-                    LEFT JOIN upload_batches ub
-                        ON c.upload_batch_id = ub.id
+            ub.uploaded_at AS uploaded_at
 
-                    WHERE
-                        DATE(
-                            COALESCE(
-                                c.claim_date,
-                                ub.uploaded_at,
-                                c.created_at
-                            )
-                        ) BETWEEN ? AND ?
+        FROM claims c
 
-                    ORDER BY
-                        c.id DESC
-                    `,
-                    [
-                        fromDate,
-                        toDate
-                    ]
-                );
-                console.log("DOWNLOAD FROM DATE:", fromDate);
-console.log("DOWNLOAD TO DATE:", toDate);
-console.log("DOWNLOAD ROW COUNT:", rows.length);
+        LEFT JOIN upload_batches ub
+            ON c.upload_batch_id = ub.id
 
+        WHERE
+            DATE(
+                COALESCE(
+                    c.claim_date,
+                    c.created_at
+                )
+            )
+            BETWEEN ?
+            AND ?
 
-            console.log(
-                "ADMIN DOWNLOAD ROW COUNT:",
-                rows.length
-            );
+        ORDER BY
+            c.id DESC
+        `,
+        [
+            fromDate,
+            toDate
+        ]
+    );
 
 
             // =================================================
@@ -3729,6 +3713,10 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
 
             const excelData =
                 rows.map(row => ({
+
+                    // -----------------------------------------
+                    // ORIGINAL EXCEL COLUMN ORDER
+                    // -----------------------------------------
 
                     "CLAIM_REF_NO":
                         row.claim_ref_no || "",
@@ -3753,7 +3741,15 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
 
                     "User Name":
                         row.user_name || "",
+                    
+                    
+                    "lot":
+                        row.lot || "",
 
+                    "platform":
+                        row.platform || "",
+
+    
                     "Claim Type":
                         row.claim_type || "",
 
@@ -3765,6 +3761,41 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
 
                     "Time":
                         row.claim_time || "",
+
+
+                    // -----------------------------------------
+                    // OTHER ORIGINAL COLUMNS
+                    // -----------------------------------------
+
+                    "Additional Deduction":
+                        row.additional_deduction || 0,
+
+                    "AL_AMT":
+                        row.al_amount || 0,
+
+                    "CLAIM_CLASS":
+                        row.claim_class || "",
+
+                    "Hospital Code":
+                        row.hospital_code || "",
+
+                    "Type of MOU":
+                        row.type_of_mou || "",
+
+                    "Diagnosis":
+                        row.diagnosis || "",
+
+                    "Diagnosis 2":
+                        row.diagnosis_2 || "",
+
+                    "POLICY_NAME":
+                        row.policy_name || "",
+
+                    "Queue":
+                        row.queue || "",
+
+                    "Ageing":
+                        row.ageing || "",
 
                     "Today Status":
                         row.today_status || "",
@@ -3793,88 +3824,94 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
                     "Deduction AMT":
                         row.deduction_amount || 0,
 
-                    "Diagnosis 2":
-                        row.diagnosis_2 || "",
-
                     "inter. Doc & Exe":
                         row.inter_doc_exe || "",
 
-                    "lot":
-                        row.lot || "",
 
-                    "platform":
-                        row.platform || ""
+                    // -----------------------------------------
+                    // LOT + PLATFORM
+                    // -----------------------------------------
+
+                    // -----------------------------------------
+                    // UPLOADED DATE & TIME
+                    // -----------------------------------------
+
+                    "Uploaded Date & Time":
+                        row.uploaded_at || "",
+
+
+                    // -----------------------------------------
+                    // SAVED DATE & TIME
+                    // updated_at changes when user clicks SAVE
+                    // -----------------------------------------
+
+                    "Saved Date & Time":
+                        row.updated_at || ""
+
                 }));
 
 
             // =================================================
-            // EVEN IF NO ROWS, CREATE HEADER
+            // WORKSHEET
             // =================================================
 
             const worksheet =
                 XLSX.utils.json_to_sheet(
-                    excelData,
-                    {
-                        header: [
-                            "CLAIM_REF_NO",
-                            "INWARD_NO",
-                            "POLICY_NO",
-                            "CLAIM_AMT",
-                            "Vertical",
-                            "Department",
-                            "User ID",
-                            "User Name",
-                            "Claim Type",
-                            "Status",
-                            "Date",
-                            "Time",
-                            "Today Status",
-                            "I3 Status",
-                            "Full qc",
-                            "RELATION",
-                            "HNF",
-                            "ILOM ID",
-                            "Approve AMT",
-                            "Remark",
-                            "Deduction AMT",
-                            "Diagnosis 2",
-                            "inter. Doc & Exe",
-                            "lot",
-                            "platform"
-                        ]
-                    }
+                    excelData
                 );
 
 
+            // =================================================
+            // COLUMN WIDTH
+            // =================================================
+
             worksheet["!cols"] = [
 
-                { wch: 20 },
-                { wch: 18 },
-                { wch: 18 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 18 },
-                { wch: 15 },
-                { wch: 20 },
-                { wch: 15 },
-                { wch: 25 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 20 },
-                { wch: 20 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 18 },
-                { wch: 15 },
-                { wch: 30 },
-                { wch: 18 },
-                { wch: 25 },
-                { wch: 25 },
-                { wch: 15 },
-                { wch: 15 }
+                { wch: 20 }, // CLAIM_REF_NO
+                { wch: 18 }, // INWARD_NO
+                { wch: 18 }, // POLICY_NO
+                { wch: 15 }, // CLAIM_AMT
+                { wch: 15 }, // Vertical
+                { wch: 18 }, // Department
+                { wch: 15 }, // User ID
+                { wch: 20 }, // User Name
+                { wch: 15 }, // Claim Type
+                { wch: 20 }, // Status
+                { wch: 15 }, // Date
+                { wch: 15 }, // Time
+
+                { wch: 20 }, // Additional Deduction
+                { wch: 15 }, // AL_AMT
+                { wch: 18 }, // CLAIM_CLASS
+                { wch: 18 }, // Hospital Code
+                { wch: 18 }, // Type of MOU
+                { wch: 25 }, // Diagnosis
+                { wch: 25 }, // Diagnosis 2
+                { wch: 25 }, // POLICY_NAME
+                { wch: 15 }, // Queue
+                { wch: 15 }, // Ageing
+                { wch: 20 }, // Today Status
+                { wch: 20 }, // I3 Status
+                { wch: 15 }, // Full qc
+                { wch: 15 }, // RELATION
+                { wch: 15 }, // HNF
+                { wch: 18 }, // ILOM ID
+                { wch: 15 }, // Approve AMT
+                { wch: 30 }, // Remark
+                { wch: 18 }, // Deduction AMT
+                { wch: 25 }, // inter. Doc & Exe
+
+                { wch: 15 }, // lot
+                { wch: 15 }, // platform
+
+                { wch: 25 }, // Uploaded Date & Time
+                { wch: 25 }  // Saved Date & Time
             ];
 
+
+            // =================================================
+            // APPEND SHEET
+            // =================================================
 
             XLSX.utils.book_append_sheet(
                 workbook,
@@ -3884,7 +3921,7 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
 
 
             // =================================================
-            // WRITE XLSX
+            // CREATE BUFFER
             // =================================================
 
             const buffer =
@@ -3897,11 +3934,14 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
                 );
 
 
+            // =================================================
+            // DOWNLOAD
+            // =================================================
+
             res.setHeader(
                 "Content-Disposition",
                 "attachment; filename=updated-claims.xlsx"
             );
-
 
             res.setHeader(
                 "Content-Type",
@@ -3918,7 +3958,6 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
                 error
             );
 
-
             return res.status(500).send(`
                 <h2>Download Claims Failed</h2>
 
@@ -3933,7 +3972,6 @@ console.log("DOWNLOAD ROW COUNT:", rows.length);
         }
     }
 );
-
 
 // =====================================================
 // LOGOUT
