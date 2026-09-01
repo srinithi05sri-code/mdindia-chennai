@@ -3903,32 +3903,37 @@ app.get(
             console.log("FROM DATE:", fromDate);
             console.log("TO DATE:", toDate);
 
-            const [rows] = await db.query(
-                `
-                SELECT
-                    c.*,
+           const [rows] = await db.query(
+    `
+    SELECT 
+        c.*,
 
-                    ub.file_name,
-                    ub.uploaded_at AS upload_date_time
+        ub.file_name,
 
-                FROM claims c
+       CONVERT_TZ(
+            ub.uploaded_at,
+            '+00:00',
+            '+05:30'
+        ) AS upload_date_time
 
-                LEFT JOIN upload_batches ub
-                    ON c.upload_batch_id = ub.id
+    FROM claims c
 
-                WHERE
-                    DATE(ub.uploaded_at)
-                    BETWEEN ?
-                    AND ?
+    LEFT JOIN upload_batches ub
+        ON c.upload_batch_id = ub.id
 
-                ORDER BY
-                    c.id DESC
-                `,
-                [
-                    fromDate,
-                    toDate
-                ]
-            );
+    WHERE
+        DATE(ub.uploaded_at)
+        BETWEEN ?
+        AND ?
+
+    ORDER BY
+        c.id DESC
+    `,
+    [
+        fromDate,
+        toDate
+    ]
+);
 
             console.log(
                 "DUMP ROW COUNT:",
@@ -4015,11 +4020,11 @@ app.get(
                 "inter. Doc & Exe":
                     row.inter_doc_exe || "",
 
-                "Upload Date & Time":
-                    row.upload_date_time || "",
+               "Upload Date & Time":
+        row.upload_date_time || "",
 
-                "Upload File":
-                    row.file_name || ""
+    "Upload File":
+        row.file_name || ""
 
             }));
 
