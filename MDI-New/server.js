@@ -3907,45 +3907,73 @@ app.get(
             console.log("FROM DATE:", fromDate);
             console.log("TO DATE:", toDate);
 
-           const [rows] = await db.query(
-    `
-    SELECT 
-        c.*,
 
-        ub.file_name,
+            // =================================================
+            // GET CLAIMS + USERNAME + UPLOAD TIME
+            // =================================================
 
-       CONVERT_TZ(
-            ub.uploaded_at,
-            '+00:00',
-            '+05:30'
-        ) AS upload_date_time
+            const [rows] = await db.query(
+                `
+                SELECT
 
-    FROM claims c
+                    c.*,
 
-    LEFT JOIN upload_batches ub
-        ON c.upload_batch_id = ub.id
+                    u.employee_id AS actual_employee_id,
 
-    WHERE
-        DATE(ub.uploaded_at)
-        BETWEEN ?
-        AND ?
+                    u.username AS actual_username,
 
-    ORDER BY
-        c.id DESC
-    `,
-    [
-        fromDate,
-        toDate
-    ]
-);
+                    ub.file_name AS upload_file_name,
+
+                    ub.uploaded_at AS upload_date_time
+
+                FROM claims c
+
+                LEFT JOIN users u
+                    ON TRIM(c.assigned_user_id)
+                    =
+                    TRIM(u.employee_id)
+
+                LEFT JOIN upload_batches ub
+                    ON c.upload_batch_id = ub.id
+
+                WHERE
+                    DATE(
+                        CONVERT_TZ(
+                            ub.uploaded_at,
+                            '+00:00',
+                            '+05:30'
+                        )
+                    )
+                    BETWEEN ?
+                    AND ?
+
+                ORDER BY
+                    c.id DESC
+                `,
+                [
+                    fromDate,
+                    toDate
+                ]
+            );
+
 
             console.log(
                 "DUMP ROW COUNT:",
                 rows.length
             );
 
+
+            // =================================================
+            // CREATE WORKBOOK
+            // =================================================
+
             const workbook =
                 XLSX.utils.book_new();
+
+
+            // =================================================
+            // EXCEL DATA
+            // =================================================
 
             const excelData = rows.map(row => ({
 
@@ -3967,11 +3995,27 @@ app.get(
                 "Department":
                     row.department || "",
 
+                // ---------------------------------------------
+                // EMPLOYEE ID
+                // ---------------------------------------------
+
                 "User ID":
-                    row.assigned_user_id || "",
+                    row.actual_employee_id ||
+                    row.assigned_user_id ||
+                    "",
+
+                // ---------------------------------------------
+                // USERNAME
+                // ---------------------------------------------
 
                 "User Name":
-                    row.user_name || "",
+                    row.actual_username ||
+                    row.user_name ||
+                    "",
+
+                // ---------------------------------------------
+                // LOT + PLATFORM
+                // ---------------------------------------------
 
                 "lot":
                     row.lot || "",
@@ -3979,17 +4023,33 @@ app.get(
                 "platform":
                     row.platform || "",
 
+                // ---------------------------------------------
+                // CLAIM TYPE
+                // ---------------------------------------------
+
                 "Claim Type":
                     row.claim_type || "",
 
+                // ---------------------------------------------
+                // STATUS
+                // ---------------------------------------------
+
                 "Status":
                     row.claim_status || "",
+
+                // ---------------------------------------------
+                // CLAIM DATE / TIME
+                // ---------------------------------------------
 
                 "Date":
                     row.claim_date || "",
 
                 "Time":
                     row.claim_time || "",
+
+                // ---------------------------------------------
+                // OTHER FIELDS
+                // ---------------------------------------------
 
                 "Today Status":
                     row.today_status || "",
@@ -4024,27 +4084,67 @@ app.get(
                 "inter. Doc & Exe":
                     row.inter_doc_exe || "",
 
-             "Upload Date & Time":
-    row.upload_date_time
-        ? new Date(row.upload_date_time).toLocaleString(
-            "en-IN",
-            {
-                timeZone: "Asia/Kolkata",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: true
-            }
-        )
-        : "",
+                // =================================================
+                // UPLOAD DATE & TIME - IST
+                // =================================================
 
-    "Upload File":
-        row.file_name || ""
+                "Upload Date & Time":
+                    row.upload_date_time
+                        ? new Date(
+                            row.upload_date_time
+                        ).toLocaleString(
+                            "en-IN",
+                            {
+                                timeZone: "Asia/Kolkata",
+
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+
+                                hour12: false
+                            }
+                        )
+                        : "",
+
+                // =================================================
+                // SAVE DATE & TIME - IST
+                // =================================================
+
+                "Save Date & Time":
+                    row.updated_at
+                        ? new Date(
+                            row.updated_at
+                        ).toLocaleString(
+                            "en-IN",
+                            {
+                                timeZone: "Asia/Kolkata",
+
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+
+                                hour12: false
+                            }
+                        )
+                        : "",
+
+                // =================================================
+                // UPLOAD FILE
+                // =================================================
+
+                "Upload File":
+                    row.upload_file_name || ""
 
             }));
+
 
             console.log(
                 "DUMP EXCEL GENERATED:",
@@ -4052,10 +4152,20 @@ app.get(
                 "rows"
             );
 
+
+            // =================================================
+            // CREATE SHEET
+            // =================================================
+
             const worksheet =
                 XLSX.utils.json_to_sheet(
                     excelData
                 );
+
+
+            // =================================================
+            // COLUMN WIDTHS
+            // =================================================
 
             worksheet["!cols"] = [
 
@@ -4065,14 +4175,19 @@ app.get(
                 { wch: 15 }, // CLAIM_AMT
                 { wch: 15 }, // Vertical
                 { wch: 18 }, // Department
+
                 { wch: 15 }, // User ID
-                { wch: 20 }, // User Name
+                { wch: 25 }, // User Name
+
                 { wch: 15 }, // lot
                 { wch: 15 }, // platform
+
                 { wch: 15 }, // Claim Type
                 { wch: 25 }, // Status
+
                 { wch: 15 }, // Date
                 { wch: 15 }, // Time
+
                 { wch: 20 }, // Today Status
                 { wch: 20 }, // I3 Status
                 { wch: 15 }, // Full qc
@@ -4084,16 +4199,29 @@ app.get(
                 { wch: 18 }, // Deduction AMT
                 { wch: 25 }, // Diagnosis 2
                 { wch: 25 }, // inter. Doc & Exe
-                { wch: 22 }, // Upload Date & Time
+
+                { wch: 25 }, // Upload Date & Time
+                { wch: 25 }, // Save Date & Time
+
                 { wch: 30 }  // Upload File
 
             ];
+
+
+            // =================================================
+            // APPEND SHEET
+            // =================================================
 
             XLSX.utils.book_append_sheet(
                 workbook,
                 worksheet,
                 "Claims"
             );
+
+
+            // =================================================
+            // WRITE EXCEL
+            // =================================================
 
             const buffer =
                 XLSX.write(
@@ -4103,6 +4231,7 @@ app.get(
                         bookType: "xlsx"
                     }
                 );
+
 
             res.setHeader(
                 "Content-Disposition",
@@ -4114,7 +4243,9 @@ app.get(
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             );
 
+
             return res.send(buffer);
+
 
         } catch (error) {
 
