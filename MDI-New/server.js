@@ -826,6 +826,202 @@ app.get("/admin", async (req, res) => {
         `);
     }
 });
+// =========================================================
+// DOWNLOAD PROCESS SUMMARY
+// =========================================================
+
+app.get("/admin/download-process-summary", async (req, res) => {
+
+    if (
+        !req.session.user ||
+        normalizeRole(req.session.user.role) !== "admin"
+    ) {
+        return res.redirect("/");
+    }
+
+    try {
+
+        const [rows] = await db.query(`
+            SELECT
+
+                COALESCE(c.platform, '-') AS platform,
+
+                COALESCE(
+                    u.employee_id,
+                    c.assigned_user_id,
+                    '-'
+                ) AS employee_id,
+
+                COALESCE(
+                    u.username,
+                    c.user_name,
+                    '-'
+                ) AS user_name,
+
+                COUNT(*) AS total_allocated,
+
+                SUM(c.claim_status = 'Pending') AS pending,
+
+                SUM(c.claim_status = 'Approved') AS approved,
+
+                SUM(c.claim_status = 'Rejected') AS rejected,
+
+                SUM(c.claim_status = 'Query') AS query_count,
+
+                SUM(c.claim_status = 'Re-Query') AS requery,
+
+                SUM(
+                    c.claim_status =
+                    'Query & Investigation'
+                ) AS investigation_query,
+
+                SUM(
+                    c.claim_status =
+                    'Investigation'
+                ) AS investigation,
+
+                SUM(
+                    c.claim_status =
+                    'Sent-Back'
+                ) AS sent_back,
+
+                SUM(
+                    c.claim_status = 'Keep'
+                ) AS keep_count,
+
+                SUM(
+                    c.claim_status =
+                    'Other-Doctor/Executive'
+                ) AS other_doctor_executive,
+
+                SUM(
+                    c.claim_status =
+                    'ROD-Cancel'
+                ) AS rod_cancel,
+
+                SUM(
+                    c.claim_status <> 'Pending'
+                ) AS total_productivity
+
+            FROM claims c
+
+            LEFT JOIN users u
+                ON TRIM(c.assigned_user_id)
+                = TRIM(u.employee_id)
+
+            GROUP BY
+                c.platform,
+                COALESCE(
+                    u.employee_id,
+                    c.assigned_user_id,
+                    '-'
+                ),
+                COALESCE(
+                    u.username,
+                    c.user_name,
+                    '-'
+                )
+
+            ORDER BY
+                c.platform,
+                user_name
+        `);
+
+        // Excel workbook
+        const workbook = XLSX.utils.book_new();
+
+        const excelData = rows.map(row => ({
+            "Platform": row.platform || "-",
+            "Employee ID": row.employee_id || "-",
+            "User Name": row.user_name || "-",
+            "Total Allocated": Number(row.total_allocated || 0),
+            "Approved": Number(row.approved || 0),
+            "Rejected": Number(row.rejected || 0),
+            "Query": Number(row.query_count || 0),
+            "Re-Query": Number(row.requery || 0),
+            "Query + Investigation":
+                Number(row.investigation_query || 0),
+            "Total Productivity":
+                Number(row.total_productivity || 0),
+            "Investigation":
+                Number(row.investigation || 0),
+            "Sent Back":
+                Number(row.sent_back || 0),
+            "Keep":
+                Number(row.keep_count || 0),
+            "Other Doctor & Executive":
+                Number(row.other_doctor_executive || 0),
+            "ROD Cancel":
+                Number(row.rod_cancel || 0),
+            "Pending":
+                Number(row.pending || 0)
+        }));
+
+        const worksheet =
+            XLSX.utils.json_to_sheet(excelData);
+
+        // Column widths
+        worksheet["!cols"] = [
+            { wch: 18 },
+            { wch: 18 },
+            { wch: 25 },
+            { wch: 18 },
+            { wch: 12 },
+            { wch: 12 },
+            { wch: 12 },
+            { wch: 12 },
+            { wch: 22 },
+            { wch: 20 },
+            { wch: 18 },
+            { wch: 15 },
+            { wch: 12 },
+            { wch: 25 },
+            { wch: 15 },
+            { wch: 12 }
+        ];
+
+        XLSX.utils.book_append_sheet(
+            workbook,
+            worksheet,
+            "Process Summary"
+        );
+
+        // Convert to Excel buffer
+        const buffer = XLSX.write(
+            workbook,
+            {
+                type: "buffer",
+                bookType: "xlsx"
+            }
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=process-summary.xlsx"
+        );
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+
+        return res.send(buffer);
+
+    } catch (error) {
+
+        console.error(
+            "PROCESS SUMMARY DOWNLOAD ERROR:",
+            error
+        );
+
+        return res.status(500).send(`
+            <h2>Process Summary Download Error</h2>
+            <pre>${error.message}</pre>
+            <br>
+            <a href="/admin">Back to Admin</a>
+        `);
+    }
+});
 
 
 // =====================================================

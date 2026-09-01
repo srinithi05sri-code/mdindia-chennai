@@ -37,10 +37,99 @@
 
     <hr>
 
-
+   
     <!-- ================= PRODUCTIVITY ================= -->
 
     <h2>Productivity Dashboard</h2>
+   
+<!-- ================= PRODUCTIVITY FILTER ================= -->
+
+<div class="productivity-filter">
+
+    <div class="date-field">
+        <label for="fromDate">From Date</label>
+
+        <input
+            type="date"
+            id="fromDate"
+            name="fromDate"
+        >
+    </div>
+
+    <div class="date-field">
+        <label for="toDate">To Date</label>
+
+        <input
+            type="date"
+            id="toDate"
+            name="toDate"
+        >
+    </div>
+
+    <button
+        type="button"
+        class="filter-btn"
+        onclick="filterProductivity()"
+    >
+        Filter
+    </button>
+
+    <button
+        type="button"
+        class="clear-filter-btn"
+        onclick="clearProductivityFilter()"
+    >
+        Clear
+    </button>
+
+</div>
+
+<div class="summary-download-section">
+    <a href="/admin/download-productivity">
+        <button type="button" class="download-btn">
+            Download Process Summary
+        </button>
+    </a>
+</div>
+
+   
+<script>
+
+function filterProductivity() {
+
+    const fromDate =
+        document.getElementById("fromDate").value;
+
+    const toDate =
+        document.getElementById("toDate").value;
+
+    if (!fromDate || !toDate) {
+        alert("Please select From Date and To Date");
+        return;
+    }
+
+    if (fromDate > toDate) {
+        alert("From Date cannot be greater than To Date");
+        return;
+    }
+
+    // Send selected dates to backend
+    window.location.href =
+        `/admin/dashboard?fromDate=${fromDate}&toDate=${toDate}`;
+}
+
+
+function clearProductivityFilter() {
+
+    document.getElementById("fromDate").value = "";
+    document.getElementById("toDate").value = "";
+
+    window.location.href = "/admin/dashboard";
+}
+
+</script>
+
+
 
     <div class="table-container">
 
@@ -158,18 +247,42 @@
 
     <!-- ================= DOWNLOAD CLAIMS ================= -->
 
-    <h2>Claims Dump</h2>
+    
+<!-- ================= DOWNLOAD CLAIMS ================= -->
 
-    <a href="/admin/download-claims">
+<h2>Claims Dump</h2>
 
-        <button
-            type="button"
-            class="download-btn"
+<form action="/admin/download-claims" method="GET" class="download-form">
+
+    <div class="date-field">
+        <label for="fromDate">From Date</label>
+        <input
+            type="date"
+            id="fromDate"
+            name="fromDate"
+            required
         >
-            Download Updated Claims
-        </button>
+    </div>
 
-    </a>
+    <div class="date-field">
+        <label for="toDate">To Date</label>
+        <input
+            type="date"
+            id="toDate"
+            name="toDate"
+            required
+        >
+    </div>
+
+    <button
+        type="submit"
+        class="download-btn"
+    >
+        Download Updated Claims
+    </button>
+
+</form>
+
 
 
     <hr>

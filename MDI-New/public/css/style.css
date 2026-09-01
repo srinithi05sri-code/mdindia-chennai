@@ -1,26 +1,38 @@
+
 /* =========================================================
-   GLOBAL
+   GLOBAL RESET
 ========================================================= */
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-/* =========================================
-   RESET
-========================================= */
-
-* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
 
-/* =========================================
+body {
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+    color: #1f2937;
+    background: #f3f6fa;
+}
+
+a {
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+
+/* =========================================================
    LOGIN PAGE
-========================================= */
+========================================================= */
 
 body.login-page {
     min-height: 100vh;
@@ -28,8 +40,6 @@ body.login-page {
     display: flex;
     justify-content: center;
     align-items: center;
-
-    font-family: Arial, Helvetica, sans-serif;
 
     background:
         linear-gradient(
@@ -41,9 +51,9 @@ body.login-page {
 }
 
 
-/* =========================================
+/* =========================================================
    LOGIN BOX
-========================================= */
+========================================================= */
 
 .login-box {
     width: 420px;
@@ -61,9 +71,9 @@ body.login-page {
 }
 
 
-/* =========================================
-   LOGO
-========================================= */
+/* =========================================================
+   LOGIN LOGO
+========================================================= */
 
 .login-logo {
     width: 75px;
@@ -77,11 +87,12 @@ body.login-page {
 
     border-radius: 18px;
 
-    background: linear-gradient(
-        135deg,
-        #2563eb,
-        #1d4ed8
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
 
     color: white;
 
@@ -95,9 +106,9 @@ body.login-page {
 }
 
 
-/* =========================================
-   SUBTITLE
-========================================= */
+/* =========================================================
+   LOGIN SUBTITLE
+========================================================= */
 
 .login-subtitle {
     color: #64748b;
@@ -108,9 +119,9 @@ body.login-page {
 }
 
 
-/* =========================================
+/* =========================================================
    LOGIN HEADING
-========================================= */
+========================================================= */
 
 .login-box h2 {
     color: #1e293b;
@@ -121,9 +132,9 @@ body.login-page {
 }
 
 
-/* =========================================
+/* =========================================================
    ERROR MESSAGE
-========================================= */
+========================================================= */
 
 .error-message {
     background: #fee2e2;
@@ -144,25 +155,19 @@ body.login-page {
 }
 
 
-/* =========================================
-   FORM
-========================================= */
+/* =========================================================
+   LOGIN FORM
+========================================================= */
 
-.form-group {
+.login-box .form-group {
     text-align: left;
 }
 
-
-.form-group > div {
+.login-box .form-group > div {
     margin-bottom: 18px;
 }
 
-
-/* =========================================
-   LABEL
-========================================= */
-
-.form-group label {
+.login-box .form-group label {
     display: block;
 
     margin-bottom: 7px;
@@ -174,12 +179,7 @@ body.login-page {
     font-weight: 600;
 }
 
-
-/* =========================================
-   INPUT
-========================================= */
-
-.form-group input {
+.login-box .form-group input {
     width: 100%;
 
     height: 48px;
@@ -201,13 +201,11 @@ body.login-page {
     transition: 0.2s ease;
 }
 
-
-.form-group input::placeholder {
+.login-box .form-group input::placeholder {
     color: #94a3b8;
 }
 
-
-.form-group input:focus {
+.login-box .form-group input:focus {
     border-color: #2563eb;
 
     background: #ffffff;
@@ -217,9 +215,9 @@ body.login-page {
 }
 
 
-/* =========================================
+/* =========================================================
    LOGIN BUTTON
-========================================= */
+========================================================= */
 
 .login-btn {
     width: 100%;
@@ -232,11 +230,12 @@ body.login-page {
 
     border-radius: 9px;
 
-    background: linear-gradient(
-        135deg,
-        #2563eb,
-        #1d4ed8
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
 
     color: white;
 
@@ -249,7 +248,6 @@ body.login-page {
     transition: all 0.2s ease;
 }
 
-
 .login-btn:hover {
     transform: translateY(-1px);
 
@@ -257,278 +255,263 @@ body.login-page {
         0 8px 20px rgba(37, 99, 235, 0.25);
 }
 
-
 .login-btn:active {
     transform: translateY(0);
 }
 
 
-/* =========================================
-   MOBILE
-========================================= */
-
-@media (max-width: 500px) {
-
-    .login-box {
-        width: calc(100% - 30px);
-
-        padding: 30px 22px;
-    }
-
-}
-
-body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f4f7fb;
-    color: #1f2937;
-}
-
-a {
-    text-decoration: none;
-}
-
-button,
-input,
-select {
-    font-family: inherit;
-}
-
 /* =========================================================
-   USER DASHBOARD - CLAIM MANAGEMENT
-   ========================================================= */
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+   USER DASHBOARD
+========================================================= */
 
 body.user-dashboard {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f3f6fa;
-    color: #1f2937;
     min-height: 100vh;
+
+    background: #f3f6fa;
 }
 
 
 /* =========================================================
-   MAIN CONTAINER
-   ========================================================= */
+   USER MAIN CONTAINER
+========================================================= */
 
-.dashboard-container {
+body.user-dashboard .dashboard-container {
     width: 100%;
     min-height: 100vh;
+
     padding: 24px;
 }
 
 
 /* =========================================================
-   HEADER
-   ========================================================= */
+   USER HEADER
+========================================================= */
 
 .user-header {
     width: 100%;
-    background: linear-gradient(135deg, #173f5f, #20639b);
+
+    background:
+        linear-gradient(
+            135deg,
+            #173f5f,
+            #20639b
+        );
+
     color: white;
+
     padding: 24px 30px;
+
     border-radius: 14px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     margin-bottom: 24px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
 .user-header h1 {
     font-size: 28px;
+
     font-weight: 700;
+
     margin-bottom: 8px;
 }
 
 .user-header p {
     font-size: 14px;
+
     margin-top: 5px;
+
     color: #e8f1f8;
 }
 
 .user-header strong {
     color: white;
-    font-weight: 700;
 }
 
 
 /* =========================================================
-   LOGOUT BUTTON
-   ========================================================= */
+   COMMON LOGOUT
+========================================================= */
 
 .logout-btn {
-    text-decoration: none;
-    background: white;
-    color: #173f5f;
+    display: inline-block;
+
     padding: 11px 22px;
+
     border-radius: 8px;
+
+    background: white;
+
+    color: #173f5f;
+
     font-size: 14px;
+
     font-weight: 700;
+
     transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
     background: #e8f1f8;
+
     transform: translateY(-1px);
 }
 
 
 /* =========================================================
-   CLAIM SECTION
-   ========================================================= */
+   USER CLAIM SECTION
+========================================================= */
 
 .claims-section {
     width: 100%;
+
     background: white;
+
     border-radius: 14px;
+
     padding: 24px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
 .claims-title-row {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     margin-bottom: 20px;
 }
 
 .claims-title-row h2 {
     font-size: 22px;
+
     color: #173f5f;
+
     font-weight: 700;
 }
 
 .table-info {
     margin-top: 6px;
+
     color: #6b7280;
+
     font-size: 13px;
 }
 
 
 /* =========================================================
-   TABLE CONTAINER
-   ========================================================= */
+   USER TABLE
+========================================================= */
 
-.table-container {
+body.user-dashboard .table-container {
     width: 100%;
+
     overflow-x: auto;
     overflow-y: auto;
 
     max-height: 68vh;
 
     border: 1px solid #dbe3ec;
+
     border-radius: 10px;
+
     background: white;
 }
 
-
-/* =========================================================
-   CLAIM TABLE
-   ========================================================= */
-
 .claim-table {
     width: max-content;
+
     min-width: 100%;
+
     border-collapse: separate;
+
     border-spacing: 0;
 
     font-size: 13px;
 }
 
-
-/* =========================================================
-   TABLE HEADER
-   ========================================================= */
-
 .claim-table thead th {
     position: sticky;
+
     top: 0;
+
     z-index: 10;
 
     background: #173f5f;
+
     color: white;
 
     padding: 13px 14px;
 
     text-align: left;
+
     white-space: nowrap;
 
     font-size: 12px;
+
     font-weight: 700;
 
-    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-right:
+        1px solid rgba(255,255,255,0.15);
+
     border-bottom: 2px solid #0f2f49;
 }
-
-
-/* Editable headers */
 
 .claim-table thead th.editable-header {
     background: #0f766e;
 }
 
-
-/* =========================================================
-   TABLE BODY
-   ========================================================= */
-
 .claim-table tbody td {
     padding: 10px 12px;
 
     border-right: 1px solid #e5e7eb;
+
     border-bottom: 1px solid #e5e7eb;
 
     background: white;
 
     white-space: nowrap;
+
     vertical-align: middle;
 
     color: #374151;
 }
 
-
-/* Alternate rows */
-
 .claim-table tbody tr:nth-child(even) td {
     background: #f8fafc;
 }
-
-
-/* Hover */
 
 .claim-table tbody tr:hover td {
     background: #eef6ff;
 }
 
-
-/* =========================================================
-   USER ID / USER NAME
-   ========================================================= */
-
 .user-id-cell {
     font-weight: 700;
+
     color: #173f5f !important;
+
     background: #eef5fb !important;
 }
 
 .user-name-cell {
     font-weight: 700;
+
     color: #20639b !important;
+
     background: #eef5fb !important;
 }
 
-
-/* =========================================================
-   EDITABLE CELLS
-   ========================================================= */
-
 .editable-cell {
     background: #f0fdfa !important;
+
     border-left: 1px solid #ccfbf1;
 }
 
@@ -538,8 +521,8 @@ body.user-dashboard {
 
 
 /* =========================================================
-   INPUTS
-   ========================================================= */
+   USER INPUTS
+========================================================= */
 
 .editable-input {
     width: 140px;
@@ -547,6 +530,7 @@ body.user-dashboard {
     padding: 8px 9px;
 
     border: 1px solid #cbd5e1;
+
     border-radius: 6px;
 
     background: white;
@@ -556,21 +540,14 @@ body.user-dashboard {
     font-size: 13px;
 
     outline: none;
-
-    transition: border 0.2s ease,
-                box-shadow 0.2s ease;
 }
 
 .editable-input:focus {
     border-color: #0f766e;
 
-    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(15,118,110,0.12);
 }
-
-
-/* =========================================================
-   SELECT
-   ========================================================= */
 
 .editable-select {
     min-width: 150px;
@@ -578,6 +555,7 @@ body.user-dashboard {
     padding: 8px 30px 8px 9px;
 
     border: 1px solid #cbd5e1;
+
     border-radius: 6px;
 
     background: white;
@@ -589,25 +567,25 @@ body.user-dashboard {
     cursor: pointer;
 
     outline: none;
-
-    transition: border 0.2s ease,
-                box-shadow 0.2s ease;
 }
 
 .editable-select:focus {
     border-color: #0f766e;
 
-    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(15,118,110,0.12);
 }
 
 
 /* =========================================================
    SAVE SECTION
-   ========================================================= */
+========================================================= */
 
 .save-section {
     display: flex;
+
     justify-content: flex-end;
+
     align-items: center;
 
     margin-top: 20px;
@@ -617,15 +595,15 @@ body.user-dashboard {
     border-top: 1px solid #e5e7eb;
 }
 
-
-/* =========================================================
-   SAVE BUTTON
-   ========================================================= */
-
 .save-claims-btn {
     border: none;
 
-    background: linear-gradient(135deg, #0f766e, #0d9488);
+    background:
+        linear-gradient(
+            135deg,
+            #0f766e,
+            #0d9488
+        );
 
     color: white;
 
@@ -639,7 +617,8 @@ body.user-dashboard {
 
     cursor: pointer;
 
-    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+    box-shadow:
+        0 4px 12px rgba(15,118,110,0.25);
 
     transition: all 0.2s ease;
 }
@@ -647,17 +626,9 @@ body.user-dashboard {
 .save-claims-btn:hover {
     transform: translateY(-1px);
 
-    box-shadow: 0 6px 16px rgba(15, 118, 110, 0.32);
+    box-shadow:
+        0 6px 16px rgba(15,118,110,0.32);
 }
-
-.save-claims-btn:active {
-    transform: translateY(0);
-}
-
-
-/* =========================================================
-   DISABLED SAVE BUTTON
-   ========================================================= */
 
 .save-claims-btn:disabled {
     background: #94a3b8;
@@ -671,94 +642,36 @@ body.user-dashboard {
 
 
 /* =========================================================
-   SCROLLBAR
-   ========================================================= */
-
-.table-container::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-.table-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-    background: #94a3b8;
-    border-radius: 10px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
-}
-
-
-/* =========================================================
-   MOBILE / SMALL SCREEN
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-    .dashboard-container {
-        padding: 12px;
-    }
-
-    .user-header {
-        padding: 18px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .user-header h1 {
-        font-size: 22px;
-    }
-
-    .logout-btn {
-        align-self: flex-end;
-    }
-
-    .claims-section {
-        padding: 15px;
-    }
-
-    .claims-title-row h2 {
-        font-size: 19px;
-    }
-
-    .table-container {
-        max-height: 65vh;
-    }
-
-    .save-section {
-        justify-content: center;
-    }
-
-    .save-claims-btn {
-        width: 100%;
-    }
-}
-/* =========================================================
    ADMIN DASHBOARD
-   ========================================================= */
+========================================================= */
 
 body.dashboard-container {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f3f6fa;
-    color: #1f2937;
     min-height: 100vh;
+
     padding: 24px;
-    margin: 0;
+
+    background: #f3f6fa;
+}
+
+.admin-page {
+    width: 100%;
 }
 
 
 /* =========================================================
    ADMIN HEADER
-   ========================================================= */
+========================================================= */
 
 .dashboard-header {
     width: 100%;
-    background: linear-gradient(135deg, #173f5f, #20639b);
+
+    background:
+        linear-gradient(
+            135deg,
+            #173f5f,
+            #20639b
+        );
+
     color: white;
 
     padding: 24px 30px;
@@ -766,27 +679,26 @@ body.dashboard-container {
     border-radius: 14px;
 
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
     margin-bottom: 25px;
 
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-
-    position: relative;
-    overflow: hidden;
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.12);
 }
 
 .dashboard-header h1 {
-    margin: 0 0 8px 0;
-
     font-size: 28px;
+
     font-weight: 700;
+
+    margin-bottom: 8px;
 }
 
 .dashboard-header .welcome-text {
-    margin: 0;
-
     font-size: 14px;
 
     color: #e8f1f8;
@@ -796,64 +708,59 @@ body.dashboard-container {
     color: white;
 }
 
-
-/* =========================================================
-   LOGOUT
-   ========================================================= */
-
 .dashboard-header .logout-btn {
-    display: inline-block;
-
     background: white;
+
     color: #173f5f;
-
-    text-decoration: none;
-
-    padding: 11px 22px;
-
-    border-radius: 8px;
-
-    font-size: 14px;
-    font-weight: 700;
-
-    transition: all 0.2s ease;
-}
-
-.dashboard-header .logout-btn:hover {
-    background: #e8f1f8;
-
-    transform: translateY(-1px);
 }
 
 
 /* =========================================================
-   HEADINGS
-   ========================================================= */
+   ADMIN SECTIONS
+========================================================= */
 
-body.dashboard-container > h2 {
+.admin-section {
+    margin-bottom: 35px;
+}
+
+.admin-section h2 {
     color: #173f5f;
 
     font-size: 22px;
 
-    margin: 25px 0 15px 0;
+    margin-bottom: 15px;
 
     font-weight: 700;
 }
 
-body.dashboard-container hr {
-    border: 0;
 
-    height: 1px;
+/* =========================================================
+   ADMIN TABLE CONTAINER
+========================================================= */
 
-    background: #dbe3ec;
+body.dashboard-container .table-container {
+    width: 100%;
 
-    margin: 25px 0;
+    overflow-x: auto;
+
+    overflow-y: auto;
+
+    max-height: 60vh;
+
+    border: 1px solid #dbe3ec;
+
+    border-radius: 10px;
+
+    background: white;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.05);
 }
 
 
 /* =========================================================
    PRODUCTIVITY TABLE
-   ========================================================= */
+========================================================= */
 
 .productivity-table {
     width: 100%;
@@ -861,6 +768,7 @@ body.dashboard-container hr {
     min-width: 1100px;
 
     border-collapse: separate;
+
     border-spacing: 0;
 
     background: white;
@@ -868,11 +776,9 @@ body.dashboard-container hr {
     font-size: 13px;
 }
 
-
-/* Header */
-
 .productivity-table thead th {
     position: sticky;
+
     top: 0;
 
     z-index: 10;
@@ -891,13 +797,11 @@ body.dashboard-container hr {
 
     font-weight: 700;
 
-    border-right: 1px solid rgba(255,255,255,0.15);
+    border-right:
+        1px solid rgba(255,255,255,0.15);
 
     border-bottom: 2px solid #0f2f49;
 }
-
-
-/* Body */
 
 .productivity-table tbody td {
     padding: 11px 14px;
@@ -915,8 +819,901 @@ body.dashboard-container hr {
     background: white;
 }
 
+.productivity-table tbody tr:nth-child(even) td {
+    background: #f8fafc;
+}
 
-/* Alternate rows */
+.productivity-table tbody tr:hover td {
+    background: #eef6ff;
+}
+
+.productivity-table tbody td:first-child {
+    font-weight: 700;
+
+    color: #173f5f;
+}
+
+.productivity-table tbody td:nth-child(2) {
+    font-weight: 700;
+
+    color: #20639b;
+}
+
+.productivity-table td.productivity {
+    font-weight: 800;
+
+    color: #0f766e;
+
+    background: #f0fdfa !important;
+}
+
+.empty-message {
+    text-align: center !important;
+
+    padding: 30px !important;
+
+    color: #64748b !important;
+}
+
+
+/* =========================================================
+   ACTION CARD
+========================================================= */
+
+.action-card {
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.05);
+}
+
+.action-card p {
+    margin-bottom: 15px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   DOWNLOAD BUTTON
+========================================================= */
+
+.download-btn {
+    border: none;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f766e,
+            #0d9488
+        );
+
+    color: white;
+
+    padding: 12px 24px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(15,118,110,0.25);
+
+    transition: all 0.2s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 16px rgba(15,118,110,0.32);
+}
+
+
+/* =========================================================
+   ADMIN FORMS
+========================================================= */
+
+.admin-form {
+    width: 100%;
+
+    max-width: 600px;
+
+    background: white;
+
+    padding: 24px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.06);
+}
+
+.form-field {
+    margin-bottom: 18px;
+}
+
+.form-field label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.form-field input,
+.form-field select {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+    border-color: #20639b;
+
+    box-shadow:
+        0 0 0 3px rgba(32,99,155,0.12);
+}
+
+.form-field input::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-btn {
+    border: none;
+
+    background:
+        linear-gradient(
+            135deg,
+            #20639b,
+            #173f5f
+        );
+
+    color: white;
+
+    padding: 11px 22px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(23,63,95,0.25);
+}
+
+
+/* =========================================================
+   SAVE TIME
+========================================================= */
+
+.save-time-box {
+    margin-top: 20px;
+
+    padding: 14px 18px;
+
+    background: #ecfdf5;
+
+    color: #065f46;
+
+    border: 1px solid #a7f3d0;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    max-width: 600px;
+}
+
+.save-time-box strong {
+    margin-right: 8px;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.table-container::-webkit-scrollbar {
+    width: 10px;
+
+    height: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+
+/* =========================================================
+   UPLOAD DASHBOARD
+========================================================= */
+
+.upload-dashboard {
+    margin: 0;
+
+    padding: 0;
+
+    min-height: 100vh;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    background: #f4f7fb;
+
+    color: #1f2937;
+}
+
+.upload-content {
+    width: 94%;
+
+    max-width: 1400px;
+
+    margin: 0 auto;
+
+    padding: 25px 0 50px;
+}
+
+
+/* =========================================================
+   UPLOAD HEADER
+========================================================= */
+
+.upload-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 22px 28px;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,0.08);
+
+    margin-bottom: 20px;
+}
+
+.header-left h1 {
+    margin-bottom: 6px;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+    color: #1e3a8a;
+}
+
+.upload-header .welcome-text {
+    font-size: 15px;
+
+    color: #64748b;
+}
+
+.upload-header .welcome-text strong {
+    color: #1e293b;
+}
+
+.header-right {
+    display: flex;
+
+    align-items: center;
+}
+
+.upload-header .logout-btn {
+    background: #dc2626;
+
+    color: white;
+}
+
+.upload-header .logout-btn:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================================
+   UPLOAD BOX
+========================================================= */
+
+.upload-box {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,0.07);
+
+    margin-bottom: 30px;
+}
+
+.upload-box h2,
+.upload-card h2 {
+    margin-bottom: 15px;
+
+    font-size: 23px;
+
+    color: #1e3a8a;
+}
+
+.upload-box .info {
+    margin-bottom: 25px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.file-box {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+    margin-bottom: 22px;
+}
+
+.file-box label {
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.file-box input[type="file"] {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    background: #f8fafc;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.upload-btn {
+    border: none;
+
+    padding: 12px 24px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.upload-btn:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   UPLOAD HISTORY
+========================================================= */
+
+.upload-card {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,0.07);
+
+    overflow: hidden;
+}
+
+.claims-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 14px;
+}
+
+.claims-table thead {
+    background: #1e3a8a;
+}
+
+.claims-table th {
+    padding: 14px 16px;
+
+    color: white;
+
+    text-align: left;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.claims-table td {
+    padding: 13px 16px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    color: #334155;
+
+    background: white;
+}
+
+.claims-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+.claims-table td:first-child {
+    font-weight: 600;
+
+    color: #1e3a8a;
+}
+
+.delete-btn {
+    border: none;
+
+    padding: 8px 16px;
+
+    background: #ef4444;
+
+    color: white;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    body.dashboard-container {
+        padding: 15px;
+    }
+
+    .dashboard-header,
+    .user-header,
+    .upload-header {
+        padding: 18px;
+    }
+
+    .upload-content {
+        width: 96%;
+    }
+
+    .upload-box,
+    .upload-card {
+        padding: 20px;
+    }
+
+    .claims-table {
+        display: block;
+
+        overflow-x: auto;
+
+        white-space: nowrap;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    body.dashboard-container {
+        padding: 12px;
+    }
+
+    .dashboard-header,
+    .user-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .dashboard-header h1,
+    .user-header h1 {
+        font-size: 22px;
+    }
+
+    .dashboard-header .logout-btn,
+    .user-header .logout-btn {
+        align-self: flex-end;
+    }
+
+    .admin-section h2 {
+        font-size: 19px;
+    }
+
+    .admin-form {
+        max-width: 100%;
+
+        padding: 18px;
+    }
+
+    .download-btn {
+        width: 100%;
+    }
+
+    body.user-dashboard .dashboard-container {
+        padding: 12px;
+    }
+
+    .claims-section {
+        padding: 15px;
+    }
+
+    .claims-title-row h2 {
+        font-size: 19px;
+    }
+
+    body.user-dashboard .table-container {
+        max-height: 65vh;
+    }
+
+    .save-section {
+        justify-content: center;
+    }
+
+    .save-claims-btn {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .upload-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .header-right {
+        width: 100%;
+    }
+
+    .upload-header .logout-btn {
+        width: 100%;
+
+        text-align: center;
+    }
+
+    .upload-box,
+    .upload-card {
+        padding: 16px;
+    }
+
+    .upload-btn {
+        width: 100%;
+    }
+
+    .login-box {
+        width: calc(100% - 30px);
+
+        padding: 30px 22px;
+    }
+}
+/* =========================================================
+   ADMIN DASHBOARD
+========================================================= */
+
+body.dashboard-container {
+    margin: 0;
+    padding: 24px;
+    min-height: 100vh;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    background: #f3f6fa;
+    color: #1f2937;
+}
+
+
+/* =========================================================
+   MAIN ADMIN CONTAINER
+========================================================= */
+
+body.dashboard-container > .dashboard-container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   ADMIN HEADER
+========================================================= */
+
+.dashboard-header {
+    width: 100%;
+
+    padding: 24px 30px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: linear-gradient(
+        135deg,
+        #173f5f,
+        #20639b
+    );
+
+    color: white;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.12);
+
+    margin-bottom: 25px;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 8px;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.dashboard-header .welcome-text {
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #e8f1f8;
+}
+
+.dashboard-header .welcome-text strong {
+    color: white;
+}
+
+
+/* =========================================================
+   ADMIN LOGOUT
+========================================================= */
+
+.dashboard-header .logout-btn {
+    display: inline-block;
+
+    padding: 11px 22px;
+
+    background: white;
+    color: #173f5f;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.dashboard-header .logout-btn:hover {
+    background: #e8f1f8;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   HORIZONTAL LINE
+========================================================= */
+
+body.dashboard-container hr {
+    border: none;
+
+    height: 1px;
+
+    background: #dbe3ec;
+
+    margin: 25px 0;
+}
+
+
+/* =========================================================
+   SECTION HEADINGS
+========================================================= */
+
+body.dashboard-container h2 {
+    margin: 25px 0 15px;
+
+    color: #173f5f;
+
+    font-size: 22px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   PRODUCTIVITY TABLE CONTAINER
+========================================================= */
+
+body.dashboard-container .table-container {
+    width: 100%;
+
+    max-height: 60vh;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    background: white;
+
+    border: 1px solid #dbe3ec;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================================================
+   PRODUCTIVITY TABLE
+========================================================= */
+
+.productivity-table {
+    width: max-content;
+
+    min-width: 100%;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    background: white;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.productivity-table thead th {
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+
+    padding: 13px 14px;
+
+    background: #173f5f;
+
+    color: white;
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    border-right: 1px solid
+        rgba(255, 255, 255, 0.15);
+
+    border-bottom: 2px solid #0f2f49;
+}
+
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.productivity-table tbody td {
+    padding: 11px 14px;
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    color: #374151;
+
+    background: white;
+
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+/* Alternate row */
 
 .productivity-table tbody tr:nth-child(even) td {
     background: #f8fafc;
@@ -930,7 +1727,9 @@ body.dashboard-container hr {
 }
 
 
-/* Platform */
+/* =========================================================
+   PLATFORM
+========================================================= */
 
 .productivity-table tbody td:first-child {
     font-weight: 700;
@@ -939,7 +1738,9 @@ body.dashboard-container hr {
 }
 
 
-/* Username */
+/* =========================================================
+   USERNAME
+========================================================= */
 
 .productivity-table tbody td:nth-child(2) {
     font-weight: 700;
@@ -948,7 +1749,9 @@ body.dashboard-container hr {
 }
 
 
-/* Productivity */
+/* =========================================================
+   TOTAL PRODUCTIVITY
+========================================================= */
 
 .productivity-table td.productivity {
     font-weight: 800;
@@ -960,28 +1763,232 @@ body.dashboard-container hr {
 
 
 /* =========================================================
-   TABLE CONTAINER
-   ========================================================= */
+   DOWNLOAD BUTTON
+========================================================= */
 
-body.dashboard-container .table-container {
-    width: 100%;
+.download-btn {
+    border: none;
 
-    overflow-x: auto;
-    overflow-y: auto;
+    padding: 12px 24px;
 
-    max-height: 60vh;
+    background: linear-gradient(
+        135deg,
+        #0f766e,
+        #0d9488
+    );
 
-    border: 1px solid #dbe3ec;
+    color: white;
 
-    border-radius: 10px;
+    border-radius: 8px;
 
-    background: white;
+    font-size: 14px;
 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(15, 118, 110, 0.25);
+
+    transition: 0.2s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 16px rgba(15, 118, 110, 0.32);
 }
 
 
-/* Scrollbar */
+/* =========================================================
+   ADMIN FORMS
+========================================================= */
+
+body.dashboard-container form {
+    width: 100%;
+    max-width: 600px;
+
+    padding: 24px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =========================================================
+   FORM DIV
+========================================================= */
+
+body.dashboard-container form > div {
+    margin-bottom: 16px;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+body.dashboard-container form label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+body.dashboard-container form input {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: 0.2s ease;
+}
+
+body.dashboard-container form input:focus {
+    border-color: #20639b;
+
+    box-shadow:
+        0 0 0 3px rgba(32, 99, 155, 0.12);
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+body.dashboard-container form select {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+body.dashboard-container form select:focus {
+    border-color: #20639b;
+
+    box-shadow:
+        0 0 0 3px rgba(32, 99, 155, 0.12);
+}
+
+
+/* =========================================================
+   FORM BUTTON
+========================================================= */
+
+body.dashboard-container form button {
+    border: none;
+
+    padding: 11px 22px;
+
+    background: linear-gradient(
+        135deg,
+        #20639b,
+        #173f5f
+    );
+
+    color: white;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+body.dashboard-container form button:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(23, 63, 95, 0.25);
+}
+
+
+/* =========================================================
+   REASSIGN
+========================================================= */
+
+.reassign-form {
+    margin-top: 25px;
+}
+
+
+/* =========================================================
+   SAVE TIME
+========================================================= */
+
+.save-time-box {
+    display: inline-block;
+
+    margin-top: 20px;
+
+    padding: 12px 18px;
+
+    background: #ecfdf5;
+
+    color: #065f46;
+
+    border: 1px solid #a7f3d0;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+.save-time-box strong {
+    margin-right: 5px;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
 
 body.dashboard-container .table-container::-webkit-scrollbar {
     width: 10px;
@@ -1004,182 +2011,8 @@ body.dashboard-container .table-container::-webkit-scrollbar-thumb:hover {
 
 
 /* =========================================================
-   DOWNLOAD BUTTON
-   ========================================================= */
-
-.download-btn {
-    border: none;
-
-    background: linear-gradient(135deg, #0f766e, #0d9488);
-
-    color: white;
-
-    padding: 12px 24px;
-
-    border-radius: 8px;
-
-    font-size: 14px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
-
-    transition: all 0.2s ease;
-}
-
-.download-btn:hover {
-    transform: translateY(-1px);
-
-    box-shadow: 0 6px 16px rgba(15, 118, 110, 0.32);
-}
-
-.download-btn:active {
-    transform: translateY(0);
-}
-
-
-/* =========================================================
-   FORMS
-   ========================================================= */
-
-.form-group {
-    background: white;
-
-    padding: 24px;
-
-    border-radius: 12px;
-
-    border: 1px solid #e2e8f0;
-
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-
-    max-width: 600px;
-
-    margin-bottom: 25px;
-}
-
-
-/* Labels */
-
-.form-group label {
-    display: block;
-
-    color: #374151;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    margin-bottom: 7px;
-}
-
-
-/* Inputs */
-
-.form-group input {
-    width: 100%;
-
-    padding: 11px 12px;
-
-    border: 1px solid #cbd5e1;
-
-    border-radius: 7px;
-
-    background: white;
-
-    color: #111827;
-
-    font-size: 14px;
-
-    outline: none;
-
-    margin-bottom: 15px;
-
-    transition: border 0.2s ease,
-                box-shadow 0.2s ease;
-}
-
-.form-group input:focus {
-    border-color: #20639b;
-
-    box-shadow: 0 0 0 3px rgba(32, 99, 155, 0.12);
-}
-
-
-/* Select */
-
-.form-group select {
-    width: 100%;
-
-    padding: 11px 12px;
-
-    border: 1px solid #cbd5e1;
-
-    border-radius: 7px;
-
-    background: white;
-
-    color: #111827;
-
-    font-size: 14px;
-
-    outline: none;
-
-    margin-bottom: 15px;
-
-    cursor: pointer;
-}
-
-.form-group select:focus {
-    border-color: #20639b;
-
-    box-shadow: 0 0 0 3px rgba(32, 99, 155, 0.12);
-}
-
-
-/* Form buttons */
-
-.form-group button {
-    border: none;
-
-    background: linear-gradient(135deg, #20639b, #173f5f);
-
-    color: white;
-
-    padding: 11px 22px;
-
-    border-radius: 7px;
-
-    font-size: 14px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-}
-
-.form-group button:hover {
-    transform: translateY(-1px);
-
-    box-shadow: 0 5px 14px rgba(23, 63, 95, 0.25);
-}
-
-
-/* =========================================================
-   REASSIGN SECTION
-   ========================================================= */
-
-.reassign-form {
-    margin-top: 25px;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+   MOBILE
+========================================================= */
 
 @media (max-width: 768px) {
 
@@ -1205,330 +2038,224 @@ body.dashboard-container .table-container::-webkit-scrollbar-thumb:hover {
         align-self: flex-end;
     }
 
-    body.dashboard-container > h2 {
+    body.dashboard-container h2 {
         font-size: 19px;
     }
 
     body.dashboard-container .table-container {
-        max-height: 60vh;
-    }
-
-    .form-group {
-        max-width: 100%;
-
-        padding: 18px;
+        max-height: 55vh;
     }
 
     .download-btn {
         width: 100%;
     }
+
+    body.dashboard-container form {
+        max-width: 100%;
+        padding: 18px;
+    }
 }
 /* =========================================================
-   UPLOAD DASHBOARD
-   ========================================================= */
+   DATE FILTER
+========================================================= */
 
-.upload-dashboard {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f4f7fb;
-    color: #1f2937;
-}
-
-/* Main container */
-.upload-content {
-    width: 94%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 25px 0 50px;
-}
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.upload-header {
+.date-filter {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 22px 28px;
+    align-items: flex-end;
+    gap: 15px;
+
     background: #ffffff;
-    border-radius: 14px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+
+    padding: 18px 20px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+
     margin-bottom: 20px;
 }
 
-.header-left h1 {
-    margin: 0 0 6px;
-    font-size: 30px;
-    font-weight: 700;
-    color: #1e3a8a;
-}
-
-.welcome-text {
-    margin: 0;
-    font-size: 15px;
-    color: #64748b;
-}
-
-.welcome-text strong {
-    color: #1e293b;
-}
-
-/* Logout */
-.header-right {
-    display: flex;
-    align-items: center;
-}
-
-.logout-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background: #dc2626;
-    color: #ffffff;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    transition: 0.2s ease;
-}
-
-.logout-btn:hover {
-    background: #b91c1c;
-    transform: translateY(-1px);
-}
-
-/* Horizontal line */
-.upload-content > hr {
-    border: none;
-    height: 1px;
-    background: #dbe3ef;
-    margin: 25px 0;
-}
-
-/* =========================================================
-   UPLOAD BOX
-   ========================================================= */
-
-.upload-box {
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
-    margin-bottom: 30px;
-}
-
-.upload-box h2 {
-    margin: 0 0 8px;
-    font-size: 23px;
-    color: #1e3a8a;
-}
-
-.upload-box .info {
-    margin: 0 0 25px;
-    color: #64748b;
-    font-size: 14px;
-}
-
-/* File selection box */
-.file-box {
+.date-field {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    margin-bottom: 22px;
+    gap: 7px;
 }
 
-.file-box label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #334155;
-}
-
-.file-box input[type="file"] {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    background: #f8fafc;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.file-box input[type="file"]:hover {
-    border-color: #2563eb;
-}
-
-/* Upload button */
-.upload-btn {
-    border: none;
-    padding: 12px 24px;
-    background: #2563eb;
-    color: #ffffff;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.upload-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-1px);
-}
-
-/* =========================================================
-   UPLOAD HISTORY CARD
-   ========================================================= */
-
-.upload-card {
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
-    overflow: hidden;
-}
-
-.upload-card h2 {
-    margin: 0 0 20px;
-    font-size: 23px;
-    color: #1e3a8a;
-}
-
-/* =========================================================
-   UPLOAD HISTORY TABLE
-   ========================================================= */
-
-.claims-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-.claims-table thead {
-    background: #1e3a8a;
-}
-
-.claims-table th {
-    padding: 14px 16px;
-    color: #ffffff;
-    text-align: left;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.claims-table td {
-    padding: 13px 16px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #334155;
-    background: #ffffff;
-}
-
-.claims-table tbody tr:hover td {
-    background: #f8fafc;
-}
-
-/* File name */
-.claims-table td:first-child {
-    font-weight: 600;
-    color: #1e3a8a;
-}
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-.claims-table td:nth-child(4) {
-    font-weight: 600;
-}
-
-/* =========================================================
-   DELETE BUTTON
-   ========================================================= */
-
-.delete-btn {
-    border: none;
-    padding: 8px 16px;
-    background: #ef4444;
-    color: #ffffff;
-    border-radius: 7px;
+.date-field label {
     font-size: 13px;
     font-weight: 600;
+    color: #374151;
+}
+
+.date-field input {
+    height: 42px;
+
+    padding: 0 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: #f8fafc;
+
+    color: #1f2937;
+
+    font-size: 14px;
+
+    outline: none;
+
     cursor: pointer;
-    transition: 0.2s ease;
 }
 
-.delete-btn:hover {
-    background: #dc2626;
+.date-field input:focus {
+    border-color: #20639b;
+
+    background: #ffffff;
+
+    box-shadow: 0 0 0 3px rgba(32, 99, 155, 0.12);
+}
+
+
+/* SEARCH BUTTON */
+
+.filter-btn {
+    height: 42px;
+
+    padding: 0 24px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: linear-gradient(
+        135deg,
+        #20639b,
+        #173f5f
+    );
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
     transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(23, 63, 95, 0.25);
 }
 
-/* =========================================================
-   EMPTY TABLE
-   ========================================================= */
 
-.claims-table td[colspan="5"] {
-    text-align: center;
-    padding: 30px;
-    color: #64748b;
-    font-style: italic;
-}
+/* MOBILE */
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+@media (max-width: 768px) {
 
-@media (max-width: 900px) {
-
-    .upload-content {
-        width: 96%;
-    }
-
-    .upload-header {
-        padding: 18px;
-    }
-
-    .header-left h1 {
-        font-size: 24px;
-    }
-
-    .upload-box,
-    .upload-card {
-        padding: 20px;
-    }
-
-    .claims-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-}
-
-@media (max-width: 600px) {
-
-    .upload-header {
+    .date-filter {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+
+        align-items: stretch;
     }
 
-    .header-right {
-        width: 100%;
-    }
-
-    .logout-btn {
-        width: 100%;
-        text-align: center;
-        box-sizing: border-box;
-    }
-
-    .upload-box,
-    .upload-card {
-        padding: 16px;
-    }
-
-    .upload-btn {
+    .date-field input,
+    .filter-btn {
         width: 100%;
     }
 }
+
+/* =========================================================
+   CLAIM DUMP DATE FILTER
+========================================================= */
+
+.download-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+
+    margin-bottom: 20px;
+
+    max-width: 850px;
+}
+
+.date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.date-field label {
+    color: #374151;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.date-field input[type="date"] {
+    height: 44px;
+
+    padding: 0 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: #f8fafc;
+
+    color: #1f2937;
+
+    font-size: 14px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+.date-field input[type="date"]:focus {
+    border-color: #20639b;
+
+    background: white;
+
+    box-shadow:
+        0 0 0 3px rgba(32, 99, 155, 0.12);
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .download-form {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 14px;
+    }
+
+    .date-field input[type="date"] {
+        width: 100%;
+    }
+
+    .download-form .download-btn {
+        width: 100%;
+    }
+}
+
