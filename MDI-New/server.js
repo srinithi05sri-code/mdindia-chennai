@@ -3645,157 +3645,204 @@ app.get(
     "/admin/download-claims",
     async (req, res) => {
 
+        // =====================================================
+        // ADMIN LOGIN CHECK
+        // =====================================================
+
         if (
             !req.session.user ||
-            normalizeRole(
-                req.session.user.role
-            ) !== "admin"
+            normalizeRole(req.session.user.role) !== "admin"
         ) {
-
             return res.redirect("/");
         }
 
 
         const fromDate =
-            String(
-                req.query.fromDate || ""
-            ).trim();
-
+            String(req.query.fromDate || "").trim();
 
         const toDate =
-            String(
-                req.query.toDate || ""
-            ).trim();
+            String(req.query.toDate || "").trim();
 
 
-        if (
-            !fromDate ||
-            !toDate
-        ) {
+        if (!fromDate || !toDate) {
 
-            return res.status(400).send(
-                "From Date and To Date are required."
-            );
+            return res.status(400).send(`
+                <h2>Download Failed</h2>
+                <p>From Date and To Date are required.</p>
+                <a href="/admin">Back to Admin</a>
+            `);
         }
 
 
         try {
 
+            // =================================================
+            // IMPORTANT
+            // Use upload_batches.uploaded_at as fallback too
+            // =================================================
+
             const [rows] =
                 await db.query(
                     `
-                    SELECT *
-                    FROM claims
+                    SELECT
+                        c.*
+                    FROM claims c
+
+                    LEFT JOIN upload_batches ub
+                        ON c.upload_batch_id = ub.id
 
                     WHERE
                         DATE(
                             COALESCE(
-                                claim_date,
-                                created_at
+                                c.claim_date,
+                                ub.uploaded_at,
+                                c.created_at
                             )
-                        )
-                        BETWEEN ?
-                        AND ?
+                        ) BETWEEN ? AND ?
 
                     ORDER BY
-                        id DESC
+                        c.id DESC
                     `,
                     [
                         fromDate,
                         toDate
                     ]
                 );
+                console.log("DOWNLOAD FROM DATE:", fromDate);
+console.log("DOWNLOAD TO DATE:", toDate);
+console.log("DOWNLOAD ROW COUNT:", rows.length);
 
+
+            console.log(
+                "ADMIN DOWNLOAD ROW COUNT:",
+                rows.length
+            );
+
+
+            // =================================================
+            // CREATE EXCEL
+            // =================================================
 
             const workbook =
                 XLSX.utils.book_new();
 
 
             const excelData =
-                rows.map(
-                    row => ({
+                rows.map(row => ({
 
-                        "CLAIM_REF_NO":
-                            row.claim_ref_no || "",
+                    "CLAIM_REF_NO":
+                        row.claim_ref_no || "",
 
-                        "INWARD_NO":
-                            row.inward_no || "",
+                    "INWARD_NO":
+                        row.inward_no || "",
 
-                        "POLICY_NO":
-                            row.policy_no || "",
+                    "POLICY_NO":
+                        row.policy_no || "",
 
-                        "CLAIM_AMT":
-                            row.claim_amount || 0,
+                    "CLAIM_AMT":
+                        row.claim_amount || 0,
 
-                        "Vertical":
-                            row.vertical || "",
+                    "Vertical":
+                        row.vertical || "",
 
-                        "Department":
-                            row.department || "",
+                    "Department":
+                        row.department || "",
 
-                        "User ID":
-                            row.assigned_user_id || "",
+                    "User ID":
+                        row.assigned_user_id || "",
 
-                        "User Name":
-                            row.user_name || "",
+                    "User Name":
+                        row.user_name || "",
 
-                        "Claim Type":
-                            row.claim_type || "",
+                    "Claim Type":
+                        row.claim_type || "",
 
-                        "Status":
-                            row.claim_status || "",
+                    "Status":
+                        row.claim_status || "",
 
-                        "Date":
-                            row.claim_date || "",
+                    "Date":
+                        row.claim_date || "",
 
-                        "Time":
-                            row.claim_time || "",
+                    "Time":
+                        row.claim_time || "",
 
-                        "Today Status":
-                            row.today_status || "",
+                    "Today Status":
+                        row.today_status || "",
 
-                        "I3 Status":
-                            row.i3_status || "",
+                    "I3 Status":
+                        row.i3_status || "",
 
-                        "Full qc":
-                            row.full_qc || "",
+                    "Full qc":
+                        row.full_qc || "",
 
-                        "RELATION":
-                            row.relation || "",
+                    "RELATION":
+                        row.relation || "",
 
-                        "HNF":
-                            row.hnf || "",
+                    "HNF":
+                        row.hnf || "",
 
-                        "ILOM ID":
-                            row.ilom_id || "",
+                    "ILOM ID":
+                        row.ilom_id || "",
 
-                        "Approve AMT":
-                            row.approve_amount || 0,
+                    "Approve AMT":
+                        row.approve_amount || 0,
 
-                        "Remark":
-                            row.user_remark || "",
+                    "Remark":
+                        row.user_remark || "",
 
-                        "Deduction AMT":
-                            row.deduction_amount || 0,
+                    "Deduction AMT":
+                        row.deduction_amount || 0,
 
-                        "Diagnosis 2":
-                            row.diagnosis_2 || "",
+                    "Diagnosis 2":
+                        row.diagnosis_2 || "",
 
-                        "inter. Doc & Exe":
-                            row.inter_doc_exe || "",
+                    "inter. Doc & Exe":
+                        row.inter_doc_exe || "",
 
-                        "lot":
-                            row.lot || "",
+                    "lot":
+                        row.lot || "",
 
-                        "platform":
-                            row.platform || ""
-                    })
-                );
+                    "platform":
+                        row.platform || ""
+                }));
 
+
+            // =================================================
+            // EVEN IF NO ROWS, CREATE HEADER
+            // =================================================
 
             const worksheet =
                 XLSX.utils.json_to_sheet(
-                    excelData
+                    excelData,
+                    {
+                        header: [
+                            "CLAIM_REF_NO",
+                            "INWARD_NO",
+                            "POLICY_NO",
+                            "CLAIM_AMT",
+                            "Vertical",
+                            "Department",
+                            "User ID",
+                            "User Name",
+                            "Claim Type",
+                            "Status",
+                            "Date",
+                            "Time",
+                            "Today Status",
+                            "I3 Status",
+                            "Full qc",
+                            "RELATION",
+                            "HNF",
+                            "ILOM ID",
+                            "Approve AMT",
+                            "Remark",
+                            "Deduction AMT",
+                            "Diagnosis 2",
+                            "inter. Doc & Exe",
+                            "lot",
+                            "platform"
+                        ]
+                    }
                 );
 
 
@@ -3836,6 +3883,10 @@ app.get(
             );
 
 
+            // =================================================
+            // WRITE XLSX
+            // =================================================
+
             const buffer =
                 XLSX.write(
                     workbook,
@@ -3858,9 +3909,7 @@ app.get(
             );
 
 
-            return res.send(
-                buffer
-            );
+            return res.send(buffer);
 
         } catch (error) {
 
