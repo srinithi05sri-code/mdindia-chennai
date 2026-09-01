@@ -1752,7 +1752,7 @@ app.get(
 
                         u.username AS employee_name,
 
-                        ub.upload_at AS upload_time
+                        ub.uploaded_at AS upload_time
 
                     FROM claims c
 
