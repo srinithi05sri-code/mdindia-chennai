@@ -272,6 +272,7 @@
                             <th>platform</th>
                             <th>User ID</th>
                             <th>User Name</th>
+                            <th>Uploaded Time</th>
 
                             <th class="editable-header">
                                 Claim Type
@@ -500,7 +501,7 @@
                                 <td class="user-name-cell">
                                     <%= claim.employee_name || "-" %>
                                 </td>
-
+                                <td><%= claim.upload_time ? new Date(claim.upload_time).toLocaleString(...) : '-' %></td>
 
 
                                 <!-- ================= CLAIM TYPE ================= -->

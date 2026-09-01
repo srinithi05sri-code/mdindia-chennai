@@ -279,6 +279,196 @@ function validateDateRange(fromDate, toDate) {
         valid: true
     };
 }
+// =====================================================
+// EXCEL DATE / TIME FORMAT HELPERS
+// =====================================================
+
+function formatExcelDate(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "-";
+    }
+
+    // Excel serial date
+    if (typeof value === "number") {
+
+        const parsed =
+            XLSX.SSF.parse_date_code(value);
+
+        if (parsed) {
+
+            const day =
+                String(parsed.d).padStart(2, "0");
+
+            const month =
+                String(parsed.m).padStart(2, "0");
+
+            const year =
+                String(parsed.y);
+
+            return `${day}/${month}/${year}`;
+        }
+    }
+
+    // JS Date
+    if (value instanceof Date) {
+
+        if (!isNaN(value.getTime())) {
+
+            return value.toLocaleDateString(
+                "en-IN",
+                {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    timeZone: "Asia/Kolkata"
+                }
+            );
+        }
+    }
+
+    // Already formatted Excel string
+    const text =
+        String(value).trim();
+
+    if (!text) {
+        return "-";
+    }
+
+    return text;
+}
+
+
+function formatExcelTime(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "-";
+    }
+
+    // Excel time serial
+    if (typeof value === "number") {
+
+        const parsed =
+            XLSX.SSF.parse_date_code(value);
+
+        if (parsed) {
+
+            const hour =
+                parsed.H || 0;
+
+            const minute =
+                parsed.M || 0;
+
+            const second =
+                parsed.S || 0;
+
+            const date =
+                new Date(
+                    1970,
+                    0,
+                    1,
+                    hour,
+                    minute,
+                    second
+                );
+
+            return date.toLocaleTimeString(
+                "en-IN",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                }
+            );
+        }
+    }
+
+    if (value instanceof Date) {
+
+        if (!isNaN(value.getTime())) {
+
+            return value.toLocaleTimeString(
+                "en-IN",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                    timeZone: "Asia/Kolkata"
+                }
+            );
+        }
+    }
+
+    const text =
+        String(value).trim();
+
+    if (!text) {
+        return "-";
+    }
+
+    // HH:MM:SS
+    if (
+        /^\d{2}:\d{2}:\d{2}$/.test(text)
+    ) {
+
+        const date =
+            new Date(
+                `1970-01-01T${text}`
+            );
+
+        if (!isNaN(date.getTime())) {
+
+            return date.toLocaleTimeString(
+                "en-IN",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                }
+            );
+        }
+    }
+
+    return text;
+}
+
+
+function formatUploadedAt(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+    const date =
+        new Date(value);
+
+    if (isNaN(date.getTime())) {
+        return String(value);
+    }
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+            timeZone: "Asia/Kolkata"
+        }
+    );
+}
+
 
 // =====================================================
 // DATABASE TEST
@@ -646,13 +836,14 @@ app.post(
             // READ EXCEL
             // =================================================
 
-            const workbook =
-                XLSX.read(
-                    req.file.buffer,
-                    {
-                        type: "buffer"
-                    }
-                );
+           const workbook =
+    XLSX.read(
+        req.file.buffer,
+        {
+            type: "buffer",
+            cellDates: true
+        }
+    );
 
             const sheetName =
                 workbook.SheetNames[0];
@@ -931,14 +1122,14 @@ app.post(
                     ).trim();
 
                 const claimDate =
-                    String(
-                        row["Date"] || ""
-                    ).trim();
+    formatExcelDate(
+        row["Date"]
+    );
 
-                const claimTime =
-                    String(
-                        row["Time"] || ""
-                    ).trim();
+const claimTime =
+    formatExcelTime(
+        row["Time"]
+    );
 
                 const todayStatus =
                     String(
@@ -1075,7 +1266,8 @@ app.post(
                         deduction_amount,
                         inter_doc_exe,
                         lot,
-                        platform
+                        platform,
+                        
                     )
                     VALUES
                     (
@@ -1084,7 +1276,7 @@ app.post(
                         ?, ?, ?, ?, ?, ?,
                         ?, ?, ?, ?, ?, ?,
                         ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?
+                        ?, ?, ?, ?, ?,NOW()
                     )
                     `,
                     [
@@ -1097,6 +1289,7 @@ app.post(
                         department,
                         assignedUserId,
                         userName,
+                        uploaded_at,
                         claimType,
                         claimStatus,
                         remark,
@@ -1553,6 +1746,61 @@ app.get("/admin", async (req, res) => {
                 Back to Admin
             </a>
         `);
+    }
+});
+app.get("/admin/download-claims", async (req, res) => {
+
+    if (
+        !req.session.user ||
+        normalizeRole(req.session.user.role) !== "admin"
+    ) {
+        return res.redirect("/");
+    }
+
+    try {
+
+        const [claims] = await db.query(`
+            SELECT *
+            FROM claims
+            ORDER BY id
+        `);
+
+        const worksheet = XLSX.utils.json_to_sheet(claims);
+        const workbook = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(
+            workbook,
+            worksheet,
+            "Claims"
+        );
+
+        const buffer = XLSX.write(workbook, {
+            type: "buffer",
+            bookType: "xlsx"
+        });
+
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=updated_claims.xlsx"
+        );
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+
+        return res.send(buffer);
+
+    } catch (error) {
+
+        console.error(
+            "CLAIM DOWNLOAD ERROR:",
+            error
+        );
+
+        return res.status(500).send(
+            "Failed to download claims"
+        );
     }
 });
 // =========================================================
@@ -2481,7 +2729,9 @@ app.get(
 
                         u.username AS employee_name,
 
-                        ub.uploaded_at AS upload_time
+                        ub.uploaded_at AS upload_time,
+                        
+
 
                     FROM claims c
 
@@ -2681,7 +2931,9 @@ app.get(
                                 formattedDate,
 
                             formatted_claim_time:
-                                formattedTime
+                                formattedTime,
+                            formatted_upload_time:
+                                 formatUploadedAt(claim.upload_time)    
                         };
                     }
                 );
