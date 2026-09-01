@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -17,11 +16,15 @@
     >
 </head>
 
+
 <body class="user-dashboard">
 
 <div class="dashboard-container">
 
-    <!-- ================= HEADER ================= -->
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
     <header class="user-header">
 
@@ -47,6 +50,7 @@
 
         </div>
 
+
         <a
             href="/logout"
             class="logout-btn"
@@ -57,9 +61,13 @@
     </header>
 
 
-    <!-- ================= CLAIM SECTION ================= -->
+
+    <!-- =====================================================
+         CLAIM SECTION
+    ====================================================== -->
 
     <section class="claims-section">
+
 
         <div class="claims-title-row">
 
@@ -76,7 +84,7 @@
             </div>
 
 
-            <!-- ================= LAST SAVED TIME ================= -->
+            <!-- LAST SAVED -->
 
             <% if (typeof savedAt !== "undefined" && savedAt) { %>
 
@@ -97,9 +105,10 @@
         </div>
 
 
-        <!-- =====================================================
+
+        <!-- =================================================
              PROCESS SUMMARY
-        ===================================================== -->
+        ================================================== -->
 
         <div class="process-summary-section">
 
@@ -161,82 +170,82 @@
 
                     <tbody>
 
-                        <% if (processSummary && processSummary.length > 0) { %>
+                    <% if (processSummary && processSummary.length > 0) { %>
 
-                            <% processSummary.forEach(row => { %>
-
-                                <tr>
-
-                                    <td>
-                                        <%= row.platform || "-" %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.total_allocated || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.approved || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.rejected || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.query_count || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.requery || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.investigation_query || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.investigation || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.sent_back || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.keep_count || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.other_doctor_executive || 0 %>
-                                    </td>
-
-                                    <td>
-                                        <%= row.pending || 0 %>
-                                    </td>
-
-                                    <td class="productivity">
-                                        <%= row.total_productivity || 0 %>
-                                    </td>
-
-                                </tr>
-
-                            <% }) %>
-
-                        <% } else { %>
+                        <% processSummary.forEach(row => { %>
 
                             <tr>
 
-                                <td
-                                    colspan="13"
-                                    style="text-align:center;"
-                                >
-                                    No productivity data available
+                                <td>
+                                    <%= row.platform || "-" %>
+                                </td>
+
+                                <td>
+                                    <%= row.total_allocated || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.approved || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.rejected || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.query_count || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.requery || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.investigation_query || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.investigation || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.sent_back || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.keep_count || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.other_doctor_executive || 0 %>
+                                </td>
+
+                                <td>
+                                    <%= row.pending || 0 %>
+                                </td>
+
+                                <td class="productivity">
+                                    <%= row.total_productivity || 0 %>
                                 </td>
 
                             </tr>
 
-                        <% } %>
+                        <% }) %>
+
+                    <% } else { %>
+
+                        <tr>
+
+                            <td
+                                colspan="13"
+                                style="text-align:center;"
+                            >
+                                No productivity data available
+                            </td>
+
+                        </tr>
+
+                    <% } %>
 
                     </tbody>
 
@@ -247,77 +256,50 @@
         </div>
 
 
-        <!-- =====================================================
+
+        <!-- =================================================
              SAVE FORM
-        ===================================================== -->
+        ================================================== -->
 
         <form
             action="/save-claims"
             method="POST"
             id="claimsForm"
-            onsubmit="return preventDoubleSubmit(this);"
         >
 
             <div class="table-container">
 
                 <table class="claim-table">
 
-                    <!-- ================= TABLE HEADER ================= -->
-
                     <thead>
 
                         <tr>
 
                             <th>CLAIM_REF_NO</th>
-
                             <th>INWARD_NO</th>
-
                             <th>POLICY_NO</th>
-
                             <th>Vertical</th>
-
                             <th>Additional Deduction</th>
-
                             <th>CLAIM_AMT</th>
-
                             <th>AL_AMT</th>
-
                             <th>CLAIM_CLASS</th>
-
                             <th>Hospital Code</th>
-
                             <th>Type of MOU</th>
-
                             <th>Diagnosis</th>
-
                             <th>POLICY_NAME</th>
-
                             <th>Queue</th>
-
                             <th>Ageing</th>
-
                             <th>Date</th>
-
                             <th>Time</th>
-
                             <th>Today Status</th>
-
                             <th>I3 Status</th>
-
                             <th>Full qc</th>
-
                             <th>RELATION</th>
-
                             <th>HNF</th>
-
                             <th>lot</th>
-
                             <th>platform</th>
-
                             <th>User ID</th>
-
                             <th>User Name</th>
-
                             <th>Uploaded Time</th>
 
                             <th class="editable-header">
@@ -357,7 +339,6 @@
                     </thead>
 
 
-                    <!-- ================= TABLE BODY ================= -->
 
                     <tbody>
 
@@ -367,212 +348,214 @@
 
                             <tr>
 
-                                <!-- ================= CLAIM REF NO ================= -->
+
+                                <!-- CLAIM REF NO -->
 
                                 <td>
                                     <%= claim.claim_ref_no || "-" %>
                                 </td>
 
 
-                                <!-- ================= INWARD NO ================= -->
+                                <!-- INWARD NO -->
 
                                 <td>
                                     <%= claim.inward_no || "-" %>
                                 </td>
 
 
-                                <!-- ================= POLICY NO ================= -->
+                                <!-- POLICY NO -->
 
                                 <td>
                                     <%= claim.policy_no || "-" %>
                                 </td>
 
 
-                                <!-- ================= VERTICAL ================= -->
+                                <!-- VERTICAL -->
 
                                 <td>
                                     <%= claim.vertical || "-" %>
                                 </td>
 
 
-                                <!-- ================= ADDITIONAL DEDUCTION ================= -->
+                                <!-- ADDITIONAL DEDUCTION -->
 
                                 <td>
                                     <%= claim.additional_deduction ?? "-" %>
                                 </td>
 
 
-                                <!-- ================= CLAIM AMOUNT ================= -->
+                                <!-- CLAIM AMOUNT -->
 
                                 <td>
                                     <%= claim.claim_amount ?? "-" %>
                                 </td>
 
 
-                                <!-- ================= AL AMOUNT ================= -->
+                                <!-- AL AMOUNT -->
 
                                 <td>
                                     <%= claim.al_amount ?? "-" %>
                                 </td>
 
 
-                                <!-- ================= CLAIM CLASS ================= -->
+                                <!-- CLAIM CLASS -->
 
                                 <td>
                                     <%= claim.claim_class || "-" %>
                                 </td>
 
 
-                                <!-- ================= HOSPITAL CODE ================= -->
+                                <!-- HOSPITAL CODE -->
 
                                 <td>
                                     <%= claim.hospital_code || "-" %>
                                 </td>
 
 
-                                <!-- ================= TYPE OF MOU ================= -->
+                                <!-- TYPE OF MOU -->
 
                                 <td>
                                     <%= claim.type_of_mou || "-" %>
                                 </td>
 
 
-                                <!-- ================= DIAGNOSIS ================= -->
+                                <!-- DIAGNOSIS -->
 
                                 <td>
                                     <%= claim.diagnosis || "-" %>
                                 </td>
 
 
-                                <!-- ================= POLICY NAME ================= -->
+                                <!-- POLICY NAME -->
 
                                 <td>
                                     <%= claim.policy_name || "-" %>
                                 </td>
 
 
-                                <!-- ================= QUEUE ================= -->
+                                <!-- QUEUE -->
 
                                 <td>
                                     <%= claim.queue || "-" %>
                                 </td>
 
 
-                                <!-- ================= AGEING ================= -->
+                                <!-- AGEING -->
 
                                 <td>
                                     <%= claim.ageing || "-" %>
                                 </td>
 
 
-                                <!-- ================= DATE ================= -->
+                                <!-- =================================================
+                                     DATE
+                                ================================================== -->
 
                                 <td>
-                                    <%= claim.formatted_claim_date || "-" %>
+                                    <%= formatExcelDate(claim.claim_date) %>
                                 </td>
 
 
-                                <!-- ================= TIME ================= -->
+                                <!-- TIME -->
 
                                 <td>
                                     <%= claim.formatted_claim_time || "-" %>
                                 </td>
 
 
-                                <!-- ================= TODAY STATUS ================= -->
+                                <!-- TODAY STATUS -->
 
                                 <td>
                                     <%= claim.today_status || "-" %>
                                 </td>
 
 
-                                <!-- ================= I3 STATUS ================= -->
+                                <!-- I3 STATUS -->
 
                                 <td>
                                     <%= claim.i3_status || "-" %>
                                 </td>
 
 
-                                <!-- ================= FULL QC ================= -->
+                                <!-- FULL QC -->
 
                                 <td>
                                     <%= claim.full_qc || "-" %>
                                 </td>
 
 
-                                <!-- ================= RELATION ================= -->
+                                <!-- RELATION -->
 
                                 <td>
                                     <%= claim.relation || "-" %>
                                 </td>
 
 
-                                <!-- ================= HNF ================= -->
+                                <!-- HNF -->
 
                                 <td>
                                     <%= claim.hnf || "-" %>
                                 </td>
 
 
-                                <!-- ================= LOT ================= -->
+                                <!-- LOT -->
 
                                 <td>
                                     <%= claim.lot || "-" %>
                                 </td>
 
 
-                                <!-- ================= PLATFORM ================= -->
+                                <!-- PLATFORM -->
 
                                 <td>
                                     <%= claim.platform || "-" %>
                                 </td>
 
 
-                                <!-- ================= USER ID ================= -->
+                                <!-- USER ID -->
 
                                 <td class="user-id-cell">
-
                                     <%= claim.employee_id ||
                                         claim.assigned_user_id ||
                                         "-" %>
-
                                 </td>
 
 
-                                <!-- ================= USER NAME ================= -->
+                                <!-- USER NAME -->
 
                                 <td class="user-name-cell">
-
                                     <%= claim.employee_name || "-" %>
-
                                 </td>
 
 
-                                <!-- ================= UPLOADED TIME ================= -->
+                                <!-- UPLOADED TIME -->
 
                                 <td>
 
                                     <%= claim.uploaded_at
-                                        ? new Date(claim.uploaded_at).toLocaleString(
-                                            'en-IN',
-                                            {
-                                                day: '2-digit',
-                                                month: '2-digit',
-                                                year: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                                second: '2-digit',
-                                                hour12: true
-                                            }
-                                        )
-                                        : '-' %>
+                                        ? new Date(claim.uploaded_at)
+                                            .toLocaleString(
+                                                'en-IN',
+                                                {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    second: '2-digit',
+                                                    hour12: true
+                                                }
+                                            )
+                                        : "-"
+                                    %>
 
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      CLAIM TYPE
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -585,7 +568,6 @@
                                             Select
                                         </option>
 
-
                                         <option
                                             value="IPD"
                                             <%= claim.claim_type === "IPD"
@@ -595,7 +577,6 @@
                                             IPD
                                         </option>
 
-
                                         <option
                                             value="OPD"
                                             <%= claim.claim_type === "OPD"
@@ -604,7 +585,6 @@
                                         >
                                             OPD
                                         </option>
-
 
                                         <option
                                             value="PrePost"
@@ -620,9 +600,10 @@
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      ILOM ID
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -636,9 +617,10 @@
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      APPROVE AMOUNT
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -652,9 +634,10 @@
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      STATUS
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -672,7 +655,6 @@
                                             Approved
                                         </option>
 
-
                                         <option
                                             value="Rejected"
                                             <%= claim.claim_status === "Rejected"
@@ -681,7 +663,6 @@
                                         >
                                             Rejected
                                         </option>
-
 
                                         <option
                                             value="Query"
@@ -692,7 +673,6 @@
                                             Query
                                         </option>
 
-
                                         <option
                                             value="Re-Query"
                                             <%= claim.claim_status === "Re-Query"
@@ -701,7 +681,6 @@
                                         >
                                             Re-Query
                                         </option>
-
 
                                         <option
                                             value="Investigation&Query"
@@ -712,7 +691,6 @@
                                             Investigation&Query
                                         </option>
 
-
                                         <option
                                             value="Investigation"
                                             <%= claim.claim_status === "Investigation"
@@ -721,7 +699,6 @@
                                         >
                                             Investigation
                                         </option>
-
 
                                         <option
                                             value="SentBack"
@@ -732,7 +709,6 @@
                                             SentBack
                                         </option>
 
-
                                         <option
                                             value="Keep"
                                             <%= claim.claim_status === "Keep"
@@ -741,7 +717,6 @@
                                         >
                                             Keep
                                         </option>
-
 
                                         <option
                                             value="OtherDoctor/Executive"
@@ -752,7 +727,6 @@
                                             OtherDoctor/Executive
                                         </option>
 
-
                                         <option
                                             value="ROD Cancel"
                                             <%= claim.claim_status === "ROD Cancel"
@@ -761,7 +735,6 @@
                                         >
                                             ROD Cancel
                                         </option>
-
 
                                         <option
                                             value="Pending"
@@ -777,9 +750,10 @@
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      REMARK
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -793,9 +767,10 @@
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      DEDUCTION AMOUNT
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -809,9 +784,10 @@
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      DIAGNOSIS 2
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -825,9 +801,10 @@
                                 </td>
 
 
-                                <!-- =====================================================
+
+                                <!-- =================================================
                                      INTER DOC EXE
-                                ===================================================== -->
+                                ================================================== -->
 
                                 <td class="editable-cell">
 
@@ -840,7 +817,6 @@
                                             Select
                                         </option>
 
-
                                         <option
                                             value="Internal Doctor"
                                             <%= claim.inter_doc_exe === "Internal Doctor"
@@ -849,7 +825,6 @@
                                         >
                                             Internal Doctor
                                         </option>
-
 
                                         <option
                                             value="External Doctor"
@@ -860,7 +835,6 @@
                                             External Doctor
                                         </option>
 
-
                                         <option
                                             value="Internal Executive"
                                             <%= claim.inter_doc_exe === "Internal Executive"
@@ -869,7 +843,6 @@
                                         >
                                             Internal Executive
                                         </option>
-
 
                                         <option
                                             value="External Executive"
@@ -888,13 +861,12 @@
 
                         <% }) %>
 
-
                     <% } else { %>
 
                         <tr>
 
                             <td
-                                colspan="33"
+                                colspan="34"
                                 style="text-align:center;"
                             >
                                 No claims assigned
@@ -911,7 +883,10 @@
             </div>
 
 
-            <!-- ================= SAVE BUTTON ================= -->
+
+            <!-- =================================================
+                 SAVE BUTTON
+            ================================================== -->
 
             <div class="save-section">
 
@@ -932,213 +907,226 @@
 </div>
 
 
-<!-- =====================================================
-     DOUBLE SAVE PREVENTION
-===================================================== -->
+
+<!-- =========================================================
+     EXCEL DATE + SAVE SCRIPT
+========================================================= -->
 
 <script>
+
+
+/* ============================================================
+   EXCEL DATE CONVERTER
+
+   Excel serial example:
+   46578
+
+   This converts it to:
+   DD/MM/YYYY
+============================================================ */
+
+function formatExcelDate(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return "-";
+
+    }
+
+
+    /* Already a normal date */
+
+    if (
+        typeof value === "string" &&
+        value.includes("-")
+    ) {
+
+        const date = new Date(value);
+
+        if (!isNaN(date.getTime())) {
+
+            return date.toLocaleDateString(
+                "en-IN"
+            );
+
+        }
+
+    }
+
+
+    /* Excel serial number */
+
+    const serial = Number(value);
+
+    if (!isNaN(serial) && serial > 1000) {
+
+        const excelEpoch =
+            new Date(Date.UTC(1899, 11, 30));
+
+        excelEpoch.setUTCDate(
+            excelEpoch.getUTCDate() + serial
+        );
+
+        return excelEpoch.toLocaleDateString(
+            "en-IN",
+            {
+                timeZone: "UTC"
+            }
+        );
+
+    }
+
+
+    return value;
+
+}
+
+
+
+/* ============================================================
+   SAVE CLAIMS
+============================================================ */
 
 let isSaving = false;
 
 
-/*
- * Confirm before saving
- */
-function confirmSave() {
+const claimsForm =
+    document.getElementById("claimsForm");
 
-    if (isSaving) {
-        return false;
-    }
 
-    return confirm("Save all claim changes?");
+const saveButton =
+    document.getElementById("saveClaimsBtn");
+
+
+if (claimsForm) {
+
+    claimsForm.addEventListener(
+        "submit",
+        function(event) {
+
+            /*
+             * Prevent second submit
+             */
+
+            if (isSaving) {
+
+                event.preventDefault();
+
+                return false;
+
+            }
+
+
+            /*
+             * Ask confirmation
+             */
+
+            const confirmed =
+                confirm(
+                    "Save all claim changes?"
+                );
+
+
+            if (!confirmed) {
+
+                event.preventDefault();
+
+                return false;
+
+            }
+
+
+            /*
+             * Mark as saving
+             */
+
+            isSaving = true;
+
+
+            /*
+             * Disable button immediately
+             */
+
+            if (saveButton) {
+
+                saveButton.disabled = true;
+
+                saveButton.innerText =
+                    "Saving...";
+
+                saveButton.style.cursor =
+                    "not-allowed";
+
+                saveButton.style.opacity =
+                    "0.6";
+
+            }
+
+
+            /*
+             * Disable all submit buttons
+             */
+
+            const submitButtons =
+                claimsForm.querySelectorAll(
+                    'button[type="submit"]'
+                );
+
+
+            submitButtons.forEach(
+                function(button) {
+
+                    button.disabled = true;
+
+                }
+            );
+
+
+            /*
+             * Allow form to submit normally.
+             *
+             * IMPORTANT:
+             * Do NOT use fetch() here.
+             * Browser will wait for the backend
+             * response/redirect normally.
+             */
+
+            return true;
+
+        }
+    );
+
 }
 
-
-/*
- * Prevent double submit
- */
-function preventDoubleSubmit(form) {
-
-    /*
-     * If already submitting,
-     * completely block another submit.
-     */
-    if (isSaving) {
-        return false;
-    }
-
-
-    /*
-     * Mark as saving immediately.
-     */
-    isSaving = true;
-
-
-    /*
-     * Get Save button.
-     */
-    const button =
-        document.getElementById("saveClaimsBtn");
-
-
-    /*
-     * Disable button.
-     */
-    if (button) {
-
-        button.disabled = true;
-
-        button.innerText =
-            "Saving...";
-
-        button.style.cursor =
-            "not-allowed";
-
-        button.style.opacity =
-            "0.6";
-    }
-
-
-    /*
-     * Allow the original form
-     * submission to continue.
-     */
-    return true;
-}
-
-
-/*
- * Add confirmation before submit.
- *
- * This is handled using the form submit event
- * so pressing Enter also gets protection.
- */
-document.addEventListener("DOMContentLoaded", function () {
-
-    const form =
-        document.getElementById("claimsForm");
-
-    if (!form) {
-        return;
-    }
-
-
-    form.addEventListener("submit", function (event) {
-
-        /*
-         * Already saving
-         */
-        if (isSaving) {
-
-            event.preventDefault();
-
-            return;
-        }
-
-
-        /*
-         * Ask user for confirmation.
-         */
-        const confirmed =
-            confirm("Save all claim changes?");
-
-
-        /*
-         * User clicked Cancel.
-         */
-        if (!confirmed) {
-
-            event.preventDefault();
-
-            return;
-        }
-
-
-        /*
-         * Mark as saving.
-         */
-        isSaving = true;
-
-
-        /*
-         * Disable button immediately.
-         */
-        const button =
-            document.getElementById("saveClaimsBtn");
-
-
-        if (button) {
-
-            button.disabled = true;
-
-            button.innerText =
-                "Saving...";
-
-            button.style.cursor =
-                "not-allowed";
-
-            button.style.opacity =
-                "0.6";
-        }
-
-    });
-
-});
-
-
-/*
- * Prevent accidental page refresh/back submission
- * from enabling another save while current request
- * is still being processed.
- */
-window.addEventListener("pageshow", function () {
-
-    /*
-     * Only reset if the page is restored
-     * from browser cache.
-     */
-    if (event.persisted) {
-
-        isSaving = false;
-
-        const button =
-            document.getElementById("saveClaimsBtn");
-
-        if (button) {
-
-            button.disabled = false;
-
-            button.innerText =
-                "Save Claims";
-
-            button.style.cursor =
-                "pointer";
-
-            button.style.opacity =
-                "1";
-        }
-    }
-
-});
 
 </script>
 
 
-<!-- =====================================================
+
+<!-- =========================================================
      SUCCESS MESSAGE
-===================================================== -->
+========================================================= -->
 
 <% if (typeof saved !== "undefined" && saved) { %>
 
-    <script>
+<script>
 
-        window.addEventListener("load", function () {
+window.addEventListener(
+    "load",
+    function() {
 
-            alert("Saved Successfully!");
+        alert(
+            "Claims saved successfully!"
+        );
 
-        });
+    }
+);
 
-    </script>
+</script>
 
 <% } %>
 
