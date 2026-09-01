@@ -4025,7 +4025,21 @@ app.get(
                     row.inter_doc_exe || "",
 
                "Upload Date & Time":
-        row.upload_date_time || "",
+         row.upload_date_time
+        ? new Date(row.upload_date_time).toLocaleString(
+            "en-IN",
+            {
+                timeZone: "Asia/Kolkata",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
+            }
+        )
+        : "",
 
     "Upload File":
         row.file_name || ""
