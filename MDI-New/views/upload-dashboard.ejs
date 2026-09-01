@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,38 +13,92 @@
 <body class="upload-dashboard">
 
 <div class="upload-content">
-  <header class="upload-header">
-     <div class="header-left">
-                <h1>Upload Dashboard</h1>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="upload-header">
+
+        <div class="header-left">
+
+            <h1>
+                Upload Dashboard
+            </h1>
+
+            <p class="welcome-text">
+                Welcome,
+                <strong>
+                    <%= user.username %>
+                </strong>
+            </p>
+
+            <% if (user.department) { %>
 
                 <p class="welcome-text">
-                    Welcome, <strong><%= user.username %></strong>
+                    Department:
+                    <strong>
+                        <%= user.department %>
+                    </strong>
                 </p>
-            </div>
 
-            <div class="header-right">
-                <a href="/logout" class="logout-btn">
-                    Logout
-                </a>
-            </div>
-  </header>
+            <% } %>
+
+        </div>
+
+        <div class="header-right">
+
+            <a
+                href="/logout"
+                class="logout-btn"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
 
     <hr>
 
-    <!-- Upload Section -->
+
+    <!-- ================= SUCCESS / ERROR MESSAGE ================= -->
+
+    <% if (typeof success !== "undefined" && success) { %>
+
+        <div class="success-message">
+            <%= success %>
+        </div>
+
+    <% } %>
+
+
+    <% if (typeof error !== "undefined" && error) { %>
+
+        <div class="error-message">
+            <%= error %>
+        </div>
+
+    <% } %>
+
+
+    <!-- ================= UPLOAD SECTION ================= -->
 
     <div class="upload-box">
 
-        <h2>Upload Claims Excel</h2>
+        <h2>
+            Upload Claims Excel
+        </h2>
 
         <p class="info">
             Upload the approved Excel format containing claim details.
         </p>
 
+
         <form
             action="/upload-excel"
             method="POST"
             enctype="multipart/form-data"
+            id="uploadForm"
         >
 
             <div class="file-box">
@@ -60,9 +115,21 @@
                     required
                 >
 
+                <p
+                    id="fileName"
+                    class="file-name"
+                >
+                    No file selected
+                </p>
+
             </div>
 
-            <button type="submit" class="upload-btn">
+
+            <button
+                type="submit"
+                class="upload-btn"
+                id="uploadBtn"
+            >
                 Upload Excel
             </button>
 
@@ -70,94 +137,410 @@
 
     </div>
 
-    <!-- Uploaded Files -->
+
+    <!-- ================= UPLOAD HISTORY ================= -->
 
     <div class="upload-card">
 
-        <h2>Upload History</h2>
+        <div class="claims-title-row">
 
-        <table class="claims-table">
+            <div>
 
-            <thead>
-                <tr>
-                    <th>File Name</th>
-                    <th>Upload Time</th>
-                    <th>Total Claims</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+                <h2>
+                    Upload History
+                </h2>
 
-            <tbody>
+                <p class="table-info">
+                    Previously uploaded Excel files
+                </p>
 
-                <% if (uploads && uploads.length > 0) { %>
+            </div>
 
-                    <% uploads.forEach(upload => { %>
+        </div>
+
+
+        <div class="table-container">
+
+            <table class="claims-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            File Name
+                        </th>
+
+                        <th>
+                            Upload Time
+                        </th>
+
+                        <th>
+                            Total Claims
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <% if (uploads && uploads.length > 0) { %>
+
+                        <% uploads.forEach(upload => { %>
+
+                            <tr>
+
+                                <!-- FILE NAME -->
+
+                                <td>
+
+                                    <%= upload.file_name || "-" %>
+
+                                </td>
+
+
+                                <!-- UPLOAD TIME -->
+
+                                <td>
+
+                                    <%= upload.upload_at
+                                        ? new Date(upload.upload_at).toLocaleString(
+                                            'en-IN',
+                                            {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                second: '2-digit',
+                                                hour12: true
+                                            }
+                                        )
+                                        : "-"
+                                    %>
+
+                                </td>
+
+
+                                <!-- TOTAL CLAIMS -->
+
+                                <td>
+
+                                    <%= upload.total_claims || 0 %>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    <% if (upload.status === "ACTIVE") { %>
+
+                                        <span class="status-active">
+                                            ACTIVE
+                                        </span>
+
+                                    <% } else if (upload.status === "DELETED") { %>
+
+                                        <span class="status-deleted">
+                                            DELETED
+                                        </span>
+
+                                    <% } else { %>
+
+                                        <span>
+                                            <%= upload.status || "-" %>
+                                        </span>
+
+                                    <% } %>
+
+                                </td>
+
+
+                                <!-- ACTION -->
+
+                                <td>
+
+                                    <% if (upload.status === "ACTIVE") { %>
+
+                                        <form
+                                            action="/delete-upload/<%= upload.id %>"
+                                            method="POST"
+                                            class="delete-upload-form"
+                                            onsubmit="return confirmDelete(this);"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="delete-btn"
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </form>
+
+                                    <% } else { %>
+
+                                        <span class="no-action">
+                                            -
+                                        </span>
+
+                                    <% } %>
+
+                                </td>
+
+                            </tr>
+
+                        <% }) %>
+
+
+                    <% } else { %>
 
                         <tr>
 
-                            <td>
-                                <%= upload.file_name %>
-                            </td>
-
-                            <td>
-                                <%= upload.upload_at %>
-                            </td>
-
-                            <td>
-                                <%= upload.total_claims %>
-                            </td>
-
-                            <td>
-                                <%= upload.status %>
-                            </td>
-
-                            <td>
-
-                                <% if (upload.status === "ACTIVE") { %>
-
-                                    <form
-                                       action="/delete-upload/<%= upload.id %>"
-                                        method="POST"
-                                        onsubmit="return confirm('Delete this upload and its claims?');"
-                                    >
-
-                                        <button
-                                            type="submit"
-                                            class="delete-btn"
-                                        >
-                                            Delete
-                                        </button>
-
-                                    </form>
-
-                                <% } %>
-
+                            <td
+                                colspan="5"
+                                style="text-align: center;"
+                            >
+                                No Excel files uploaded yet.
                             </td>
 
                         </tr>
 
-                    <% }) %>
+                    <% } %>
 
-                <% } else { %>
+                </tbody>
 
-                    <tr>
+            </table>
 
-                        <td colspan="5">
-                            No Excel files uploaded yet.
-                        </td>
-
-                    </tr>
-
-                <% } %>
-
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
 
+
 </div>
 
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+    /*
+     * Show selected Excel file name
+     */
+
+    const excelFile =
+        document.getElementById("excelFile");
+
+    const fileName =
+        document.getElementById("fileName");
+
+
+    if (excelFile) {
+
+        excelFile.addEventListener("change", function () {
+
+            if (this.files && this.files.length > 0) {
+
+                fileName.textContent =
+                    this.files[0].name;
+
+            } else {
+
+                fileName.textContent =
+                    "No file selected";
+
+            }
+
+        });
+
+    }
+
+
+    /*
+     * Prevent accidental double upload
+     */
+
+    let isUploading = false;
+
+
+    const uploadForm =
+        document.getElementById("uploadForm");
+
+
+    if (uploadForm) {
+
+        uploadForm.addEventListener(
+            "submit",
+            function (event) {
+
+                if (isUploading) {
+
+                    event.preventDefault();
+
+                    return false;
+
+                }
+
+
+                /*
+                 * Check file
+                 */
+
+                if (
+                    !excelFile ||
+                    !excelFile.files ||
+                    excelFile.files.length === 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an Excel file."
+                    );
+
+                    return false;
+
+                }
+
+
+                const selectedFile =
+                    excelFile.files[0];
+
+
+                /*
+                 * Validate extension
+                 */
+
+                const fileNameLower =
+                    selectedFile.name.toLowerCase();
+
+
+                if (
+                    !fileNameLower.endsWith(".xlsx") &&
+                    !fileNameLower.endsWith(".xls")
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a valid Excel file (.xlsx or .xls)."
+                    );
+
+                    excelFile.value = "";
+
+                    fileName.textContent =
+                        "No file selected";
+
+                    return false;
+
+                }
+
+
+                /*
+                 * Start upload
+                 */
+
+                isUploading = true;
+
+
+                const uploadBtn =
+                    document.getElementById("uploadBtn");
+
+
+                if (uploadBtn) {
+
+                    uploadBtn.disabled = true;
+
+                    uploadBtn.innerText =
+                        "Uploading...";
+
+                    uploadBtn.style.cursor =
+                        "not-allowed";
+
+                    uploadBtn.style.opacity =
+                        "0.7";
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Prevent double delete
+     */
+
+    function confirmDelete(form) {
+
+        if (form.dataset.submitting === "true") {
+
+            return false;
+
+        }
+
+
+        const confirmed =
+            confirm(
+                "Delete this upload and all claims belonging to this upload?"
+            );
+
+
+        if (!confirmed) {
+
+            return false;
+
+        }
+
+
+        form.dataset.submitting =
+            "true";
+
+
+        const button =
+            form.querySelector(
+                "button[type='submit']"
+            );
+
+
+        if (button) {
+
+            button.disabled = true;
+
+            button.innerText =
+                "Deleting...";
+
+            button.style.cursor =
+                "not-allowed";
+
+            button.style.opacity =
+                "0.7";
+
+        }
+
+
+        return true;
+
+    }
+
+</script>
+
+
 </body>
+
 </html>

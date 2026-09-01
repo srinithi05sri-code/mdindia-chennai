@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,123 +14,136 @@
 
 <div class="dashboard-container">
 
-    <!-- ================= HEADER ================= -->
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
     <header class="dashboard-header">
 
         <div>
-            <h1>Admin Dashboard</h1>
+
+            <h1>
+                Admin Dashboard
+            </h1>
 
             <p class="welcome-text">
                 Welcome,
-                <strong><%= user.username %></strong>
+                <strong>
+                    <%= user.username %>
+                </strong>
             </p>
+
         </div>
 
         <div>
-            <a href="/logout" class="logout-btn">
+
+            <a
+                href="/logout"
+                class="logout-btn"
+            >
                 Logout
             </a>
+
         </div>
 
     </header>
 
-
     <hr>
 
-   
-    <!-- ================= PRODUCTIVITY ================= -->
 
-    <h2>Productivity Dashboard</h2>
-   
-<!-- ================= PRODUCTIVITY FILTER ================= -->
+    <!-- =====================================================
+         PRODUCTIVITY DASHBOARD
+    ====================================================== -->
 
-<div class="productivity-filter">
+    <h2>
+        Productivity Dashboard
+    </h2>
 
-    <div class="date-field">
-        <label for="fromDate">From Date</label>
 
-        <input
-            type="date"
-            id="fromDate"
-            name="fromDate"
+    <!-- =====================================================
+         PRODUCTIVITY FILTER
+    ====================================================== -->
+
+    <div class="productivity-filter">
+
+        <div class="date-field">
+
+            <label for="productivityFromDate">
+                From Date
+            </label>
+
+            <input
+                type="date"
+                id="productivityFromDate"
+                name="fromDate"
+                value="<%= typeof fromDate !== 'undefined' ? fromDate : '' %>"
+            >
+
+        </div>
+
+
+        <div class="date-field">
+
+            <label for="productivityToDate">
+                To Date
+            </label>
+
+            <input
+                type="date"
+                id="productivityToDate"
+                name="toDate"
+                value="<%= typeof toDate !== 'undefined' ? toDate : '' %>"
+            >
+
+        </div>
+
+
+        <button
+            type="button"
+            class="filter-btn"
+            onclick="filterProductivity()"
         >
-    </div>
-
-    <div class="date-field">
-        <label for="toDate">To Date</label>
-
-        <input
-            type="date"
-            id="toDate"
-            name="toDate"
-        >
-    </div>
-
-    <button
-        type="button"
-        class="filter-btn"
-        onclick="filterProductivity()"
-    >
-        Filter
-    </button>
-
-    <button
-        type="button"
-        class="clear-filter-btn"
-        onclick="clearProductivityFilter()"
-    >
-        Clear
-    </button>
-
-</div>
-
-<div class="summary-download-section">
-    <a href="/admin/download-productivity">
-        <button type="button" class="download-btn">
-            Download Process Summary
+            Filter
         </button>
-    </a>
-</div>
-
-   
-<script>
-
-function filterProductivity() {
-
-    const fromDate =
-        document.getElementById("fromDate").value;
-
-    const toDate =
-        document.getElementById("toDate").value;
-
-    if (!fromDate || !toDate) {
-        alert("Please select From Date and To Date");
-        return;
-    }
-
-    if (fromDate > toDate) {
-        alert("From Date cannot be greater than To Date");
-        return;
-    }
-
-    // Send selected dates to backend
-    window.location.href =
-        `/admin/dashboard?fromDate=${fromDate}&toDate=${toDate}`;
-}
 
 
-function clearProductivityFilter() {
+        <button
+            type="button"
+            class="clear-filter-btn"
+            onclick="clearProductivityFilter()"
+        >
+            Clear
+        </button>
 
-    document.getElementById("fromDate").value = "";
-    document.getElementById("toDate").value = "";
-
-    window.location.href = "/admin/dashboard";
-}
-
-</script>
+    </div>
 
 
+    <!-- =====================================================
+         DOWNLOAD PROCESS SUMMARY
+    ====================================================== -->
+
+    <div class="summary-download-section">
+
+        <a
+            href="/admin/download-productivity"
+            class="download-link"
+        >
+
+            <button
+                type="button"
+                class="download-btn"
+            >
+                Download Process Summary
+            </button>
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         PRODUCTIVITY TABLE
+    ====================================================== -->
 
     <div class="table-container">
 
@@ -138,20 +152,63 @@ function clearProductivityFilter() {
             <thead>
 
                 <tr>
-                    <th>Platform</th>
-                    <th>User Name</th>
-                    <th>Total Allocated</th>
-                    <th>Approved</th>
-                    <th>Rejected</th>
-                    <th>Query</th>
-                    <th>Re-Query</th>
-                    <th>Query + Investigation</th>
-                    <th>Total Productivity</th>
-                    <th>Investigation</th>
-                    <th>Sent Back</th>
-                    <th>Keep</th>
-                    <th>Other Doctor & Executive</th>
-                    <th>Pending</th>
+
+                    <th>
+                        Platform
+                    </th>
+
+                    <th>
+                        User Name
+                    </th>
+
+                    <th>
+                        Total Allocated
+                    </th>
+
+                    <th>
+                        Approved
+                    </th>
+
+                    <th>
+                        Rejected
+                    </th>
+
+                    <th>
+                        Query
+                    </th>
+
+                    <th>
+                        Re-Query
+                    </th>
+
+                    <th>
+                        Query + Investigation
+                    </th>
+
+                    <th>
+                        Total Productivity
+                    </th>
+
+                    <th>
+                        Investigation
+                    </th>
+
+                    <th>
+                        Sent Back
+                    </th>
+
+                    <th>
+                        Keep
+                    </th>
+
+                    <th>
+                        Other Doctor & Executive
+                    </th>
+
+                    <th>
+                        Pending
+                    </th>
+
                 </tr>
 
             </thead>
@@ -165,57 +222,100 @@ function clearProductivityFilter() {
 
                         <tr>
 
+                            <!-- PLATFORM -->
+
                             <td>
                                 <%= row.platform || "-" %>
                             </td>
+
+
+                            <!-- USER NAME -->
 
                             <td>
                                 <%= row.user_name || "-" %>
                             </td>
 
+
+                            <!-- TOTAL ALLOCATED -->
+
                             <td>
                                 <%= row.total_allocated || 0 %>
                             </td>
+
+
+                            <!-- APPROVED -->
 
                             <td>
                                 <%= row.approved || 0 %>
                             </td>
 
+
+                            <!-- REJECTED -->
+
                             <td>
                                 <%= row.rejected || 0 %>
                             </td>
+
+
+                            <!-- QUERY -->
 
                             <td>
                                 <%= row.query_count || 0 %>
                             </td>
 
+
+                            <!-- RE-QUERY -->
+
                             <td>
                                 <%= row.requery || 0 %>
                             </td>
+
+
+                            <!-- QUERY + INVESTIGATION -->
 
                             <td>
                                 <%= row.investigation_query || 0 %>
                             </td>
 
+
+                            <!-- TOTAL PRODUCTIVITY -->
+
                             <td class="productivity">
+
                                 <%= row.total_productivity || 0 %>
+
                             </td>
+
+
+                            <!-- INVESTIGATION -->
 
                             <td>
                                 <%= row.investigation || 0 %>
                             </td>
 
+
+                            <!-- SENT BACK -->
+
                             <td>
                                 <%= row.sent_back || 0 %>
                             </td>
+
+
+                            <!-- KEEP -->
 
                             <td>
                                 <%= row.keep_count || 0 %>
                             </td>
 
+
+                            <!-- OTHER DOCTOR / EXECUTIVE -->
+
                             <td>
                                 <%= row.other_doctor_executive || 0 %>
                             </td>
+
+
+                            <!-- PENDING -->
 
                             <td>
                                 <%= row.pending || 0 %>
@@ -228,9 +328,14 @@ function clearProductivityFilter() {
                 <% } else { %>
 
                     <tr>
-                        <td colspan="14" style="text-align:center;">
+
+                        <td
+                            colspan="14"
+                            style="text-align: center;"
+                        >
                             No productivity data available
                         </td>
+
                     </tr>
 
                 <% } %>
@@ -245,106 +350,162 @@ function clearProductivityFilter() {
     <hr>
 
 
-    <!-- ================= DOWNLOAD CLAIMS ================= -->
+    <!-- =====================================================
+         CLAIMS DUMP
+    ====================================================== -->
 
-    
-<!-- ================= DOWNLOAD CLAIMS ================= -->
+    <h2>
+        Claims Dump
+    </h2>
 
-<h2>Claims Dump</h2>
 
-<form action="/admin/download-claims" method="GET" class="download-form">
-
-    <div class="date-field">
-        <label for="fromDate">From Date</label>
-        <input
-            type="date"
-            id="fromDate"
-            name="fromDate"
-            required
-        >
-    </div>
-
-    <div class="date-field">
-        <label for="toDate">To Date</label>
-        <input
-            type="date"
-            id="toDate"
-            name="toDate"
-            required
-        >
-    </div>
-
-    <button
-        type="submit"
-        class="download-btn"
+    <form
+        action="/admin/download-claims"
+        method="GET"
+        class="download-form"
+        onsubmit="return validateClaimsDownload();"
     >
-        Download Updated Claims
-    </button>
 
-</form>
+        <div class="date-field">
 
+            <label for="claimsFromDate">
+                From Date
+            </label>
+
+            <input
+                type="date"
+                id="claimsFromDate"
+                name="fromDate"
+                required
+            >
+
+        </div>
+
+
+        <div class="date-field">
+
+            <label for="claimsToDate">
+                To Date
+            </label>
+
+            <input
+                type="date"
+                id="claimsToDate"
+                name="toDate"
+                required
+            >
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="download-btn"
+        >
+            Download Updated Claims
+        </button>
+
+    </form>
 
 
     <hr>
 
 
-    <!-- ================= CREATE USER ================= -->
+    <!-- =====================================================
+         CREATE NEW USER
+    ====================================================== -->
 
-    <h2>Create New User</h2>
+    <h2>
+        Create New User
+    </h2>
+
 
     <form
         action="/admin/create-user"
         method="POST"
+        class="admin-form"
+        onsubmit="return validateCreateUser();"
     >
 
+        <!-- EMPLOYEE ID -->
+
         <div>
-            <label>Employee ID</label>
+
+            <label for="employeeId">
+                Employee ID
+            </label>
 
             <input
                 type="text"
+                id="employeeId"
                 name="employeeId"
                 placeholder="Enter Employee ID"
                 required
             >
+
         </div>
 
 
+        <!-- USERNAME -->
+
         <div>
-            <label>Username</label>
+
+            <label for="username">
+                Username
+            </label>
 
             <input
                 type="text"
+                id="username"
                 name="username"
                 placeholder="Enter Username"
                 required
             >
+
         </div>
 
 
+        <!-- PASSWORD -->
+
         <div>
-            <label>Password</label>
+
+            <label for="password">
+                Password
+            </label>
 
             <input
                 type="password"
+                id="password"
                 name="password"
                 placeholder="Enter Password"
                 required
             >
+
         </div>
 
 
+        <!-- DEPARTMENT -->
+
         <div>
-            <label>Department</label>
+
+            <label for="department">
+                Department
+            </label>
 
             <input
                 type="text"
+                id="department"
                 name="department"
                 placeholder="Enter Department"
             >
+
         </div>
 
 
-        <button type="submit">
+        <button
+            type="submit"
+            class="create-user-btn"
+        >
             Create User
         </button>
 
@@ -354,7 +515,9 @@ function clearProductivityFilter() {
     <hr>
 
 
-    <!-- ================= REASSIGN CLAIMS ================= -->
+    <!-- =====================================================
+         REASSIGN CLAIMS
+    ====================================================== -->
 
     <h2 class="reassign-form">
         Reassign Claims
@@ -365,15 +528,21 @@ function clearProductivityFilter() {
         action="/admin/reassign"
         method="POST"
         class="form-group"
+        onsubmit="return validateReassign();"
     >
 
-        <label>
+        <!-- =================================================
+             OLD USER
+        ================================================== -->
+
+        <label for="oldUserId">
             Leaving User
         </label>
 
 
         <select
             name="oldUserId"
+            id="oldUserId"
             required
         >
 
@@ -381,14 +550,19 @@ function clearProductivityFilter() {
                 Select User
             </option>
 
+
             <% if (userList && userList.length > 0) { %>
 
                 <% userList.forEach(u => { %>
 
                     <option value="<%= u.id %>">
+
                         <%= u.username %>
+
                         -
+
                         <%= u.department || "-" %>
+
                     </option>
 
                 <% }) %>
@@ -402,13 +576,18 @@ function clearProductivityFilter() {
         <br>
 
 
-        <label>
+        <!-- =================================================
+             NEW USER
+        ================================================== -->
+
+        <label for="newUserId">
             Assign To
         </label>
 
 
         <select
             name="newUserId"
+            id="newUserId"
             required
         >
 
@@ -416,14 +595,19 @@ function clearProductivityFilter() {
                 Select New User
             </option>
 
+
             <% if (userList && userList.length > 0) { %>
 
                 <% userList.forEach(u => { %>
 
                     <option value="<%= u.id %>">
+
                         <%= u.username %>
+
                         -
+
                         <%= u.department || "-" %>
+
                     </option>
 
                 <% }) %>
@@ -437,14 +621,19 @@ function clearProductivityFilter() {
         <br>
 
 
-        <button type="submit">
+        <button
+            type="submit"
+            class="reassign-btn"
+        >
             Reassign Claims
         </button>
 
     </form>
 
 
-    <!-- ================= SAVE TIME ================= -->
+    <!-- =====================================================
+         LAST SAVED
+    ====================================================== -->
 
     <% if (typeof savedAt !== "undefined" && savedAt) { %>
 
@@ -454,7 +643,9 @@ function clearProductivityFilter() {
                 Last Saved:
             </strong>
 
-            <%= savedAt %>
+            <span>
+                <%= savedAt %>
+            </span>
 
         </div>
 
@@ -463,5 +654,275 @@ function clearProductivityFilter() {
 
 </div>
 
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+    /* =====================================================
+       PRODUCTIVITY FILTER
+    ====================================================== */
+
+    function filterProductivity() {
+
+        const fromDate =
+            document.getElementById("productivityFromDate").value;
+
+        const toDate =
+            document.getElementById("productivityToDate").value;
+
+
+        if (!fromDate || !toDate) {
+
+            alert(
+                "Please select From Date and To Date."
+            );
+
+            return;
+
+        }
+
+
+        if (fromDate > toDate) {
+
+            alert(
+                "From Date cannot be greater than To Date."
+            );
+
+            return;
+
+        }
+
+
+        window.location.href =
+            "/admin/dashboard?fromDate="
+            + encodeURIComponent(fromDate)
+            + "&toDate="
+            + encodeURIComponent(toDate);
+
+    }
+
+
+
+    /* =====================================================
+       CLEAR PRODUCTIVITY FILTER
+    ====================================================== */
+
+    function clearProductivityFilter() {
+
+        document.getElementById(
+            "productivityFromDate"
+        ).value = "";
+
+        document.getElementById(
+            "productivityToDate"
+        ).value = "";
+
+
+        window.location.href =
+            "/admin/dashboard";
+
+    }
+
+
+
+    /* =====================================================
+       CLAIM DOWNLOAD VALIDATION
+    ====================================================== */
+
+    function validateClaimsDownload() {
+
+        const fromDate =
+            document.getElementById("claimsFromDate").value;
+
+        const toDate =
+            document.getElementById("claimsToDate").value;
+
+
+        if (!fromDate || !toDate) {
+
+            alert(
+                "Please select From Date and To Date."
+            );
+
+            return false;
+
+        }
+
+
+        if (fromDate > toDate) {
+
+            alert(
+                "From Date cannot be greater than To Date."
+            );
+
+            return false;
+
+        }
+
+
+        return true;
+
+    }
+
+
+
+    /* =====================================================
+       CREATE USER VALIDATION
+    ====================================================== */
+
+    function validateCreateUser() {
+
+        const employeeId =
+            document.getElementById("employeeId").value.trim();
+
+        const username =
+            document.getElementById("username").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+
+        if (!employeeId) {
+
+            alert(
+                "Please enter Employee ID."
+            );
+
+            return false;
+
+        }
+
+
+        if (!username) {
+
+            alert(
+                "Please enter Username."
+            );
+
+            return false;
+
+        }
+
+
+        if (!password) {
+
+            alert(
+                "Please enter Password."
+            );
+
+            return false;
+
+        }
+
+
+        return true;
+
+    }
+
+
+
+    /* =====================================================
+       REASSIGN VALIDATION
+    ====================================================== */
+
+    function validateReassign() {
+
+        const oldUser =
+            document.getElementById("oldUserId").value;
+
+        const newUser =
+            document.getElementById("newUserId").value;
+
+
+        if (!oldUser) {
+
+            alert(
+                "Please select the Leaving User."
+            );
+
+            return false;
+
+        }
+
+
+        if (!newUser) {
+
+            alert(
+                "Please select the New User."
+            );
+
+            return false;
+
+        }
+
+
+        if (oldUser === newUser) {
+
+            alert(
+                "Leaving User and New User cannot be the same."
+            );
+
+            return false;
+
+        }
+
+
+        return confirm(
+            "Are you sure you want to reassign all claims from the selected user?"
+        );
+
+    }
+
+</script>
+
+
+<!-- =========================================================
+     SUCCESS MESSAGES
+========================================================= -->
+
+<% if (typeof success !== "undefined" && success) { %>
+
+    <script>
+
+        window.addEventListener(
+            "load",
+            function () {
+
+                alert(
+                    "<%= success %>"
+                );
+
+            }
+        );
+
+    </script>
+
+<% } %>
+
+
+<% if (typeof error !== "undefined" && error) { %>
+
+    <script>
+
+        window.addEventListener(
+            "load",
+            function () {
+
+                alert(
+                    "<%= error %>"
+                );
+
+            }
+        );
+
+    </script>
+
+<% } %>
+
+
 </body>
+
 </html>

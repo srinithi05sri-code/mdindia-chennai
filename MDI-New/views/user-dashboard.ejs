@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -16,15 +15,11 @@
         rel="stylesheet"
         href="/css/style.css"
     >
-
 </head>
-
 
 <body class="user-dashboard">
 
-
 <div class="dashboard-container">
-
 
     <!-- ================= HEADER ================= -->
 
@@ -36,14 +31,12 @@
                 User Dashboard
             </h1>
 
-
             <p>
                 Welcome,
                 <strong>
                     <%= user.username %>
                 </strong>
             </p>
-
 
             <p>
                 Department:
@@ -53,7 +46,6 @@
             </p>
 
         </div>
-
 
         <a
             href="/logout"
@@ -65,11 +57,9 @@
     </header>
 
 
-
     <!-- ================= CLAIM SECTION ================= -->
 
     <section class="claims-section">
-
 
         <div class="claims-title-row">
 
@@ -86,7 +76,7 @@
             </div>
 
 
-            <!-- SAVE TIME -->
+            <!-- ================= LAST SAVED TIME ================= -->
 
             <% if (typeof savedAt !== "undefined" && savedAt) { %>
 
@@ -106,126 +96,160 @@
 
         </div>
 
-<!-- =====================================================
-     PROCESS SUMMARY
-===================================================== -->
 
-<div class="process-summary-section">
+        <!-- =====================================================
+             PROCESS SUMMARY
+        ===================================================== -->
 
-    <div class="claims-title-row">
-        <div>
-            <h2>Process Summary</h2>
-            <p class="table-info">
-                Your claim processing summary
-            </p>
-        </div>
-    </div>
+        <div class="process-summary-section">
 
-    <div class="table-container">
+            <div class="claims-title-row">
 
-        <table class="productivity-table">
+                <div>
 
-            <thead>
-                <tr>
-                    <th>Platform</th>
-                    <th>Total Allocated</th>
-                    <th>Approved</th>
-                    <th>Rejected</th>
-                    <th>Query</th>
-                    <th>Re-Query</th>
-                    <th>Query + Investigation</th>
-                    <th>Investigation</th>
-                    <th>Sent Back</th>
-                    <th>Keep</th>
-                    <th>Other Doctor & Executive</th>
-                    <th>Pending</th>
-                    <th>Total Productivity</th>
-                </tr>
-            </thead>
+                    <h2>
+                        Process Summary
+                    </h2>
 
-            <tbody>
+                    <p class="table-info">
+                        Your claim processing summary
+                    </p>
 
-                <% if (processSummary && processSummary.length > 0) { %>
+                </div>
 
-                    <% processSummary.forEach(row => { %>
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="productivity-table">
+
+                    <thead>
 
                         <tr>
 
-                            <td>
-                                <%= row.platform || "-" %>
-                            </td>
+                            <th>Platform</th>
 
-                            <td>
-                                <%= row.total_allocated || 0 %>
-                            </td>
+                            <th>Total Allocated</th>
 
-                            <td>
-                                <%= row.approved || 0 %>
-                            </td>
+                            <th>Approved</th>
 
-                            <td>
-                                <%= row.rejected || 0 %>
-                            </td>
+                            <th>Rejected</th>
 
-                            <td>
-                                <%= row.query_count || 0 %>
-                            </td>
+                            <th>Query</th>
 
-                            <td>
-                                <%= row.requery || 0 %>
-                            </td>
+                            <th>Re-Query</th>
 
-                            <td>
-                                <%= row.investigation_query || 0 %>
-                            </td>
+                            <th>Query + Investigation</th>
 
-                            <td>
-                                <%= row.investigation || 0 %>
-                            </td>
+                            <th>Investigation</th>
 
-                            <td>
-                                <%= row.sent_back || 0 %>
-                            </td>
+                            <th>Sent Back</th>
 
-                            <td>
-                                <%= row.keep_count || 0 %>
-                            </td>
+                            <th>Keep</th>
 
-                            <td>
-                                <%= row.other_doctor_executive || 0 %>
-                            </td>
+                            <th>Other Doctor & Executive</th>
 
-                            <td>
-                                <%= row.pending || 0 %>
-                            </td>
+                            <th>Pending</th>
 
-                            <td class="productivity">
-                                <%= row.total_productivity || 0 %>
-                            </td>
+                            <th>Total Productivity</th>
 
                         </tr>
 
-                    <% }) %>
+                    </thead>
 
-                <% } else { %>
 
-                    <tr>
-                        <td colspan="13" style="text-align:center;">
-                            No productivity data available
-                        </td>
-                    </tr>
+                    <tbody>
 
-                <% } %>
+                        <% if (processSummary && processSummary.length > 0) { %>
 
-            </tbody>
+                            <% processSummary.forEach(row => { %>
 
-        </table>
+                                <tr>
 
-    </div>
+                                    <td>
+                                        <%= row.platform || "-" %>
+                                    </td>
 
-</div>
+                                    <td>
+                                        <%= row.total_allocated || 0 %>
+                                    </td>
 
-        <!-- ================= SAVE FORM ================= -->
+                                    <td>
+                                        <%= row.approved || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.rejected || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.query_count || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.requery || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.investigation_query || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.investigation || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.sent_back || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.keep_count || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.other_doctor_executive || 0 %>
+                                    </td>
+
+                                    <td>
+                                        <%= row.pending || 0 %>
+                                    </td>
+
+                                    <td class="productivity">
+                                        <%= row.total_productivity || 0 %>
+                                    </td>
+
+                                </tr>
+
+                            <% }) %>
+
+                        <% } else { %>
+
+                            <tr>
+
+                                <td
+                                    colspan="13"
+                                    style="text-align:center;"
+                                >
+                                    No productivity data available
+                                </td>
+
+                            </tr>
+
+                        <% } %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SAVE FORM
+        ===================================================== -->
 
         <form
             action="/save-claims"
@@ -234,12 +258,9 @@
             onsubmit="return preventDoubleSubmit(this);"
         >
 
-
             <div class="table-container">
 
-
                 <table class="claim-table">
-
 
                     <!-- ================= TABLE HEADER ================= -->
 
@@ -248,30 +269,55 @@
                         <tr>
 
                             <th>CLAIM_REF_NO</th>
+
                             <th>INWARD_NO</th>
+
                             <th>POLICY_NO</th>
+
                             <th>Vertical</th>
+
                             <th>Additional Deduction</th>
+
                             <th>CLAIM_AMT</th>
+
                             <th>AL_AMT</th>
+
                             <th>CLAIM_CLASS</th>
+
                             <th>Hospital Code</th>
+
                             <th>Type of MOU</th>
+
                             <th>Diagnosis</th>
+
                             <th>POLICY_NAME</th>
+
                             <th>Queue</th>
+
                             <th>Ageing</th>
+
                             <th>Date</th>
+
                             <th>Time</th>
+
                             <th>Today Status</th>
+
                             <th>I3 Status</th>
+
                             <th>Full qc</th>
+
                             <th>RELATION</th>
+
                             <th>HNF</th>
+
                             <th>lot</th>
+
                             <th>platform</th>
+
                             <th>User ID</th>
+
                             <th>User Name</th>
+
                             <th>Uploaded Time</th>
 
                             <th class="editable-header">
@@ -311,211 +357,222 @@
                     </thead>
 
 
-
                     <!-- ================= TABLE BODY ================= -->
 
                     <tbody>
 
-
                     <% if (claims && claims.length > 0) { %>
-
 
                         <% claims.forEach(claim => { %>
 
-
                             <tr>
 
-
-                                <!-- CLAIM REF NO -->
+                                <!-- ================= CLAIM REF NO ================= -->
 
                                 <td>
                                     <%= claim.claim_ref_no || "-" %>
                                 </td>
 
 
-                                <!-- INWARD NO -->
+                                <!-- ================= INWARD NO ================= -->
 
                                 <td>
                                     <%= claim.inward_no || "-" %>
                                 </td>
 
 
-                                <!-- POLICY NO -->
+                                <!-- ================= POLICY NO ================= -->
 
                                 <td>
                                     <%= claim.policy_no || "-" %>
                                 </td>
 
 
-                                <!-- VERTICAL -->
+                                <!-- ================= VERTICAL ================= -->
 
                                 <td>
                                     <%= claim.vertical || "-" %>
                                 </td>
 
 
-                                <!-- ADDITIONAL DEDUCTION -->
+                                <!-- ================= ADDITIONAL DEDUCTION ================= -->
 
                                 <td>
                                     <%= claim.additional_deduction ?? "-" %>
                                 </td>
 
 
-                                <!-- CLAIM AMOUNT -->
+                                <!-- ================= CLAIM AMOUNT ================= -->
 
                                 <td>
                                     <%= claim.claim_amount ?? "-" %>
                                 </td>
 
 
-                                <!-- AL AMOUNT -->
+                                <!-- ================= AL AMOUNT ================= -->
 
                                 <td>
                                     <%= claim.al_amount ?? "-" %>
                                 </td>
 
 
-                                <!-- CLAIM CLASS -->
+                                <!-- ================= CLAIM CLASS ================= -->
 
                                 <td>
                                     <%= claim.claim_class || "-" %>
                                 </td>
 
 
-                                <!-- HOSPITAL CODE -->
+                                <!-- ================= HOSPITAL CODE ================= -->
 
                                 <td>
                                     <%= claim.hospital_code || "-" %>
                                 </td>
 
 
-                                <!-- TYPE OF MOU -->
+                                <!-- ================= TYPE OF MOU ================= -->
 
                                 <td>
                                     <%= claim.type_of_mou || "-" %>
                                 </td>
 
 
-                                <!-- DIAGNOSIS -->
+                                <!-- ================= DIAGNOSIS ================= -->
 
                                 <td>
                                     <%= claim.diagnosis || "-" %>
                                 </td>
 
 
-                                <!-- POLICY NAME -->
+                                <!-- ================= POLICY NAME ================= -->
 
                                 <td>
                                     <%= claim.policy_name || "-" %>
                                 </td>
 
 
-                                <!-- QUEUE -->
+                                <!-- ================= QUEUE ================= -->
 
                                 <td>
                                     <%= claim.queue || "-" %>
                                 </td>
 
 
-                                <!-- AGEING -->
+                                <!-- ================= AGEING ================= -->
 
                                 <td>
                                     <%= claim.ageing || "-" %>
                                 </td>
 
 
-                                <!-- DATE -->
+                                <!-- ================= DATE ================= -->
 
                                 <td>
                                     <%= claim.formatted_claim_date || "-" %>
                                 </td>
 
 
-                                <!-- TIME -->
+                                <!-- ================= TIME ================= -->
 
                                 <td>
                                     <%= claim.formatted_claim_time || "-" %>
                                 </td>
 
 
-                                <!-- TODAY STATUS -->
+                                <!-- ================= TODAY STATUS ================= -->
 
                                 <td>
                                     <%= claim.today_status || "-" %>
                                 </td>
 
 
-                                <!-- I3 STATUS -->
+                                <!-- ================= I3 STATUS ================= -->
 
                                 <td>
                                     <%= claim.i3_status || "-" %>
                                 </td>
 
 
-                                <!-- FULL QC -->
+                                <!-- ================= FULL QC ================= -->
 
                                 <td>
                                     <%= claim.full_qc || "-" %>
                                 </td>
 
 
-                                <!-- RELATION -->
+                                <!-- ================= RELATION ================= -->
 
                                 <td>
                                     <%= claim.relation || "-" %>
                                 </td>
 
 
-                                <!-- HNF -->
+                                <!-- ================= HNF ================= -->
 
                                 <td>
                                     <%= claim.hnf || "-" %>
                                 </td>
 
 
-                                <!-- LOT -->
+                                <!-- ================= LOT ================= -->
 
                                 <td>
                                     <%= claim.lot || "-" %>
                                 </td>
 
 
-                                <!-- PLATFORM -->
+                                <!-- ================= PLATFORM ================= -->
 
                                 <td>
                                     <%= claim.platform || "-" %>
                                 </td>
 
 
-                                <!-- USER ID -->
+                                <!-- ================= USER ID ================= -->
 
                                 <td class="user-id-cell">
+
                                     <%= claim.employee_id ||
                                         claim.assigned_user_id ||
                                         "-" %>
+
                                 </td>
 
 
-                                <!-- USER NAME -->
+                                <!-- ================= USER NAME ================= -->
 
                                 <td class="user-name-cell">
-                                    <%= claim.employee_name || "-" %>
-                                </td>
-<td>
-    <%= claim.uploaded_at
-        ? new Date(claim.uploaded_at).toLocaleString('en-IN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        })
-        : '-' %>
-</td>
 
-                                <!-- ================= CLAIM TYPE ================= -->
+                                    <%= claim.employee_name || "-" %>
+
+                                </td>
+
+
+                                <!-- ================= UPLOADED TIME ================= -->
+
+                                <td>
+
+                                    <%= claim.uploaded_at
+                                        ? new Date(claim.uploaded_at).toLocaleString(
+                                            'en-IN',
+                                            {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                second: '2-digit',
+                                                hour12: true
+                                            }
+                                        )
+                                        : '-' %>
+
+                                </td>
+
+
+                                <!-- =====================================================
+                                     CLAIM TYPE
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -563,8 +620,9 @@
                                 </td>
 
 
-
-                                <!-- ================= ILOM ID ================= -->
+                                <!-- =====================================================
+                                     ILOM ID
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -578,8 +636,9 @@
                                 </td>
 
 
-
-                                <!-- ================= APPROVE AMOUNT ================= -->
+                                <!-- =====================================================
+                                     APPROVE AMOUNT
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -593,8 +652,9 @@
                                 </td>
 
 
-
-                                <!-- ================= STATUS ================= -->
+                                <!-- =====================================================
+                                     STATUS
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -717,8 +777,9 @@
                                 </td>
 
 
-
-                                <!-- ================= REMARK ================= -->
+                                <!-- =====================================================
+                                     REMARK
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -732,8 +793,9 @@
                                 </td>
 
 
-
-                                <!-- ================= DEDUCTION AMOUNT ================= -->
+                                <!-- =====================================================
+                                     DEDUCTION AMOUNT
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -747,8 +809,9 @@
                                 </td>
 
 
-
-                                <!-- ================= DIAGNOSIS 2 ================= -->
+                                <!-- =====================================================
+                                     DIAGNOSIS 2
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -762,8 +825,9 @@
                                 </td>
 
 
-
-                                <!-- ================= INTER DOC EXE ================= -->
+                                <!-- =====================================================
+                                     INTER DOC EXE
+                                ===================================================== -->
 
                                 <td class="editable-cell">
 
@@ -820,15 +884,12 @@
 
                                 </td>
 
-
                             </tr>
-
 
                         <% }) %>
 
 
                     <% } else { %>
-
 
                         <tr>
 
@@ -841,16 +902,13 @@
 
                         </tr>
 
-
                     <% } %>
-
 
                     </tbody>
 
                 </table>
 
             </div>
-
 
 
             <!-- ================= SAVE BUTTON ================= -->
@@ -861,31 +919,31 @@
                     type="submit"
                     class="save-claims-btn"
                     id="saveClaimsBtn"
-                    onclick="return confirmSave();"
                 >
                     Save Claims
                 </button>
 
             </div>
 
-
         </form>
 
-
     </section>
-
 
 </div>
 
 
-
-<!-- ================= DOUBLE SAVE PREVENTION ================= -->
+<!-- =====================================================
+     DOUBLE SAVE PREVENTION
+===================================================== -->
 
 <script>
 
 let isSaving = false;
 
 
+/*
+ * Confirm before saving
+ */
 function confirmSave() {
 
     if (isSaving) {
@@ -896,20 +954,36 @@ function confirmSave() {
 }
 
 
+/*
+ * Prevent double submit
+ */
 function preventDoubleSubmit(form) {
 
+    /*
+     * If already submitting,
+     * completely block another submit.
+     */
     if (isSaving) {
         return false;
     }
 
 
+    /*
+     * Mark as saving immediately.
+     */
     isSaving = true;
 
 
+    /*
+     * Get Save button.
+     */
     const button =
         document.getElementById("saveClaimsBtn");
 
 
+    /*
+     * Disable button.
+     */
     if (button) {
 
         button.disabled = true;
@@ -920,18 +994,139 @@ function preventDoubleSubmit(form) {
         button.style.cursor =
             "not-allowed";
 
+        button.style.opacity =
+            "0.6";
     }
 
 
+    /*
+     * Allow the original form
+     * submission to continue.
+     */
     return true;
 }
 
 
+/*
+ * Add confirmation before submit.
+ *
+ * This is handled using the form submit event
+ * so pressing Enter also gets protection.
+ */
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form =
+        document.getElementById("claimsForm");
+
+    if (!form) {
+        return;
+    }
+
+
+    form.addEventListener("submit", function (event) {
+
+        /*
+         * Already saving
+         */
+        if (isSaving) {
+
+            event.preventDefault();
+
+            return;
+        }
+
+
+        /*
+         * Ask user for confirmation.
+         */
+        const confirmed =
+            confirm("Save all claim changes?");
+
+
+        /*
+         * User clicked Cancel.
+         */
+        if (!confirmed) {
+
+            event.preventDefault();
+
+            return;
+        }
+
+
+        /*
+         * Mark as saving.
+         */
+        isSaving = true;
+
+
+        /*
+         * Disable button immediately.
+         */
+        const button =
+            document.getElementById("saveClaimsBtn");
+
+
+        if (button) {
+
+            button.disabled = true;
+
+            button.innerText =
+                "Saving...";
+
+            button.style.cursor =
+                "not-allowed";
+
+            button.style.opacity =
+                "0.6";
+        }
+
+    });
+
+});
+
+
+/*
+ * Prevent accidental page refresh/back submission
+ * from enabling another save while current request
+ * is still being processed.
+ */
+window.addEventListener("pageshow", function () {
+
+    /*
+     * Only reset if the page is restored
+     * from browser cache.
+     */
+    if (event.persisted) {
+
+        isSaving = false;
+
+        const button =
+            document.getElementById("saveClaimsBtn");
+
+        if (button) {
+
+            button.disabled = false;
+
+            button.innerText =
+                "Save Claims";
+
+            button.style.cursor =
+                "pointer";
+
+            button.style.opacity =
+                "1";
+        }
+    }
+
+});
+
 </script>
 
 
-
-<!-- ================= SUCCESS MESSAGE ================= -->
+<!-- =====================================================
+     SUCCESS MESSAGE
+===================================================== -->
 
 <% if (typeof saved !== "undefined" && saved) { %>
 
@@ -949,4 +1144,5 @@ function preventDoubleSubmit(form) {
 
 
 </body>
+
 </html>
