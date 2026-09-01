@@ -1,274 +1,354 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Admin Dashboard</title>
 
     <link rel="stylesheet" href="/css/style.css">
-
 </head>
 
 <body class="dashboard-container">
 
-     <div class="">
+<div class="dashboard-container">
 
-        <header class="dashboard-header">
+    <!-- ================= HEADER ================= -->
 
-            <div class="">
-                <h1>Admin Dashboard</h1>
+    <header class="dashboard-header">
 
-                <p class="welcome-text">
-                    Welcome, <strong><%= user.username %></strong>
-                </p>
-            </div>
+        <div>
+            <h1>Admin Dashboard</h1>
 
-            <div class="">
-                <a href="/logout" class="logout-btn">
-                    Logout
-                </a>
-            </div>
+            <p class="welcome-text">
+                Welcome,
+                <strong><%= user.username %></strong>
+            </p>
+        </div>
 
-        </header>
+        <div>
+            <a href="/logout" class="logout-btn">
+                Logout
+            </a>
+        </div>
+
+    </header>
 
 
-    
+    <hr>
 
-<hr>
 
-<h2>Productivity Dashboard</h2>
+    <!-- ================= PRODUCTIVITY ================= -->
 
-<div class="table-container">
+    <h2>Productivity Dashboard</h2>
 
-    <table class="productivity-table">
+    <div class="table-container">
 
-        <thead>
+        <table class="productivity-table">
 
-            <tr>
-
-                <th>Platform</th>
-
-                <th>User Name</th>
-
-                <th>Total Allocated</th>
-
-                <th>Approved</th>
-
-                <th>Rejected</th>
-
-                <th>Query</th>
-
-                <th>Re-Query</th>
-
-                <th>Query + Investigation</th>
-
-                <th>Total Productivity</th>
-
-                <th>Investigation</th>
-
-                <th>Sent Back</th>
-
-                <th>Keep</th>
-
-                <th>Other Doctor & Executive</th>
-
-                <th>Pending</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            <% processSummary.forEach(row => { %>
+            <thead>
 
                 <tr>
-
-                    <td>
-                        <%= row.platform %>
-                    </td>
-
-                    <td>
-                        <%= row.user_name %>
-                    </td>
-
-                    <td>
-                        <%= row.total_allocated %>
-                    </td>
-
-                    <td>
-                        <%= row.approved %>
-                    </td>
-
-                    <td>
-                        <%= row.rejected %>
-                    </td>
-
-                    <td>
-                        <%= row.query_count %>
-                    </td>
-
-                    <td>
-                        <%= row.requery %>
-                    </td>
-
-                    <td>
-                        <%= row.investigation_query %>
-                    </td>
-
-                    <td class="productivity">
-
-                        <%= row.total_productivity %>
-
-                    </td>
-
-                    <td>
-                        <%= row.investigation %>
-                    </td>
-
-                    <td>
-                        <%= row.sent_back %>
-                    </td>
-
-                    <td>
-                        <%= row.keep_count %>
-                    </td>
-
-                    <td>
-                        <%= row.other_doctor_executive %>
-                    </td>
-
-                    <td>
-                        <%= row.pending %>
-                    </td>
-
+                    <th>Platform</th>
+                    <th>User Name</th>
+                    <th>Total Allocated</th>
+                    <th>Approved</th>
+                    <th>Rejected</th>
+                    <th>Query</th>
+                    <th>Re-Query</th>
+                    <th>Query + Investigation</th>
+                    <th>Total Productivity</th>
+                    <th>Investigation</th>
+                    <th>Sent Back</th>
+                    <th>Keep</th>
+                    <th>Other Doctor & Executive</th>
+                    <th>Pending</th>
                 </tr>
 
-            <% }) %>
+            </thead>
 
-        </tbody>
 
-    </table>
+            <tbody>
 
-</div>
+                <% if (processSummary && processSummary.length > 0) { %>
+
+                    <% processSummary.forEach(row => { %>
+
+                        <tr>
+
+                            <td>
+                                <%= row.platform || "-" %>
+                            </td>
+
+                            <td>
+                                <%= row.user_name || "-" %>
+                            </td>
+
+                            <td>
+                                <%= row.total_allocated || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.approved || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.rejected || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.query_count || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.requery || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.investigation_query || 0 %>
+                            </td>
+
+                            <td class="productivity">
+                                <%= row.total_productivity || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.investigation || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.sent_back || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.keep_count || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.other_doctor_executive || 0 %>
+                            </td>
+
+                            <td>
+                                <%= row.pending || 0 %>
+                            </td>
+
+                        </tr>
+
+                    <% }) %>
+
+                <% } else { %>
+
+                    <tr>
+                        <td colspan="14" style="text-align:center;">
+                            No productivity data available
+                        </td>
+                    </tr>
+
+                <% } %>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
     <hr>
 
-<h2>Claims Dump</h2>
 
-<a href="/admin/download-claims">
-    <button type="button" class="download-btn">
-        Download Updated Claims
-    </button>
-</a>
+    <!-- ================= DOWNLOAD CLAIMS ================= -->
+
+    <h2>Claims Dump</h2>
+
+    <a href="/admin/download-claims">
+
+        <button
+            type="button"
+            class="download-btn"
+        >
+            Download Updated Claims
+        </button>
+
+    </a>
+
 
     <hr>
+
+
+    <!-- ================= CREATE USER ================= -->
 
     <h2>Create New User</h2>
 
-   <form action="/admin/create-user" method="POST">
+    <form
+        action="/admin/create-user"
+        method="POST"
+    >
 
-    <div>
-        <label>Employee ID</label>
+        <div>
+            <label>Employee ID</label>
 
-        <input
-            type="text"
-            name="employeeId"
-            placeholder="Enter Employee ID"
-            required
-        >
-    </div>
+            <input
+                type="text"
+                name="employeeId"
+                placeholder="Enter Employee ID"
+                required
+            >
+        </div>
 
-    <div>
-        <label>Username</label>
 
-        <input
-            type="text"
-            name="username"
-            placeholder="Enter Username"
-            required
-        >
-    </div>
+        <div>
+            <label>Username</label>
 
-    <div>
-        <label>Password</label>
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter Username"
+                required
+            >
+        </div>
 
-        <input
-            type="password"
-            name="password"
-            placeholder="Enter Password"
-            required
-        >
-    </div>
 
-    <div>
-        <label>Department</label>
+        <div>
+            <label>Password</label>
 
-        <input
-            type="text"
-            name="department"
-            placeholder="Enter Department"
-        >
-    </div>
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter Password"
+                required
+            >
+        </div>
 
-    <button type="submit">
-        Create User
-    </button>
 
-</form>
+        <div>
+            <label>Department</label>
+
+            <input
+                type="text"
+                name="department"
+                placeholder="Enter Department"
+            >
+        </div>
+
+
+        <button type="submit">
+            Create User
+        </button>
+
+    </form>
+
+
     <hr>
 
-<h2 class="reassign-form" >Reassign Claims</h2>
 
-<form action="/admin/reassign" method="POST" class="form-group"  >
+    <!-- ================= REASSIGN CLAIMS ================= -->
 
-    <label class="form-group label">Leaving User</label>
-
-    <select name="oldUserId" required>
-
-        <option value="">Select User</option>
-
-        <% userList.forEach(u => { %>
-
-          
-
-                <option value="<%= u.id %>">
-                    <%= u.username %> - <%= u.department %>
-                </option>
-
-            
-
-        <% }) %>
-
-    </select>
-
-    <br><br>
-
-    <label>Assign To</label>
-
-    <select name="newUserId" required>
-
-        <option value="">Select New User</option>
-
-        <% userList.forEach(u => { %>
-
-           
-
-                <option value="<%= u.id %>">
-                    <%= u.username %> - <%= u.department %>
-                </option>
-
-            
-
-        <% }) %>
-
-    </select>
-
-    <br><br>
-
-    <button type="submit">
+    <h2 class="reassign-form">
         Reassign Claims
-    </button>
+    </h2>
 
-</form>
+
+    <form
+        action="/admin/reassign"
+        method="POST"
+        class="form-group"
+    >
+
+        <label>
+            Leaving User
+        </label>
+
+
+        <select
+            name="oldUserId"
+            required
+        >
+
+            <option value="">
+                Select User
+            </option>
+
+            <% if (userList && userList.length > 0) { %>
+
+                <% userList.forEach(u => { %>
+
+                    <option value="<%= u.id %>">
+                        <%= u.username %>
+                        -
+                        <%= u.department || "-" %>
+                    </option>
+
+                <% }) %>
+
+            <% } %>
+
+        </select>
+
+
+        <br>
+        <br>
+
+
+        <label>
+            Assign To
+        </label>
+
+
+        <select
+            name="newUserId"
+            required
+        >
+
+            <option value="">
+                Select New User
+            </option>
+
+            <% if (userList && userList.length > 0) { %>
+
+                <% userList.forEach(u => { %>
+
+                    <option value="<%= u.id %>">
+                        <%= u.username %>
+                        -
+                        <%= u.department || "-" %>
+                    </option>
+
+                <% }) %>
+
+            <% } %>
+
+        </select>
+
+
+        <br>
+        <br>
+
+
+        <button type="submit">
+            Reassign Claims
+        </button>
+
+    </form>
+
+
+    <!-- ================= SAVE TIME ================= -->
+
+    <% if (typeof savedAt !== "undefined" && savedAt) { %>
+
+        <div class="save-time-box">
+
+            <strong>
+                Last Saved:
+            </strong>
+
+            <%= savedAt %>
+
+        </div>
+
+    <% } %>
+
+
+</div>
 
 </body>
 </html>

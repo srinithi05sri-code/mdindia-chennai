@@ -2,529 +2,770 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>User Dashboard</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="/css/style.css">
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
 </head>
+
 
 <body class="user-dashboard">
 
-    <div class="dashboard-container">
 
-        <header class="user-header">
+<div class="dashboard-container">
+
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="user-header">
+
+        <div>
+
+            <h1>
+                User Dashboard
+            </h1>
+
+
+            <p>
+                Welcome,
+                <strong>
+                    <%= user.username %>
+                </strong>
+            </p>
+
+
+            <p>
+                Department:
+                <strong>
+                    <%= user.department || "-" %>
+                </strong>
+            </p>
+
+        </div>
+
+
+        <a
+            href="/logout"
+            class="logout-btn"
+        >
+            Logout
+        </a>
+
+    </header>
+
+
+
+    <!-- ================= CLAIM SECTION ================= -->
+
+    <section class="claims-section">
+
+
+        <div class="claims-title-row">
+
             <div>
-                <h1>User Dashboard</h1>
 
-                <p>
-                    Welcome,
-                    <strong><%= user.username %></strong>
+                <h2>
+                    My Assigned Claims
+                </h2>
+
+                <p class="table-info">
+                    Editable fields are highlighted.
                 </p>
-
-                <p>
-                    Department:
-                    <strong><%= user.department || "-" %></strong>
-                </p>
-            </div>
-
-            <a href="/logout" class="logout-btn">
-                Logout
-            </a>
-        </header>
-
-
-        <section class="claims-section">
-
-            <div class="claims-title-row">
-
-                <div>
-                    <h2>My Assigned Claims</h2>
-
-                    <p class="table-info">
-                        Editable fields are highlighted.
-                    </p>
-                </div>
 
             </div>
 
 
-            <!-- SAVE FORM -->
+            <!-- SAVE TIME -->
 
-<form
-    action="/save-claims"
-    method="POST"
-    id="claimsForm"
-    onsubmit="return preventDoubleSubmit(this);"
->
+            <% if (typeof savedAt !== "undefined" && savedAt) { %>
 
-                <div class="table-container">
+                <div class="save-time-box">
 
-                    <!-- IMPORTANT: claim-table class -->
-                    <table class="claim-table">
+                    <strong>
+                        Last Saved:
+                    </strong>
 
-                       <thead>
-    <tr>
-
-       
-
-        <th>CLAIM_REF_NO</th>
-        <th>INWARD_NO</th>
-        <th>POLICY_NO</th>
-        <th>Vertical</th>
-        <th>Additional Deduction</th>
-        <th>CLAIM_AMT</th>
-        <th>AL_AMT</th>
-        <th>CLAIM_CLASS</th>
-        <th>Hospital Code</th>
-        <th>Type of MOU</th>
-        <th>Diagnosis</th>
-        <th>POLICY_NAME</th>
-        <th>Queue</th>
-        <th>Ageing</th>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Today Status</th>
-        <th>I3 Status</th>
-        <th>Full qc</th>
-        <th>RELATION</th>
-        <th>HNF</th>
-        <th>lot</th>
-        <th>platform</th>
-         <th>User ID</th>
-        <th>User Name</th>
-        <th class="editable-header">
-            Claim Type
-        </th>
-
-        <th class="editable-header">
-            ILOM ID
-        </th>
-
-        <th class="editable-header">
-            Approve AMT
-        </th>
-
-        <th class="editable-header">
-            Status
-        </th>
-
-        <th class="editable-header">
-            Remark
-        </th>
-
-        <th class="editable-header">
-            Deduction AMT
-        </th>
-
-        <th class="editable-header">
-            Diagnosis 2
-        </th>
-
-        <th class="editable-header">
-            inter. Doc & Exe
-        </th>
-
-
-        
-
-    </tr>
-</thead>
-
-
-
-<tbody>
-
-<% claims.forEach(claim => { %>
-
-    <tr>
-
-       
-
-        <!-- CLAIM REF NO -->
-        <td>
-            <%= claim.claim_ref_no || "-" %>
-        </td>
-
-        <!-- INWARD NO -->
-        <td>
-            <%= claim.inward_no || "-" %>
-        </td>
-
-        <!-- POLICY NO -->
-        <td>
-            <%= claim.policy_no || "-" %>
-        </td>
-
-        <!-- VERTICAL -->
-        <td>
-            <%= claim.vertical || "-" %>
-        </td>
-
-        <!-- ADDITIONAL DEDUCTION -->
-        <td>
-            <%= claim.additional_deduction ?? "-" %>
-        </td>
-
-        <!-- CLAIM AMOUNT -->
-        <td>
-            <%= claim.claim_amount ?? "-" %>
-        </td>
-
-        <!-- AL AMOUNT -->
-        <td>
-            <%= claim.al_amount ?? "-" %>
-        </td>
-
-        <!-- CLAIM CLASS -->
-        <td>
-            <%= claim.claim_class || "-" %>
-        </td>
-
-        <!-- HOSPITAL CODE -->
-        <td>
-            <%= claim.hospital_code || "-" %>
-        </td>
-
-        <!-- TYPE OF MOU -->
-        <td>
-            <%= claim.type_of_mou || "-" %>
-        </td>
-
-        <!-- DIAGNOSIS -->
-        <td>
-            <%= claim.diagnosis || "-" %>
-        </td>
-
-        <!-- POLICY NAME -->
-        <td>
-            <%= claim.policy_name || "-" %>
-        </td>
-
-        <!-- QUEUE -->
-        <td>
-            <%= claim.queue || "-" %>
-        </td>
-
-        <!-- AGEING -->
-        <td>
-            <%= claim.ageing || "-" %>
-        </td>
-
-        <!-- DATE -->
-     <td>
-    <%= claim.formatted_claim_date || "-" %>
-</td>
-
-<td>
-    <%= claim.formatted_claim_time || "-" %>
-</td>
-
-        <!-- TODAY STATUS -->
-        <td>
-            <%= claim.today_status || "-" %>
-        </td>
-
-        <!-- I3 STATUS -->
-        <td>
-            <%= claim.i3_status || "-" %>
-        </td>
-
-        <!-- FULL QC -->
-        <td>
-            <%= claim.full_qc || "-" %>
-        </td>
-
-        <!-- RELATION -->
-        <td>
-            <%= claim.relation || "-" %>
-        </td>
-
-        <!-- HNF -->
-        <td>
-            <%= claim.hnf || "-" %>
-        </td>
-
-        <!-- LOT -->
-        <td>
-            <%= claim.lot || "-" %>
-        </td>
-
-        <!-- PLATFORM -->
-        <td>
-            <%= claim.platform || "-" %>
-        </td>
-         <!-- USER ID -->
-        <td class="user-id-cell">
-            <%= claim.employee_id || claim.assigned_user_id || "-" %>
-        </td>
-
-        <!-- USER NAME -->
-        <td class="user-name-cell">
-             <%= claim.employee_name || "-" %>
-        </td>
-
-        <!-- CLAIM TYPE -->
-        <td class="editable-cell">
-
-            <select
-                name="claim_type_<%= claim.id %>"
-                class="editable-select"
-            >
-
-                <option value="">
-                    Select
-                </option>
-
-                <option
-                    value="IPD"
-                    <%= claim.claim_type === "IPD" ? "selected" : "" %>
-                >
-                    IPD
-                </option>
-
-                <option
-                    value="OPD"
-                    <%= claim.claim_type === "OPD" ? "selected" : "" %>
-                >
-                    OPD
-                </option>
-
-                <option
-                    value="PrePost"
-                    <%= claim.claim_type === "PrePost" ? "selected" : "" %>
-                >
-                    PrePost
-                </option>
-
-            </select>
-
-        </td>
-
-        <!-- ILOM ID -->
-        <td class="editable-cell">
-
-            <input
-                type="text"
-                name="ilom_id_<%= claim.id %>"
-                value="<%= claim.ilom_id || '' %>"
-                class="editable-input"
-            >
-
-        </td>
-
-        <!-- APPROVE AMOUNT -->
-        <td class="editable-cell">
-
-            <input
-                type="text"
-                name="approve_amount_<%= claim.id %>"
-                value="<%= claim.approve_amount ?? '' %>"
-                class="editable-input"
-            >
-
-        </td>
-
-        <!-- STATUS -->
-        <td class="editable-cell">
-
-            <select
-                name="claim_status_<%= claim.id %>"
-                class="editable-select"
-            >
-
-                <option
-                    value="Approved"
-                    <%= claim.claim_status === "Approved" ? "selected" : "" %>
-                >
-                    Approved
-                </option>
-
-                <option
-                    value="Rejected"
-                    <%= claim.claim_status === "Rejected" ? "selected" : "" %>
-                >
-                    Rejected
-                </option>
-
-                <option
-                    value="Query"
-                    <%= claim.claim_status === "Query" ? "selected" : "" %>
-                >
-                    Query
-                </option>
-
-                <option
-                    value="Re-Query"
-                    <%= claim.claim_status === "Re-Query" ? "selected" : "" %>
-                >
-                    Re-Query
-                </option>
-
-                <option
-                    value="Investigation&Query"
-                    <%= claim.claim_status === "Investigation&Query" ? "selected" : "" %>
-                >
-                    Investigation&Query
-                </option>
-
-                <option
-                    value="Investigation"
-                    <%= claim.claim_status === "Investigation" ? "selected" : "" %>
-                >
-                    Investigation
-                </option>
-
-                <option
-                    value="SentBack"
-                    <%= claim.claim_status === "SentBack" ? "selected" : "" %>
-                >
-                    SentBack
-                </option>
-
-                <option
-                    value="Keep"
-                    <%= claim.claim_status === "Keep" ? "selected" : "" %>
-                >
-                    Keep
-                </option>
-
-                <option
-                    value="OtherDoctor/Executive"
-                    <%= claim.claim_status === "OtherDoctor/Executive" ? "selected" : "" %>
-                >
-                    OtherDoctor/Executive
-                </option>
-
-                <option
-                    value="ROD Cancel"
-                    <%= claim.claim_status === "ROD Cancel" ? "selected" : "" %>
-                >
-                    ROD Cancel
-                </option>
-
-                <option
-                    value="Pending"
-                    <%= claim.claim_status === "Pending" ? "selected" : "" %>
-                >
-                    Pending
-                </option>
-
-            </select>
-
-        </td>
-
-        <!-- REMARK -->
-        <td class="editable-cell">
-
-            <input
-                type="text"
-                name="user_remark_<%= claim.id %>"
-                value="<%= claim.user_remark || '' %>"
-                class="editable-input"
-            >
-
-        </td>
-
-        <!-- DEDUCTION AMOUNT -->
-        <td class="editable-cell">
-
-            <input
-                type="text"
-                name="deduction_amount_<%= claim.id %>"
-                value="<%= claim.deduction_amount ?? '' %>"
-                class="editable-input"
-            >
-
-        </td>
-
-        <!-- DIAGNOSIS 2 -->
-        <td class="editable-cell">
-
-            <input
-                type="text"
-                name="diagnosis_2_<%= claim.id %>"
-                value="<%= claim.diagnosis_2 || '' %>"
-                class="editable-input"
-            >
-
-        </td>
-
-        <!-- INTER DOC & EXE -->
-        <td class="editable-cell">
-
-            <select
-                name="inter_doc_exe_<%= claim.id %>"
-                class="editable-select"
-            >
-
-                <option value="">
-                    Select
-                </option>
-
-                <option
-                    value="Internal Doctor"
-                    <%= claim.inter_doc_exe === "Internal Doctor" ? "selected" : "" %>
-                >
-                    Internal Doctor
-                </option>
-
-                <option
-                    value="External Doctor"
-                    <%= claim.inter_doc_exe === "External Doctor" ? "selected" : "" %>
-                >
-                    External Doctor
-                </option>
-
-                <option
-                    value="Internal Executive"
-                    <%= claim.inter_doc_exe === "Internal Executive" ? "selected" : "" %>
-                >
-                    Internal Executive
-                </option>
-
-                <option
-                    value="External Executive"
-                    <%= claim.inter_doc_exe === "External Executive" ? "selected" : "" %>
-                >
-                    External Executive
-                </option>
-
-            </select>
-
-        </td>
-     
-    </tr>
-
-<% }) %>
-
-</tbody>
-
-                    </table>
+                    <span>
+                        <%= savedAt %>
+                    </span>
 
                 </div>
 
+            <% } %>
 
-                <!-- SAVE BUTTON -->
+        </div>
 
-                <div class="save-section">
 
-                    <button
-                        type="submit"
-                        class="save-claims-btn"
-                        onclick="return confirm('Save all claim changes?');"
-                    >
-                        Save Claims
-                    </button>
 
-                </div>
+        <!-- ================= SAVE FORM ================= -->
 
-            </form>
-        <script>
+        <form
+            action="/save-claims"
+            method="POST"
+            id="claimsForm"
+            onsubmit="return preventDoubleSubmit(this);"
+        >
+
+
+            <div class="table-container">
+
+
+                <table class="claim-table">
+
+
+                    <!-- ================= TABLE HEADER ================= -->
+
+                    <thead>
+
+                        <tr>
+
+                            <th>CLAIM_REF_NO</th>
+                            <th>INWARD_NO</th>
+                            <th>POLICY_NO</th>
+                            <th>Vertical</th>
+                            <th>Additional Deduction</th>
+                            <th>CLAIM_AMT</th>
+                            <th>AL_AMT</th>
+                            <th>CLAIM_CLASS</th>
+                            <th>Hospital Code</th>
+                            <th>Type of MOU</th>
+                            <th>Diagnosis</th>
+                            <th>POLICY_NAME</th>
+                            <th>Queue</th>
+                            <th>Ageing</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Today Status</th>
+                            <th>I3 Status</th>
+                            <th>Full qc</th>
+                            <th>RELATION</th>
+                            <th>HNF</th>
+                            <th>lot</th>
+                            <th>platform</th>
+                            <th>User ID</th>
+                            <th>User Name</th>
+
+                            <th class="editable-header">
+                                Claim Type
+                            </th>
+
+                            <th class="editable-header">
+                                ILOM ID
+                            </th>
+
+                            <th class="editable-header">
+                                Approve AMT
+                            </th>
+
+                            <th class="editable-header">
+                                Status
+                            </th>
+
+                            <th class="editable-header">
+                                Remark
+                            </th>
+
+                            <th class="editable-header">
+                                Deduction AMT
+                            </th>
+
+                            <th class="editable-header">
+                                Diagnosis 2
+                            </th>
+
+                            <th class="editable-header">
+                                inter. Doc & Exe
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <!-- ================= TABLE BODY ================= -->
+
+                    <tbody>
+
+
+                    <% if (claims && claims.length > 0) { %>
+
+
+                        <% claims.forEach(claim => { %>
+
+
+                            <tr>
+
+
+                                <!-- CLAIM REF NO -->
+
+                                <td>
+                                    <%= claim.claim_ref_no || "-" %>
+                                </td>
+
+
+                                <!-- INWARD NO -->
+
+                                <td>
+                                    <%= claim.inward_no || "-" %>
+                                </td>
+
+
+                                <!-- POLICY NO -->
+
+                                <td>
+                                    <%= claim.policy_no || "-" %>
+                                </td>
+
+
+                                <!-- VERTICAL -->
+
+                                <td>
+                                    <%= claim.vertical || "-" %>
+                                </td>
+
+
+                                <!-- ADDITIONAL DEDUCTION -->
+
+                                <td>
+                                    <%= claim.additional_deduction ?? "-" %>
+                                </td>
+
+
+                                <!-- CLAIM AMOUNT -->
+
+                                <td>
+                                    <%= claim.claim_amount ?? "-" %>
+                                </td>
+
+
+                                <!-- AL AMOUNT -->
+
+                                <td>
+                                    <%= claim.al_amount ?? "-" %>
+                                </td>
+
+
+                                <!-- CLAIM CLASS -->
+
+                                <td>
+                                    <%= claim.claim_class || "-" %>
+                                </td>
+
+
+                                <!-- HOSPITAL CODE -->
+
+                                <td>
+                                    <%= claim.hospital_code || "-" %>
+                                </td>
+
+
+                                <!-- TYPE OF MOU -->
+
+                                <td>
+                                    <%= claim.type_of_mou || "-" %>
+                                </td>
+
+
+                                <!-- DIAGNOSIS -->
+
+                                <td>
+                                    <%= claim.diagnosis || "-" %>
+                                </td>
+
+
+                                <!-- POLICY NAME -->
+
+                                <td>
+                                    <%= claim.policy_name || "-" %>
+                                </td>
+
+
+                                <!-- QUEUE -->
+
+                                <td>
+                                    <%= claim.queue || "-" %>
+                                </td>
+
+
+                                <!-- AGEING -->
+
+                                <td>
+                                    <%= claim.ageing || "-" %>
+                                </td>
+
+
+                                <!-- DATE -->
+
+                                <td>
+                                    <%= claim.formatted_claim_date || "-" %>
+                                </td>
+
+
+                                <!-- TIME -->
+
+                                <td>
+                                    <%= claim.formatted_claim_time || "-" %>
+                                </td>
+
+
+                                <!-- TODAY STATUS -->
+
+                                <td>
+                                    <%= claim.today_status || "-" %>
+                                </td>
+
+
+                                <!-- I3 STATUS -->
+
+                                <td>
+                                    <%= claim.i3_status || "-" %>
+                                </td>
+
+
+                                <!-- FULL QC -->
+
+                                <td>
+                                    <%= claim.full_qc || "-" %>
+                                </td>
+
+
+                                <!-- RELATION -->
+
+                                <td>
+                                    <%= claim.relation || "-" %>
+                                </td>
+
+
+                                <!-- HNF -->
+
+                                <td>
+                                    <%= claim.hnf || "-" %>
+                                </td>
+
+
+                                <!-- LOT -->
+
+                                <td>
+                                    <%= claim.lot || "-" %>
+                                </td>
+
+
+                                <!-- PLATFORM -->
+
+                                <td>
+                                    <%= claim.platform || "-" %>
+                                </td>
+
+
+                                <!-- USER ID -->
+
+                                <td class="user-id-cell">
+                                    <%= claim.employee_id ||
+                                        claim.assigned_user_id ||
+                                        "-" %>
+                                </td>
+
+
+                                <!-- USER NAME -->
+
+                                <td class="user-name-cell">
+                                    <%= claim.employee_name || "-" %>
+                                </td>
+
+
+
+                                <!-- ================= CLAIM TYPE ================= -->
+
+                                <td class="editable-cell">
+
+                                    <select
+                                        name="claim_type_<%= claim.id %>"
+                                        class="editable-select"
+                                    >
+
+                                        <option value="">
+                                            Select
+                                        </option>
+
+
+                                        <option
+                                            value="IPD"
+                                            <%= claim.claim_type === "IPD"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            IPD
+                                        </option>
+
+
+                                        <option
+                                            value="OPD"
+                                            <%= claim.claim_type === "OPD"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            OPD
+                                        </option>
+
+
+                                        <option
+                                            value="PrePost"
+                                            <%= claim.claim_type === "PrePost"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            PrePost
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+
+
+                                <!-- ================= ILOM ID ================= -->
+
+                                <td class="editable-cell">
+
+                                    <input
+                                        type="text"
+                                        name="ilom_id_<%= claim.id %>"
+                                        value="<%= claim.ilom_id || '' %>"
+                                        class="editable-input"
+                                    >
+
+                                </td>
+
+
+
+                                <!-- ================= APPROVE AMOUNT ================= -->
+
+                                <td class="editable-cell">
+
+                                    <input
+                                        type="text"
+                                        name="approve_amount_<%= claim.id %>"
+                                        value="<%= claim.approve_amount ?? '' %>"
+                                        class="editable-input"
+                                    >
+
+                                </td>
+
+
+
+                                <!-- ================= STATUS ================= -->
+
+                                <td class="editable-cell">
+
+                                    <select
+                                        name="claim_status_<%= claim.id %>"
+                                        class="editable-select"
+                                    >
+
+                                        <option
+                                            value="Approved"
+                                            <%= claim.claim_status === "Approved"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Approved
+                                        </option>
+
+
+                                        <option
+                                            value="Rejected"
+                                            <%= claim.claim_status === "Rejected"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Rejected
+                                        </option>
+
+
+                                        <option
+                                            value="Query"
+                                            <%= claim.claim_status === "Query"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Query
+                                        </option>
+
+
+                                        <option
+                                            value="Re-Query"
+                                            <%= claim.claim_status === "Re-Query"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Re-Query
+                                        </option>
+
+
+                                        <option
+                                            value="Investigation&Query"
+                                            <%= claim.claim_status === "Investigation&Query"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Investigation&Query
+                                        </option>
+
+
+                                        <option
+                                            value="Investigation"
+                                            <%= claim.claim_status === "Investigation"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Investigation
+                                        </option>
+
+
+                                        <option
+                                            value="SentBack"
+                                            <%= claim.claim_status === "SentBack"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            SentBack
+                                        </option>
+
+
+                                        <option
+                                            value="Keep"
+                                            <%= claim.claim_status === "Keep"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Keep
+                                        </option>
+
+
+                                        <option
+                                            value="OtherDoctor/Executive"
+                                            <%= claim.claim_status === "OtherDoctor/Executive"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            OtherDoctor/Executive
+                                        </option>
+
+
+                                        <option
+                                            value="ROD Cancel"
+                                            <%= claim.claim_status === "ROD Cancel"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            ROD Cancel
+                                        </option>
+
+
+                                        <option
+                                            value="Pending"
+                                            <%= claim.claim_status === "Pending"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Pending
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+
+
+                                <!-- ================= REMARK ================= -->
+
+                                <td class="editable-cell">
+
+                                    <input
+                                        type="text"
+                                        name="user_remark_<%= claim.id %>"
+                                        value="<%= claim.user_remark || '' %>"
+                                        class="editable-input"
+                                    >
+
+                                </td>
+
+
+
+                                <!-- ================= DEDUCTION AMOUNT ================= -->
+
+                                <td class="editable-cell">
+
+                                    <input
+                                        type="text"
+                                        name="deduction_amount_<%= claim.id %>"
+                                        value="<%= claim.deduction_amount ?? '' %>"
+                                        class="editable-input"
+                                    >
+
+                                </td>
+
+
+
+                                <!-- ================= DIAGNOSIS 2 ================= -->
+
+                                <td class="editable-cell">
+
+                                    <input
+                                        type="text"
+                                        name="diagnosis_2_<%= claim.id %>"
+                                        value="<%= claim.diagnosis_2 || '' %>"
+                                        class="editable-input"
+                                    >
+
+                                </td>
+
+
+
+                                <!-- ================= INTER DOC EXE ================= -->
+
+                                <td class="editable-cell">
+
+                                    <select
+                                        name="inter_doc_exe_<%= claim.id %>"
+                                        class="editable-select"
+                                    >
+
+                                        <option value="">
+                                            Select
+                                        </option>
+
+
+                                        <option
+                                            value="Internal Doctor"
+                                            <%= claim.inter_doc_exe === "Internal Doctor"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Internal Doctor
+                                        </option>
+
+
+                                        <option
+                                            value="External Doctor"
+                                            <%= claim.inter_doc_exe === "External Doctor"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            External Doctor
+                                        </option>
+
+
+                                        <option
+                                            value="Internal Executive"
+                                            <%= claim.inter_doc_exe === "Internal Executive"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            Internal Executive
+                                        </option>
+
+
+                                        <option
+                                            value="External Executive"
+                                            <%= claim.inter_doc_exe === "External Executive"
+                                                ? "selected"
+                                                : "" %>
+                                        >
+                                            External Executive
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+
+                            </tr>
+
+
+                        <% }) %>
+
+
+                    <% } else { %>
+
+
+                        <tr>
+
+                            <td
+                                colspan="33"
+                                style="text-align:center;"
+                            >
+                                No claims assigned
+                            </td>
+
+                        </tr>
+
+
+                    <% } %>
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+
+            <!-- ================= SAVE BUTTON ================= -->
+
+            <div class="save-section">
+
+                <button
+                    type="submit"
+                    class="save-claims-btn"
+                    id="saveClaimsBtn"
+                    onclick="return confirmSave();"
+                >
+                    Save Claims
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+    </section>
+
+
+</div>
+
+
+
+<!-- ================= DOUBLE SAVE PREVENTION ================= -->
+
+<script>
 
 let isSaving = false;
+
+
+function confirmSave() {
+
+    if (isSaving) {
+        return false;
+    }
+
+    return confirm("Save all claim changes?");
+}
+
 
 function preventDoubleSubmit(form) {
 
@@ -532,10 +773,13 @@ function preventDoubleSubmit(form) {
         return false;
     }
 
+
     isSaving = true;
 
+
     const button =
-        form.querySelector(".save-claims-btn");
+        document.getElementById("saveClaimsBtn");
+
 
     if (button) {
 
@@ -544,26 +788,36 @@ function preventDoubleSubmit(form) {
         button.innerText =
             "Saving...";
 
+        button.style.cursor =
+            "not-allowed";
+
     }
+
 
     return true;
 }
 
 
 </script>
-        </section>
-
-    </div>
 
 
-    <% if (saved) { %>
 
-        <script>
+<!-- ================= SUCCESS MESSAGE ================= -->
+
+<% if (typeof saved !== "undefined" && saved) { %>
+
+    <script>
+
+        window.addEventListener("load", function () {
+
             alert("Saved Successfully!");
-        </script>
 
-    <% } %>
+        });
+
+    </script>
+
+<% } %>
+
 
 </body>
-
 </html>
