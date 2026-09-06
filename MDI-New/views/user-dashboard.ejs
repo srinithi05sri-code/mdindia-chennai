@@ -211,128 +211,76 @@ function formatSavedDate(value) {
 
 
 
-                    <tbody>
+                   <tbody>
 
+<% if (processSummary &&
+       Array.isArray(processSummary.platformSummary)) { %>
 
-                    <% if (
-                        processSummary &&
-                        Array.isArray(processSummary.platformSummary) &&
-                        processSummary.platformSummary.length > 0
-                    ) { %>
+    <% processSummary.platformSummary.forEach(row => { %>
 
+        <tr>
 
-                        <% processSummary.platformSummary.forEach(row => { %>
+            <td><%= row.platform || "-" %></td>
 
-                            <tr>
+            <td><%= Number(row.total_allocated || 0) %></td>
 
-                                <td>
-                                    <%= row.platform || "-" %>
-                                </td>
+            <td><%= Number(row.approved || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.total_allocated || 0
-                                    ) %>
-                                </td>
+            <td><%= Number(row.rejected || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.approved || 0
-                                    ) %>
-                                </td>
+            <td><%= Number(row.query_count || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.rejected || 0
-                                    ) %>
-                                </td>
+            <td><%= Number(row.requery || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.query_count || 0
-                                    ) %>
-                                </td>
+            <td><%= Number(row.investigation_query || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.requery || 0
-                                    ) %>
-                                </td>
+            <!-- TOTAL PRODUCTIVITY -->
+            <td>
+                <%= Number(row.approved || 0)
+                 + Number(row.rejected || 0)
+                 + Number(row.query_count || 0)
+                 + Number(row.requery || 0)
+                 + Number(row.investigation_query || 0) %>
+            </td>
 
-                                <td>
-                                    <%= Number(
-                                        row.investigation_query || 0
-                                    ) %>
-                                </td>
+            <!-- NON PRODUCTIVITY DETAILS -->
 
-                                <td>
-                                    <%= Number(
-                                        row.investigation || 0
-                                    ) %>
-                                </td>
+            <td><%= Number(row.investigation || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.sent_back || 0
-                                    ) %>
-                                </td>
+            <td><%= Number(row.sent_back || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.keep_count || 0
-                                    ) %>
-                                </td>
+            <td><%= Number(row.keep_count || 0) %></td>
 
-                                <td>
-                                    <%= Number(
-                                        row.other_doctor_executive || 0
-                                    ) %>
-                                </td>
+            <td>
+                <%= Number(row.other_doctor_executive || 0) %>
+            </td>
 
-                                <td>
-                                    <%= Number(
-                                        row.pending || 0
-                                    ) %>
-                                </td>
+            <!-- NON PRODUCTIVITY TOTAL -->
+            <td>
+                <%= Number(row.investigation || 0)
+                 + Number(row.sent_back || 0)
+                 + Number(row.keep_count || 0)
+                 + Number(row.other_doctor_executive || 0) %>
+            </td>
 
-                                <td>
-                    <%= Number(row.approved || 0)
-                     + Number(row.rejected || 0)
-                     + Number(row.query_count || 0)
-                     + Number(row.requery || 0)
-                     + Number(row.investigation_query || 0) %>
-                </td>
-                 <td>
-                    <%= Number(row.investigation || 0)
-                     + Number(row.sent_back || 0)
-                     + Number(row.keep_count || 0)
-                     + Number(row.other_doctor_executive || 0) %>
-                </td>
+            <!-- PENDING -->
+            <td>
+                <%= Number(row.pending || 0) %>
+            </td>
 
-                            </tr>
+        </tr>
 
-                        <% }) %>
+    <% }); %>
 
+<% } else { %>
 
-                    <% } else { %>
+    <tr>
+        <td colspan="14">No process summary available</td>
+    </tr>
 
-                        <tr>
+<% } %>
 
-                            <td
-                                colspan="13"
-                                style="text-align:center;"
-                            >
-
-                                No productivity data available
-
-                            </td>
-
-                        </tr>
-
-                    <% } %>
-
-
-                    </tbody>
+</tbody>
 
                 </table>
 
