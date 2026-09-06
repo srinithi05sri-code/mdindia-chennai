@@ -2346,7 +2346,7 @@ app.get("/user", async (req, res) => {
             '+00:00',
             '+05:30'
         )
-    ) < '1:40:00'
+    ) < '13:50:00'
 )
 
     ORDER BY c.id DESC
@@ -2548,7 +2548,7 @@ INNER JOIN upload_batches ub
                 '+00:00',
                 '+05:30'
             )
-        ) < '1:40:00'
+        ) < '13:40:00'
     )
                 GROUP BY
                     platform
