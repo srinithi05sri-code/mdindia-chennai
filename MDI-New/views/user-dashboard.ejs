@@ -295,21 +295,19 @@ function formatSavedDate(value) {
                                     ) %>
                                 </td>
 
-                                <td class="productivity">
-
-                                    <%= Number(
-                                        row.total_productivity || 0
-                                    ) %>
-
-                                </td>
-                                
-                                <td class="">
-
-                                    <%= Number(
-                                        row.Non_productivity || 0
-                                    ) %>
-
-                                </td>
+                                <td>
+                    <%= Number(row.approved || 0)
+                     + Number(row.rejected || 0)
+                     + Number(row.query_count || 0)
+                     + Number(row.requery || 0)
+                     + Number(row.investigation_query || 0) %>
+                </td>
+                 <td>
+                    <%= Number(row.investigation || 0)
+                     + Number(row.sent_back || 0)
+                     + Number(row.keep_count || 0)
+                     + Number(row.other_doctor_executive || 0) %>
+                </td>
 
                             </tr>
 
