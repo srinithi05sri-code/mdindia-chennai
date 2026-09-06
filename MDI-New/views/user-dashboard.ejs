@@ -155,249 +155,7 @@ function formatSavedDate(value) {
              SUMMARY CARDS
         ================================================== -->
 
-        <div class="summary-cards">
-
-
-            <!-- TOTAL -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Total Allocated
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.total || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- APPROVED -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Approved
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.approved || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- REJECTED -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Rejected
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.rejected || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- QUERY -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Query
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.query || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- RE-QUERY -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Re-Query
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.requery || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- INVESTIGATION -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Investigation
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.investigation || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- SENT BACK -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Sent Back
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.sentBack || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- KEEP -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Keep
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.keep || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- OTHER DOCTOR -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Other Doctor & Executive
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.otherDoctorExecutive || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- PENDING -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    Pending
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.pending || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ROD CANCEL -->
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    ROD Cancel
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.rodCancel || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- PRODUCTIVITY -->
-
-            <div class="summary-card productivity-card">
-
-                <div class="summary-title">
-                    Total Productivity
-                </div>
-
-                <div class="summary-count">
-
-                    <%= Number(
-                        processSummary?.totalProductivity || 0
-                    ) %>
-
-                </div>
-
-            </div>
-
-        </div>
-
+        
 
 
         <!-- =================================================
@@ -432,61 +190,22 @@ function formatSavedDate(value) {
 
                     <thead>
 
-                        <tr>
-
-                            <th>
-                                Platform
-                            </th>
-
-                            <th>
-                                Total Allocated
-                            </th>
-
-                            <th>
-                                Approved
-                            </th>
-
-                            <th>
-                                Rejected
-                            </th>
-
-                            <th>
-                                Query
-                            </th>
-
-                            <th>
-                                Re-Query
-                            </th>
-
-                            <th>
-                                Query + Investigation
-                            </th>
-
-                            <th>
-                                Investigation
-                            </th>
-
-                            <th>
-                                Sent Back
-                            </th>
-
-                            <th>
-                                Keep
-                            </th>
-
-                            <th>
-                                Other Doctor & Executive
-                            </th>
-
-                            <th>
-                                Pending
-                            </th>
-
-                            <th>
-                                Total Productivity
-                            </th>
-
-                        </tr>
+                       <tr>
+            <th>Platform</th>
+            <th>Total Allocated</th>
+            <th>Approved</th>
+            <th>Rejected</th>
+            <th>Query</th>
+            <th>Re-Query</th>
+            <th>Query + Investigation</th>
+            <th>Total Productivity</th>
+            <th>Investigation</th>
+            <th>Sent-Back</th>
+            <th>keep</th>
+            <th>other_doctor_executive</th>
+            <th>Non Productivity</th>
+            <th>Pending</th>
+        </tr>
 
                     </thead>
 
@@ -580,6 +299,14 @@ function formatSavedDate(value) {
 
                                     <%= Number(
                                         row.total_productivity || 0
+                                    ) %>
+
+                                </td>
+                                
+                                <td class="productivity">
+
+                                    <%= Number(
+                                        row.Non_productivity || 0
                                     ) %>
 
                                 </td>
