@@ -1566,13 +1566,13 @@ if (claimsForm) {
 
 (function () {
 
-    function reloadAt12PM() {
+    function reloadAt12_15PM() {
         const now = new Date();
 
         const target = new Date();
-        target.setHours(12, 0, 0, 0);
+        target.setHours(12,15, 0, 0);
 
-        // 12 PM already crossed → next day's 12 PM
+        // 12:20 PM already crossed
         if (now >= target) {
             target.setDate(target.getDate() + 1);
         }
@@ -1584,11 +1584,9 @@ if (claimsForm) {
         }, delay);
     }
 
-    reloadAt12PM();
+    reloadAt12_15PM();
 
 })();
-
-
 
 </script>
 

@@ -2346,7 +2346,7 @@ app.get("/user", async (req, res) => {
             '+00:00',
             '+05:30'
         )
-    ) < '12:00:00'
+    ) < '12:15:00'
 )
 
     ORDER BY c.id DESC
