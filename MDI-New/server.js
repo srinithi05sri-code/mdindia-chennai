@@ -2363,105 +2363,30 @@ app.get("/user", async (req, res) => {
 
                 COUNT(*) AS total_allocated,
 
-                COALESCE(
-                    SUM(
-                        claim_status = 'Pending'
-                    ),
-                    0
-                ) AS pending,
+               COALESCE(
+    SUM(
+        claim_status IN (
+            'Approved',
+            'Rejected',
+            'Query',
+            'Re-Query',
+            'Query & Investigation'
+        )
+    ),
+    0
+) AS total_productivity,
 
-                COALESCE(
-                    SUM(
-                        claim_status = 'Approved'
-                    ),
-                    0
-                ) AS approved,
-
-                COALESCE(
-                    SUM(
-                        claim_status = 'Rejected'
-                    ),
-                    0
-                ) AS rejected,
-
-                COALESCE(
-                    SUM(
-                        claim_status = 'Query'
-                    ),
-                    0
-                ) AS query_count,
-
-                COALESCE(
-                    SUM(
-                        claim_status = 'Re-Query'
-                    ),
-                    0
-                ) AS requery,
-
-                COALESCE(
-                    SUM(
-                        claim_status =
-                        'Query & Investigation'
-                    ),
-                    0
-                ) AS investigation_query,
-
-                COALESCE(
-                    SUM(
-                        claim_status =
-                        'Investigation'
-                    ),
-                    0
-                ) AS investigation,
-
-                COALESCE(
-                    SUM(
-                        claim_status =
-                        'Sent-Back'
-                    ),
-                    0
-                ) AS sent_back,
-
-                COALESCE(
-                    SUM(
-                        claim_status = 'Keep'
-                    ),
-                    0
-                ) AS keep_count,
-
-                COALESCE(
-                    SUM(
-                        claim_status =
-                        'Other-Doctor/Executive'
-                    ),
-                    0
-                ) AS other_doctor_executive,
-
-                COALESCE(
-                    SUM(
-                        claim_status =
-                        'ROD-Cancel'
-                    ),
-                    0
-                ) AS rod_cancel,
-
-                COALESCE(
-                    SUM(
-                        claim_status IN (
-                            'Approved',
-                            'Rejected',
-                            'Query',
-                            'Re-Query',
-                            'Query & Investigation',
-                            'Investigation',
-                            'Sent-Back',
-                            'Keep',
-                            'Other-Doctor/Executive',
-                            'ROD-Cancel'
-                        )
-                    ),
-                    0
-                ) AS total_productivity
+COALESCE(
+    SUM(
+        claim_status IN (
+            'Investigation',
+            'Sent-Back',
+            'Keep',
+            'Other-Doctor/Executive'
+        )
+    ),
+    0
+) AS non_productivity
 
             FROM claims
 
