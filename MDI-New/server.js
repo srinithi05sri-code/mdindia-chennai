@@ -1000,35 +1000,45 @@ app.get(
 
         try {
 
-            const [uploads] =
-                await db.query(
-                    `
-                    SELECT
+          const [uploads] = await db.query(
+    `
+    SELECT
+        ub.id,
+        ub.file_name,
 
-                        ub.id,
-
-                        ub.file_name,
-
-                        
         CONVERT_TZ(
             ub.uploaded_at,
             '+00:00',
             '+05:30'
         ) AS uploaded_at,
 
-                        ub.total_claims,
+        ub.total_claims,
 
-                        CASE
-                            WHEN ub.status = 'ACTIVE'
-                            THEN 'ACTIVE'
-                            ELSE 'DELETED'
-                        END AS status
+        CASE
+            WHEN ub.status = 'ACTIVE'
+            THEN 'ACTIVE'
+            ELSE 'DELETED'
+        END AS status
 
-                    FROM upload_batches ub
+    FROM upload_batches ub
 
-                    ORDER BY ub.id DESC
-                    `
-                );
+    WHERE DATE(
+        CONVERT_TZ(
+            ub.uploaded_at,
+            '+00:00',
+            '+05:30'
+        )
+    ) = DATE(
+        CONVERT_TZ(
+            UTC_TIMESTAMP(),
+            '+00:00',
+            '+05:30'
+        )
+    )
+
+    ORDER BY ub.id DESC
+    `
+);
 
 
             return res.render(
@@ -2300,45 +2310,40 @@ app.get("/user", async (req, res) => {
         // CLAIMS
         // =====================================================
 
-        const [claims] = await db.query(
-            `
-            SELECT
+       const [claims] = await db.query(
+    `
+    SELECT
+        c.*,
+        u.id AS employeeid,
+        u.employee_id AS employee_id,
+        u.username AS employee_name,
+        ub.uploaded_at AS uploaded_at
+    FROM claims c
+    LEFT JOIN users u
+        ON TRIM(c.assigned_user_id) = TRIM(u.employee_id)
+    INNER JOIN upload_batches ub
+        ON c.upload_batch_id = ub.id
+    WHERE
+        TRIM(c.assigned_user_id) = TRIM(?)
 
-                c.*,
+        AND DATE(
+            CONVERT_TZ(
+                ub.uploaded_at,
+                '+00:00',
+                '+05:30'
+            )
+        ) = DATE(
+            CONVERT_TZ(
+                UTC_TIMESTAMP(),
+                '+00:00',
+                '+05:30'
+            )
+        )
 
-                u.id AS employeeid,
-
-                u.employee_id AS employee_id,
-
-                u.username AS employee_name,
-
-                ub.uploaded_at AS uploaded_at
-
-            FROM claims c
-
-            LEFT JOIN users u
-
-                ON TRIM(c.assigned_user_id)
-                =
-                TRIM(u.employee_id)
-
-            LEFT JOIN upload_batches ub
-
-                ON c.upload_batch_id = ub.id
-
-            WHERE
-                TRIM(c.assigned_user_id)
-                =
-                TRIM(?)
-
-            ORDER BY
-                c.id DESC
-            `,
-            [
-                employeeId
-            ]
-        );
-
+    ORDER BY c.id DESC
+    `,
+    [employeeId]
+);
         // =====================================================
         // USER SUMMARY
         // =====================================================
