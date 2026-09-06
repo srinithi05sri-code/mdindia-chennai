@@ -1564,6 +1564,31 @@ if (claimsForm) {
 
 }
 
+(function () {
+
+    function reloadAt12PM() {
+        const now = new Date();
+
+        const target = new Date();
+        target.setHours(12, 0, 0, 0);
+
+        // 12 PM already crossed → next day's 12 PM
+        if (now >= target) {
+            target.setDate(target.getDate() + 1);
+        }
+
+        const delay = target.getTime() - now.getTime();
+
+        setTimeout(function () {
+            window.location.reload();
+        }, delay);
+    }
+
+    reloadAt12PM();
+
+})();
+
+
 
 </script>
 

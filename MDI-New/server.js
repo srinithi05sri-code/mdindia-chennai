@@ -2326,19 +2326,28 @@ app.get("/user", async (req, res) => {
     WHERE
         TRIM(c.assigned_user_id) = TRIM(?)
 
-        AND DATE(
-            CONVERT_TZ(
-                ub.uploaded_at,
-                '+00:00',
-                '+05:30'
-            )
-        ) = DATE(
-            CONVERT_TZ(
-                UTC_TIMESTAMP(),
-                '+00:00',
-                '+05:30'
-            )
+        AND (
+    DATE(
+        CONVERT_TZ(
+            ub.uploaded_at,
+            '+00:00',
+            '+05:30'
         )
+    ) = DATE(
+        CONVERT_TZ(
+            UTC_TIMESTAMP(),
+            '+00:00',
+            '+05:30'
+        )
+    )
+    AND TIME(
+        CONVERT_TZ(
+            UTC_TIMESTAMP(),
+            '+00:00',
+            '+05:30'
+        )
+    ) < '12:00:00'
+)
 
     ORDER BY c.id DESC
     `,
