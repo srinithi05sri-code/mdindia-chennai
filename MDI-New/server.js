@@ -2346,7 +2346,7 @@ app.get("/user", async (req, res) => {
             '+00:00',
             '+05:30'
         )
-    ) < '12:25:00'
+    ) < '1:40:00'
 )
 
     ORDER BY c.id DESC
@@ -2516,13 +2516,40 @@ COALESCE(
                         0
                     ) AS total_productivity
 
-                FROM claims
+              FROM claims c
 
-                WHERE
-                    TRIM(assigned_user_id)
-                    =
-                    TRIM(?)
+INNER JOIN upload_batches ub
+    ON c.upload_batch_id = ub.id
 
+               WHERE
+    TRIM(c.assigned_user_id)
+    =
+    TRIM(?)
+
+    AND (
+        DATE(
+            CONVERT_TZ(
+                ub.uploaded_at,
+                '+00:00',
+                '+05:30'
+            )
+        ) =
+        DATE(
+            CONVERT_TZ(
+                UTC_TIMESTAMP(),
+                '+00:00',
+                '+05:30'
+            )
+        )
+
+        AND TIME(
+            CONVERT_TZ(
+                UTC_TIMESTAMP(),
+                '+00:00',
+                '+05:30'
+            )
+        ) < '1:40:00'
+    )
                 GROUP BY
                     platform
 

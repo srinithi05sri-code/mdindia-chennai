@@ -1239,11 +1239,11 @@ if (claimsForm) {
 
 (function () {
 
-    function reloadAt12_25PM() {
+    function reloadAt1_40PM() {
         const now = new Date();
 
         const target = new Date();
-        target.setHours(12,25, 0, 0);
+        target.setHours(1,40, 0, 0);
 
         // 12:20 PM already crossed
         if (now >= target) {
@@ -1257,7 +1257,7 @@ if (claimsForm) {
         }, delay);
     }
 
-    reloadAt12_25PM();
+    reloadAt1_40PM();
 
 })();
 
