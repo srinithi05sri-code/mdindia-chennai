@@ -3367,7 +3367,15 @@ app.get(
 
                     SUM(
                         c.claim_status <> 'Pending'
-                    ) AS total_productivity
+                    ) AS total_productivity,
+                      SUM(
+                    c.claim_status IN (
+                        'Investigation',
+                        'Sent-Back',
+                        'Keep',
+                        'Other-Doctor/Executive'
+                    )
+                ) AS non_productivity
 
                 FROM claims c
 
@@ -3375,6 +3383,17 @@ app.get(
                     ON TRIM(c.assigned_user_id)
                     =
                     TRIM(u.employee_id)
+
+                 WHERE
+                c.saved_at IS NOT NULL
+
+                AND DATE(
+                    CONVERT_TZ(
+                        c.saved_at,
+                        '+00:00',
+                        '+05:30'
+                    )
+                ) BETWEEN ? AND ?
 
                 GROUP BY
                     c.platform,
