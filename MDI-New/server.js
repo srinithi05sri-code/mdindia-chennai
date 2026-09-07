@@ -2199,6 +2199,17 @@ const [result] = await connection.query(
                 ]
             );
         }
+        console.log("SAVE UPDATE RESULT:", {
+    claimId: id,
+    employeeId: employeeId,
+    affectedRows: updateResult.affectedRows
+});
+
+if (updateResult.affectedRows === 0) {
+    throw new Error(
+        `Claim ${id} was not updated for employee ${employeeId}`
+    );
+}
         if (result.affectedRows !== 1) {
     throw new Error(
         `Claim ${id} was not saved for employee ${employeeId}`
