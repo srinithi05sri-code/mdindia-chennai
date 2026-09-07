@@ -2195,20 +2195,16 @@ const [updateresult] = await connection.query(
       affectedRows: updateResult.affectedRows
 }
             );
-        }
-       
-
+            
 if (updateResult.affectedRows === 0) {
     throw new Error(
         `Claim ${claimId} was not updated for employee ${employeeId}`
     );
 }
-        if (result.affectedRows !== 1) {
-    throw new Error(
-        `Claim ${id} was not saved for employee ${employeeId}`
-    );
-}
+        }
+       
 
+       
         // =====================================================
         // COMMIT
         // =====================================================
