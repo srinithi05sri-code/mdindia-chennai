@@ -2157,7 +2157,7 @@ app.post("/save-claims", async (req, res) => {
             // =================================================
             // UPDATE
             // =================================================
-const [updateresult] = await connection.query(
+const [updateResult] = await connection.query(
     `
     UPDATE claims
     SET
