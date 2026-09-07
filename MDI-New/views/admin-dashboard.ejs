@@ -434,7 +434,7 @@
        PRODUCTIVITY FILTER
     ====================================================== */
 
-   function downloadProcessSummary() {
+  function downloadProcessSummary() {
 
     const fromDate =
         document.getElementById("fromDate").value;
@@ -442,33 +442,23 @@
     const toDate =
         document.getElementById("toDate").value;
 
-
     if (!fromDate || !toDate) {
-
         alert(
             "Please select From Date and To Date."
         );
-
         return;
     }
 
-
     if (fromDate > toDate) {
-
         alert(
             "From Date cannot be greater than To Date."
         );
-
         return;
     }
 
-
     window.location.href =
-        `/admin/download-process-summary?fromDate=${encodeURIComponent(fromDate)}&toDate=${encodeURIComponent(toDate)}`;
-
+        `/admin/download-productivity?fromDate=${encodeURIComponent(fromDate)}&toDate=${encodeURIComponent(toDate)}`;
 }
-
-
 
 
     /* =====================================================
