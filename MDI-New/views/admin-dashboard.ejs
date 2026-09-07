@@ -434,44 +434,40 @@
        PRODUCTIVITY FILTER
     ====================================================== */
 
-    function filterProductivity() {
+   function downloadProcessSummary() {
 
-        const fromDate =
-            document.getElementById("productivityFromDate").value;
+    const fromDate =
+        document.getElementById("fromDate").value;
 
-        const toDate =
-            document.getElementById("productivityToDate").value;
-
-
-        if (!fromDate || !toDate) {
-
-            alert(
-                "Please select From Date and To Date."
-            );
-
-            return;
-
-        }
+    const toDate =
+        document.getElementById("toDate").value;
 
 
-        if (fromDate > toDate) {
+    if (!fromDate || !toDate) {
 
-            alert(
-                "From Date cannot be greater than To Date."
-            );
+        alert(
+            "Please select From Date and To Date."
+        );
 
-            return;
-
-        }
-
-
-        window.location.href =
-            "/admin/dashboard?fromDate="
-            + encodeURIComponent(fromDate)
-            + "&toDate="
-            + encodeURIComponent(toDate);
-
+        return;
     }
+
+
+    if (fromDate > toDate) {
+
+        alert(
+            "From Date cannot be greater than To Date."
+        );
+
+        return;
+    }
+
+
+    window.location.href =
+        `/admin/download-process-summary?fromDate=${encodeURIComponent(fromDate)}&toDate=${encodeURIComponent(toDate)}`;
+
+}
+
 
 
 
