@@ -66,53 +66,43 @@
 
     <div class="productivity-filter">
 
-        <div class="date-field">
-
-            <label for="productivityFromDate">
+         <div class="date-field">
+            <label for="fromDate">
                 From Date
             </label>
 
             <input
                 type="date"
-                id="productivityFromDate"
+                id="fromDate"
                 name="fromDate"
             >
-
         </div>
 
 
         <div class="date-field">
-
-            <label for="productivityToDate">
+            <label for="toDate">
                 To Date
             </label>
 
             <input
                 type="date"
-                id="productivityToDate"
+                id="toDate"
                 name="toDate"
             >
-
         </div>
 
 
-        <button
-            type="button"
-            class="filter-btn"
-            onclick="filterProductivity()"
-        >
-            Filter
-        </button>
+        <div class="button-row">
 
+            <button
+                type="button"
+                onclick="downloadProcessSummary()"
+                class="download-btn"
+            >
+                Download Process Summary
+            </button>
 
-        <button
-            type="button"
-            class="clear-filter-btn"
-            onclick="clearProductivityFilter()"
-        >
-            Clear
-        </button>
-
+        </div>
     </div>
 
 
