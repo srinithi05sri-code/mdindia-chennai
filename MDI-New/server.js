@@ -2176,7 +2176,13 @@ app.post("/save-claims", async (req, res) => {
                             UTC_TIMESTAMP(),
                             '+00:00',
                             '+05:30'
-                        )
+                        ),
+                        saved_at =
+    CONVERT_TZ(
+        UTC_TIMESTAMP(),
+        '+00:00',
+        '+05:30'
+    )
 
                 WHERE
                     id = ?
