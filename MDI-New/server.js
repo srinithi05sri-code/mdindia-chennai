@@ -2157,39 +2157,34 @@ app.post("/save-claims", async (req, res) => {
             // =================================================
             // UPDATE
             // =================================================
+const [result] = await connection.query(
+    `
+    UPDATE claims
+    SET
+        claim_type = ?,
+        ilom_id = ?,
+        approve_amount = ?,
+        claim_status = ?,
+        user_remark = ?,
+        deduction_amount = ?,
+        diagnosis_2 = ?,
+        inter_doc_exe = ?,
 
-            await connection.query(
-                `
-                UPDATE claims
+        updated_at = CONVERT_TZ(
+            UTC_TIMESTAMP(),
+            '+00:00',
+            '+05:30'
+        ),
 
-                SET
-                    claim_type = ?,
-                    ilom_id = ?,
-                    approve_amount = ?,
-                    claim_status = ?,
-                    user_remark = ?,
-                    deduction_amount = ?,
-                    diagnosis_2 = ?,
-                    inter_doc_exe = ?,
-                    updated_at =
-                        CONVERT_TZ(
-                            UTC_TIMESTAMP(),
-                            '+00:00',
-                            '+05:30'
-                        ),
-                        saved_at =
-    CONVERT_TZ(
-        UTC_TIMESTAMP(),
-        '+00:00',
-        '+05:30'
-    )
+        saved_at = CONVERT_TZ(
+            UTC_TIMESTAMP(),
+            '+00:00',
+            '+05:30'
+        )
 
-                WHERE
-                    id = ?
-
-                AND
-                    TRIM(assigned_user_id) = TRIM(?)
-                `,
+    WHERE id = ?
+    AND TRIM(assigned_user_id) = TRIM(?)
+    `,
                 [
                     finalClaimType,
                     ilomId,
@@ -2204,6 +2199,11 @@ app.post("/save-claims", async (req, res) => {
                 ]
             );
         }
+        if (result.affectedRows !== 1) {
+    throw new Error(
+        `Claim ${id} was not saved for employee ${employeeId}`
+    );
+}
 
         // =====================================================
         // COMMIT
