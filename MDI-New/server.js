@@ -2346,7 +2346,7 @@ app.get("/user", async (req, res) => {
             '+00:00',
             '+05:30'
         )
-    ) < '14:00:00'
+    ) < '24:00:00'
 )
 
     ORDER BY c.id DESC
@@ -2548,7 +2548,7 @@ INNER JOIN upload_batches ub
                 '+00:00',
                 '+05:30'
             )
-        ) < '14:00:00'
+        ) < '24:00:00'
     )
                 GROUP BY
                     platform
@@ -3284,8 +3284,19 @@ app.post(
         }
     }
 );
+
+
+// =====================================================
+// DOWNLOAD PROCESS SUMMARY
+// =====================================================
+
+// =====================================================
+// ADMIN DOWNLOAD PROCESS SUMMARY
+// FILTER BY USER SAVE DATE
+// =====================================================
+
 app.get(
-    "/admin/download-productivity",
+    "/admin/download-process-summary",
     async (req, res) => {
 
         if (
@@ -3295,248 +3306,52 @@ app.get(
             return res.redirect("/");
         }
 
+
+        const fromDate =
+            String(req.query.fromDate || "").trim();
+
+        const toDate =
+            String(req.query.toDate || "").trim();
+
+
+        if (!fromDate || !toDate) {
+
+            return res.status(400).send(
+                "From Date and To Date are required."
+            );
+        }
+
+
+        if (fromDate > toDate) {
+
+            return res.status(400).send(
+                "From Date cannot be greater than To Date."
+            );
+        }
+
+
         try {
-
-            const [rows] = await db.query(`
-                SELECT
-
-                    COALESCE(c.platform, '-') AS platform,
-
-                    COALESCE(
-                        u.employee_id,
-                        c.assigned_user_id,
-                        '-'
-                    ) AS employee_id,
-
-                    COALESCE(
-                        u.username,
-                        c.user_name,
-                        '-'
-                    ) AS user_name,
-
-                    COUNT(*) AS total_allocated,
-
-                    SUM(c.claim_status = 'Approved') AS approved,
-
-                    SUM(c.claim_status = 'Rejected') AS rejected,
-
-                    SUM(c.claim_status = 'Query') AS query_count,
-
-                    SUM(c.claim_status = 'Re-Query') AS requery,
-
-                    SUM(
-                        c.claim_status =
-                        'Query & Investigation'
-                    ) AS investigation_query,
-
-                    SUM(
-                        c.claim_status =
-                        'Investigation'
-                    ) AS investigation,
-
-                    SUM(
-                        c.claim_status =
-                        'Sent-Back'
-                    ) AS sent_back,
-
-                    SUM(
-                        c.claim_status =
-                        'Keep'
-                    ) AS keep_count,
-
-                    SUM(
-                        c.claim_status =
-                        'Other-Doctor/Executive'
-                    ) AS other_doctor_executive,
-
-                    SUM(
-                        c.claim_status =
-                        'ROD-Cancel'
-                    ) AS rod_cancel,
-
-                    SUM(
-                        c.claim_status =
-                        'Pending'
-                    ) AS pending,
-
-                    SUM(
-                        c.claim_status <> 'Pending'
-                    ) AS total_productivity
-
-                FROM claims c
-
-                LEFT JOIN users u
-                    ON TRIM(c.assigned_user_id)
-                    =
-                    TRIM(u.employee_id)
-
-                GROUP BY
-                    c.platform,
-                    COALESCE(
-                        u.employee_id,
-                        c.assigned_user_id,
-                        '-'
-                    ),
-                    COALESCE(
-                        u.username,
-                        c.user_name,
-                        '-'
-                    )
-
-                ORDER BY
-                    c.platform,
-                    user_name
-            `);
 
             console.log(
-                "PROCESS SUMMARY ROW COUNT:",
-                rows.length
+                "========== PROCESS SUMMARY DOWNLOAD =========="
             );
 
-            const excelData = rows.map(row => ({
-
-                "Platform":
-                    row.platform || "",
-
-                "Employee ID":
-                    row.employee_id || "",
-
-                "User Name":
-                    row.user_name || "",
-
-                "Total Allocated":
-                    Number(row.total_allocated || 0),
-
-                "Approved":
-                    Number(row.approved || 0),
-
-                "Rejected":
-                    Number(row.rejected || 0),
-
-                "Query":
-                    Number(row.query_count || 0),
-
-                "Re-Query":
-                    Number(row.requery || 0),
-
-                "Query + Investigation":
-                    Number(row.investigation_query || 0),
-
-                "Total Productivity":
-                    Number(row.total_productivity || 0),
-
-                "Investigation":
-                    Number(row.investigation || 0),
-
-                "Sent Back":
-                    Number(row.sent_back || 0),
-
-                "Keep":
-                    Number(row.keep_count || 0),
-
-                "Other Doctor & Executive":
-                    Number(row.other_doctor_executive || 0),
-
-                "ROD-Cancel":
-                    Number(row.rod_cancel || 0),
-
-                "Pending":
-                    Number(row.pending || 0)
-            }));
-
-            const workbook =
-                XLSX.utils.book_new();
-
-            const worksheet =
-                XLSX.utils.json_to_sheet(
-                    excelData
-                );
-
-            worksheet["!cols"] = [
-                { wch: 15 },
-                { wch: 18 },
-                { wch: 20 },
-                { wch: 18 },
-                { wch: 12 },
-                { wch: 12 },
-                { wch: 12 },
-                { wch: 12 },
-                { wch: 25 },
-                { wch: 20 },
-                { wch: 18 },
-                { wch: 15 },
-                { wch: 12 },
-                { wch: 28 },
-                { wch: 15 },
-                { wch: 12 }
-            ];
-
-            XLSX.utils.book_append_sheet(
-                workbook,
-                worksheet,
-                "Process Summary"
+            console.log(
+                "FROM DATE:",
+                fromDate
             );
 
-            const buffer =
-                XLSX.write(
-                    workbook,
-                    {
-                        type: "buffer",
-                        bookType: "xlsx"
-                    }
-                );
-
-            res.setHeader(
-                "Content-Disposition",
-                "attachment; filename=process-summary.xlsx"
+            console.log(
+                "TO DATE:",
+                toDate
             );
 
-            res.setHeader(
-                "Content-Type",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            );
 
-            return res.send(buffer);
-
-        } catch (error) {
-
-            console.error(
-                "PROCESS SUMMARY DOWNLOAD ERROR:",
-                error
-            );
-
-            return res.status(500).send(`
-                <h2>Process Summary Download Failed</h2>
-                <pre>${error.message}</pre>
-                <br>
-                <a href="/admin">
-                    Back to Admin
-                </a>
-            `);
-        }
-    }
-);
-
-// =====================================================
-// DOWNLOAD PROCESS SUMMARY
-// =====================================================
-
-app.get(
-    "/admin/download-process-summary",
-    async (req, res) => {
-
-        if (
-            !req.session.user ||
-            normalizeRole(
-                req.session.user.role
-            ) !== "admin"
-        ) {
-
-            return res.redirect("/");
-        }
-
-
-        try {
+            // =================================================
+            // GET SAVED CLAIM SUMMARY
+            // IMPORTANT:
+            // FILTER ONLY BY saved_at
+            // =================================================
 
             const [rows] =
                 await db.query(
@@ -3548,11 +3363,13 @@ app.get(
                             '-'
                         ) AS platform,
 
+
                         COALESCE(
                             u.employee_id,
                             c.assigned_user_id,
                             '-'
                         ) AS employee_id,
+
 
                         COALESCE(
                             u.username,
@@ -3560,67 +3377,120 @@ app.get(
                             '-'
                         ) AS user_name,
 
+
                         COUNT(*) AS total_allocated,
+
 
                         SUM(
                             c.claim_status = 'Approved'
                         ) AS approved,
 
+
                         SUM(
                             c.claim_status = 'Rejected'
                         ) AS rejected,
+
 
                         SUM(
                             c.claim_status = 'Query'
                         ) AS query_count,
 
+
                         SUM(
                             c.claim_status = 'Re-Query'
                         ) AS requery,
+
 
                         SUM(
                             c.claim_status =
                             'Query & Investigation'
                         ) AS investigation_query,
 
+
+                        /*
+                         * TOTAL PRODUCTIVITY
+                         *
+                         * ONLY THESE 5:
+                         *
+                         * Approved
+                         * Rejected
+                         * Query
+                         * Re-Query
+                         * Query & Investigation
+                         */
+
+                        SUM(
+                            c.claim_status IN (
+                                'Approved',
+                                'Rejected',
+                                'Query',
+                                'Re-Query',
+                                'Query & Investigation'
+                            )
+                        ) AS total_productivity,
+
+
+                        /*
+                         * NON PRODUCTIVITY
+                         *
+                         * ONLY THESE 4:
+                         *
+                         * Investigation
+                         * Sent-Back
+                         * Keep
+                         * Other Doctor / Executive
+                         */
+
+                        SUM(
+                            c.claim_status IN (
+                                'Investigation',
+                                'Sent-Back',
+                                'Keep',
+                                'Other-Doctor/Executive'
+                            )
+                        ) AS non_productivity,
+
+
                         SUM(
                             c.claim_status =
                             'Investigation'
                         ) AS investigation,
+
 
                         SUM(
                             c.claim_status =
                             'Sent-Back'
                         ) AS sent_back,
 
+
                         SUM(
                             c.claim_status =
                             'Keep'
                         ) AS keep_count,
+
 
                         SUM(
                             c.claim_status =
                             'Other-Doctor/Executive'
                         ) AS other_doctor_executive,
 
+
                         SUM(
                             c.claim_status =
                             'ROD-Cancel'
                         ) AS rod_cancel,
 
+
                         SUM(
                             c.claim_status =
                             'Pending'
-                        ) AS pending,
+                        ) AS pending
 
-                        SUM(
-                            c.claim_status <> 'Pending'
-                        ) AS total_productivity
 
                     FROM claims c
 
-                    LEFT JOIN users u
 
+                    LEFT JOIN users u
                         ON TRIM(
                             c.assigned_user_id
                         )
@@ -3628,6 +3498,31 @@ app.get(
                         TRIM(
                             u.employee_id
                         )
+
+
+                    WHERE
+
+                        /*
+                         * VERY IMPORTANT
+                         *
+                         * Date is user's SAVE date.
+                         * NOT upload date.
+                         * NOT updated_at.
+                         */
+
+                        DATE(
+                            c.saved_at
+                        )
+                        BETWEEN ?
+                        AND ?
+
+
+                        /*
+                         * saved_at must exist.
+                         */
+
+                        AND c.saved_at IS NOT NULL
+
 
                     GROUP BY
 
@@ -3645,14 +3540,30 @@ app.get(
                             '-'
                         )
 
+
                     ORDER BY
 
                         c.platform,
 
                         user_name
-                    `
+
+                    `,
+                    [
+                        fromDate,
+                        toDate
+                    ]
                 );
 
+
+            console.log(
+                "PROCESS SUMMARY ROW COUNT:",
+                rows.length
+            );
+
+
+            // =================================================
+            // CREATE EXCEL
+            // =================================================
 
             const workbook =
                 XLSX.utils.book_new();
@@ -3665,79 +3576,131 @@ app.get(
                         "Platform":
                             row.platform || "-",
 
+
                         "Employee ID":
                             row.employee_id || "-",
 
+
                         "User Name":
                             row.user_name || "-",
+
 
                         "Total Allocated":
                             Number(
                                 row.total_allocated || 0
                             ),
 
+
                         "Approved":
                             Number(
                                 row.approved || 0
                             ),
+
 
                         "Rejected":
                             Number(
                                 row.rejected || 0
                             ),
 
+
                         "Query":
                             Number(
                                 row.query_count || 0
                             ),
+
 
                         "Re-Query":
                             Number(
                                 row.requery || 0
                             ),
 
+
                         "Query + Investigation":
                             Number(
                                 row.investigation_query || 0
                             ),
+
 
                         "Total Productivity":
                             Number(
                                 row.total_productivity || 0
                             ),
 
+
                         "Investigation":
                             Number(
                                 row.investigation || 0
                             ),
+
 
                         "Sent Back":
                             Number(
                                 row.sent_back || 0
                             ),
 
+
                         "Keep":
                             Number(
                                 row.keep_count || 0
                             ),
+
 
                         "Other Doctor & Executive":
                             Number(
                                 row.other_doctor_executive || 0
                             ),
 
-                        "ROD Cancel":
+
+                        "Non Productivity":
+                            Number(
+                                row.non_productivity || 0
+                            ),
+
+
+                        "ROD-Cancel":
                             Number(
                                 row.rod_cancel || 0
                             ),
+
 
                         "Pending":
                             Number(
                                 row.pending || 0
                             )
+
                     })
                 );
 
+
+            // =================================================
+            // EMPTY RESULT
+            // =================================================
+
+            if (excelData.length === 0) {
+
+                return res.status(404).send(`
+                    <h2>No Saved Claims Found</h2>
+
+                    <p>
+                        No claims were saved between
+                        ${fromDate}
+                        and
+                        ${toDate}.
+                    </p>
+
+                    <br>
+
+                    <a href="/admin">
+                        Back to Admin
+                    </a>
+                `);
+
+            }
+
+
+            // =================================================
+            // WORKSHEET
+            // =================================================
 
             const worksheet =
                 XLSX.utils.json_to_sheet(
@@ -3747,37 +3710,24 @@ app.get(
 
             worksheet["!cols"] = [
 
-                { wch: 18 },
+                { wch: 20 }, // Platform
+                { wch: 18 }, // Employee ID
+                { wch: 25 }, // User Name
+                { wch: 18 }, // Total Allocated
+                { wch: 12 }, // Approved
+                { wch: 12 }, // Rejected
+                { wch: 12 }, // Query
+                { wch: 12 }, // Re-Query
+                { wch: 25 }, // Query + Investigation
+                { wch: 20 }, // Total Productivity
+                { wch: 18 }, // Investigation
+                { wch: 15 }, // Sent Back
+                { wch: 12 }, // Keep
+                { wch: 28 }, // Other Doctor
+                { wch: 18 }, // Non Productivity
+                { wch: 15 }, // ROD Cancel
+                { wch: 12 }  // Pending
 
-                { wch: 18 },
-
-                { wch: 25 },
-
-                { wch: 18 },
-
-                { wch: 12 },
-
-                { wch: 12 },
-
-                { wch: 12 },
-
-                { wch: 12 },
-
-                { wch: 22 },
-
-                { wch: 20 },
-
-                { wch: 18 },
-
-                { wch: 15 },
-
-                { wch: 12 },
-
-                { wch: 25 },
-
-                { wch: 15 },
-
-                { wch: 12 }
             ];
 
 
@@ -3787,6 +3737,10 @@ app.get(
                 "Process Summary"
             );
 
+
+            // =================================================
+            // DOWNLOAD
+            // =================================================
 
             const buffer =
                 XLSX.write(
@@ -3800,7 +3754,7 @@ app.get(
 
             res.setHeader(
                 "Content-Disposition",
-                "attachment; filename=process-summary.xlsx"
+                `attachment; filename=process-summary-${fromDate}-to-${toDate}.xlsx`
             );
 
 
@@ -3810,9 +3764,8 @@ app.get(
             );
 
 
-            return res.send(
-                buffer
-            );
+            return res.send(buffer);
+
 
         } catch (error) {
 
@@ -3823,9 +3776,13 @@ app.get(
 
 
             return res.status(500).send(`
-                <h2>Process Summary Download Error</h2>
+                <h2>
+                    Process Summary Download Failed
+                </h2>
 
-                <pre>${error.message}</pre>
+                <pre>
+${error.message}
+                </pre>
 
                 <br>
 
@@ -3833,7 +3790,9 @@ app.get(
                     Back to Admin
                 </a>
             `);
+
         }
+
     }
 );
 
