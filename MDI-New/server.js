@@ -3301,9 +3301,30 @@ app.get(
             return res.redirect("/");
         }
 
+        const fromDate = String(
+            req.query.fromDate || ""
+        ).trim();
+
+        const toDate = String(
+            req.query.toDate || ""
+        ).trim();
+
+        if (!fromDate || !toDate) {
+            return res.status(400).send(
+                "From Date and To Date are required."
+            );
+        }
+
+        if (fromDate > toDate) {
+            return res.status(400).send(
+                "From Date cannot be greater than To Date."
+            );
+        }
+
         try {
 
-            const [rows] = await db.query(`
+            const [rows] = await db.query(
+                `
                 SELECT
 
                     COALESCE(c.platform, '-') AS platform,
@@ -3322,13 +3343,21 @@ app.get(
 
                     COUNT(*) AS total_allocated,
 
-                    SUM(c.claim_status = 'Approved') AS approved,
+                    SUM(
+                        c.claim_status = 'Approved'
+                    ) AS approved,
 
-                    SUM(c.claim_status = 'Rejected') AS rejected,
+                    SUM(
+                        c.claim_status = 'Rejected'
+                    ) AS rejected,
 
-                    SUM(c.claim_status = 'Query') AS query_count,
+                    SUM(
+                        c.claim_status = 'Query'
+                    ) AS query_count,
 
-                    SUM(c.claim_status = 'Re-Query') AS requery,
+                    SUM(
+                        c.claim_status = 'Re-Query'
+                    ) AS requery,
 
                     SUM(
                         c.claim_status =
@@ -3336,18 +3365,15 @@ app.get(
                     ) AS investigation_query,
 
                     SUM(
-                        c.claim_status =
-                        'Investigation'
+                        c.claim_status = 'Investigation'
                     ) AS investigation,
 
                     SUM(
-                        c.claim_status =
-                        'Sent-Back'
+                        c.claim_status = 'Sent-Back'
                     ) AS sent_back,
 
                     SUM(
-                        c.claim_status =
-                        'Keep'
+                        c.claim_status = 'Keep'
                     ) AS keep_count,
 
                     SUM(
@@ -3356,26 +3382,31 @@ app.get(
                     ) AS other_doctor_executive,
 
                     SUM(
-                        c.claim_status =
-                        'ROD-Cancel'
+                        c.claim_status = 'ROD-Cancel'
                     ) AS rod_cancel,
 
                     SUM(
-                        c.claim_status =
-                        'Pending'
+                        c.claim_status = 'Pending'
                     ) AS pending,
 
                     SUM(
-                        c.claim_status <> 'Pending'
+                        c.claim_status IN (
+                            'Approved',
+                            'Rejected',
+                            'Query',
+                            'Re-Query',
+                            'Query & Investigation'
+                        )
                     ) AS total_productivity,
-                      SUM(
-                    c.claim_status IN (
-                        'Investigation',
-                        'Sent-Back',
-                        'Keep',
-                        'Other-Doctor/Executive'
-                    )
-                ) AS non_productivity
+
+                    SUM(
+                        c.claim_status IN (
+                            'Investigation',
+                            'Sent-Back',
+                            'Keep',
+                            'Other-Doctor/Executive'
+                        )
+                    ) AS non_productivity
 
                 FROM claims c
 
@@ -3384,24 +3415,26 @@ app.get(
                     =
                     TRIM(u.employee_id)
 
-                 WHERE
-                c.saved_at IS NOT NULL
+                WHERE
+                    c.saved_at IS NOT NULL
 
-                AND DATE(
-                    CONVERT_TZ(
-                        c.saved_at,
-                        '+00:00',
-                        '+05:30'
-                    )
-                ) BETWEEN ? AND ?
+                    AND DATE(
+                        CONVERT_TZ(
+                            c.saved_at,
+                            '+00:00',
+                            '+05:30'
+                        )
+                    ) BETWEEN ? AND ?
 
                 GROUP BY
                     c.platform,
+
                     COALESCE(
                         u.employee_id,
                         c.assigned_user_id,
                         '-'
                     ),
+
                     COALESCE(
                         u.username,
                         c.user_name,
@@ -3411,7 +3444,22 @@ app.get(
                 ORDER BY
                     c.platform,
                     user_name
-            `);
+                `,
+                [
+                    fromDate,
+                    toDate
+                ]
+            );
+
+            console.log(
+                "PROCESS SUMMARY FROM:",
+                fromDate
+            );
+
+            console.log(
+                "PROCESS SUMMARY TO:",
+                toDate
+            );
 
             console.log(
                 "PROCESS SUMMARY ROW COUNT:",
@@ -3430,43 +3478,74 @@ app.get(
                     row.user_name || "",
 
                 "Total Allocated":
-                    Number(row.total_allocated || 0),
+                    Number(
+                        row.total_allocated || 0
+                    ),
 
                 "Approved":
-                    Number(row.approved || 0),
+                    Number(
+                        row.approved || 0
+                    ),
 
                 "Rejected":
-                    Number(row.rejected || 0),
+                    Number(
+                        row.rejected || 0
+                    ),
 
                 "Query":
-                    Number(row.query_count || 0),
+                    Number(
+                        row.query_count || 0
+                    ),
 
                 "Re-Query":
-                    Number(row.requery || 0),
+                    Number(
+                        row.requery || 0
+                    ),
 
                 "Query + Investigation":
-                    Number(row.investigation_query || 0),
+                    Number(
+                        row.investigation_query || 0
+                    ),
 
                 "Total Productivity":
-                    Number(row.total_productivity || 0),
+                    Number(
+                        row.total_productivity || 0
+                    ),
 
                 "Investigation":
-                    Number(row.investigation || 0),
+                    Number(
+                        row.investigation || 0
+                    ),
 
                 "Sent Back":
-                    Number(row.sent_back || 0),
+                    Number(
+                        row.sent_back || 0
+                    ),
 
                 "Keep":
-                    Number(row.keep_count || 0),
+                    Number(
+                        row.keep_count || 0
+                    ),
 
                 "Other Doctor & Executive":
-                    Number(row.other_doctor_executive || 0),
+                    Number(
+                        row.other_doctor_executive || 0
+                    ),
 
                 "ROD-Cancel":
-                    Number(row.rod_cancel || 0),
+                    Number(
+                        row.rod_cancel || 0
+                    ),
+
+                "Non Productivity":
+                    Number(
+                        row.non_productivity || 0
+                    ),
 
                 "Pending":
-                    Number(row.pending || 0)
+                    Number(
+                        row.pending || 0
+                    )
             }));
 
             const workbook =
@@ -3493,6 +3572,7 @@ app.get(
                 { wch: 12 },
                 { wch: 28 },
                 { wch: 15 },
+                { wch: 20 },
                 { wch: 12 }
             ];
 
@@ -3513,7 +3593,7 @@ app.get(
 
             res.setHeader(
                 "Content-Disposition",
-                "attachment; filename=process-summary.xlsx"
+                `attachment; filename=process-summary-${fromDate}-to-${toDate}.xlsx`
             );
 
             res.setHeader(
@@ -3540,7 +3620,7 @@ app.get(
             `);
         }
     }
-); 
+);
 
 // =====================================================
 // DOWNLOAD PROCESS SUMMARY
