@@ -2157,7 +2157,7 @@ app.post("/save-claims", async (req, res) => {
             // =================================================
             // UPDATE
             // =================================================
-const [result] = await connection.query(
+const [updateresult] = await connection.query(
     `
     UPDATE claims
     SET
@@ -2170,20 +2170,11 @@ const [result] = await connection.query(
         diagnosis_2 = ?,
         inter_doc_exe = ?,
 
-        updated_at = CONVERT_TZ(
-            UTC_TIMESTAMP(),
-            '+00:00',
-            '+05:30'
-        ),
-
-        saved_at = CONVERT_TZ(
-            UTC_TIMESTAMP(),
-            '+00:00',
-            '+05:30'
-        )
-
-    WHERE id = ?
-    AND TRIM(assigned_user_id) = TRIM(?)
+       updated_at = UTC_TIMESTAMP(),
+        saved_at = UTC_TIMESTAMP()
+    WHERE
+        id = ?
+        AND TRIM(assigned_user_id) = TRIM(?)
     `,
                 [
                     finalClaimType,
@@ -2198,16 +2189,18 @@ const [result] = await connection.query(
                     employeeId
                 ]
             );
+         console.log("SAVE UPDATE RESULT:", {
+        claimId: id,
+       employeeId: employeeId,
+      affectedRows: updateResult.affectedRows
+}
+            );
         }
-        console.log("SAVE UPDATE RESULT:", {
-    claimId: id,
-    employeeId: employeeId,
-    affectedRows: updateResult.affectedRows
-});
+       
 
 if (updateResult.affectedRows === 0) {
     throw new Error(
-        `Claim ${id} was not updated for employee ${employeeId}`
+        `Claim ${claimId} was not updated for employee ${employeeId}`
     );
 }
         if (result.affectedRows !== 1) {
